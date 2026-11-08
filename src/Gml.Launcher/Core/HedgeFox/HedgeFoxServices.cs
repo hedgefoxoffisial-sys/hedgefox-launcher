@@ -17,20 +17,26 @@ public static class HedgeFoxServices
 {
     public static readonly CultureInfo Russian = CultureInfo.GetCultureInfo("ru-RU");
 
-    /// <summary>Russian unless the player picked a language in the settings.</summary>
-    public static CultureInfo? DefaultUiCulture(string? savedLanguageCode) =>
-        string.IsNullOrWhiteSpace(savedLanguageCode) ? Russian : null;
+    /// <summary>
+    ///     Russian always (spec «Настройки»: «по умолчанию русский, даже если язык ОС другой»). The HedgeFox settings
+    ///     have no language picker, and v0.9 saved the OS language (en-US, zh-CN) as soon as Settings was opened, so a
+    ///     saved language other than Russian is rewritten once; nothing is saved when nothing was.
+    /// </summary>
+    internal static void UseRussian(IStorageService storage)
+    {
+        var settings = storage.GetAsync<SettingsInfo>(StorageConstants.Settings).Result;
+        if (settings is not null && settings.LanguageCode != Russian.Name)
+            storage.SetAsync(StorageConstants.Settings, settings with { LanguageCode = Russian.Name }).Wait();
+
+        // the stock resources and SettingsInfo.Default (which saves CurrentUICulture) both follow this
+        Assets.Resources.Resources.Culture = Russian;
+        CultureInfo.CurrentUICulture = Russian;
+        CultureInfo.DefaultThreadCurrentUICulture = Russian;
+    }
 
     public static void Register(IStorageService storage)
     {
-        var saved = storage.GetAsync<SettingsInfo>(StorageConstants.Settings).Result?.LanguageCode;
-        if (DefaultUiCulture(saved) is { } culture)
-        {
-            // the stock resources and SettingsInfo.Default (which saves CurrentUICulture) both follow this
-            Assets.Resources.Resources.Culture = culture;
-            CultureInfo.CurrentUICulture = culture;
-            CultureInfo.DefaultThreadCurrentUICulture = culture;
-        }
+        UseRussian(storage);
 
         var http = CreateHttpClient();
         var m = Locator.CurrentMutable;

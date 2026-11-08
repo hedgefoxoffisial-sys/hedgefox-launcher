@@ -38,7 +38,7 @@
 | Файл | Правка |
 |---|---|
 | `App.axaml` | `RequestedThemeVariant="Dark"` и последней строкой `HedgeFoxTheme.axaml` |
-| `Core/Extensions/ServiceLocator.cs` | одна строка: `HedgeFoxServices.Register(storageService)` (наши сервисы, русский по умолчанию) |
+| `Core/Extensions/ServiceLocator.cs` | одна строка: `HedgeFoxServices.Register(storageService)` (наши сервисы; язык всегда русский, сохранённый v0.9 английский или китайский переписывается) |
 | `Core/Helpers/AppViewLocator.cs` | одна строка первой веткой: `HfViews.Resolve(viewModel)` (наши страницы; «Моды» остаётся стоковой) |
 | `Assets/Styles/Colors.axaml` | генерируется `tools/brand.py`, руками не правим |
 | `Assets/Resources/ResourceKeysDictionary.cs` | адрес API `https://api.hedgefox.ru` и папка данных `.hedgefox` |

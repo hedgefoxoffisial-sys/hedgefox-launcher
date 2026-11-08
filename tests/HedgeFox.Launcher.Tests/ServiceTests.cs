@@ -1,7 +1,10 @@
+using System.Globalization;
 using System.Net;
 using System.Reflection;
 using System.Text;
 using Gml.Launcher.Core.HedgeFox;
+using Gml.Launcher.Core.Services;
+using Gml.Launcher.Models;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using Xunit;
@@ -279,11 +282,38 @@ public class CopyRulesTests
         Assert.Equal("https://www.hedgefox.ru/download/linux/", HfLinks.InstallFor(windows: false, macOs: false));
     }
 
-    [Fact]
-    public void RussianUnlessThePlayerChoseAnotherLanguage()
+    // spec «Настройки»: Russian even when the OS speaks another language; the HedgeFox settings have no picker,
+    // so a language saved by v0.9 (it stored the OS language when Settings was opened) must not stick
+    [Theory]
+    [InlineData("en-US")]
+    [InlineData("zh-CN")]
+    [InlineData("ru-RU")]
+    public void ASavedLanguageBecomesRussian(string saved)
     {
-        Assert.Equal("ru-RU", HedgeFoxServices.DefaultUiCulture(null)?.Name);
-        Assert.Equal("ru-RU", HedgeFoxServices.DefaultUiCulture("")?.Name);
-        Assert.Null(HedgeFoxServices.DefaultUiCulture("en-US"));
+        var storage = new TestStorage();
+        storage.SetAsync(StorageConstants.Settings, new SettingsInfo(900, 600, false, true, 1024, saved)).Wait();
+        Gml.Launcher.Assets.Resources.Resources.Culture = CultureInfo.GetCultureInfo(saved);
+
+        HedgeFoxServices.UseRussian(storage);
+
+        var settings = storage.GetAsync<SettingsInfo>(StorageConstants.Settings).Result!;
+        Assert.Equal("ru-RU", settings.LanguageCode);
+        Assert.Equal(1024, settings.RamValue);
+        Assert.Equal("ru-RU", Gml.Launcher.Assets.Resources.Resources.Culture?.Name);
+        Assert.Equal("ru-RU", CultureInfo.CurrentUICulture.Name);
+    }
+
+    [Fact]
+    public void NothingSavedStaysUnsavedButRussian()
+    {
+        var storage = new TestStorage();
+        Gml.Launcher.Assets.Resources.Resources.Culture = CultureInfo.GetCultureInfo("en-US");
+
+        HedgeFoxServices.UseRussian(storage);
+
+        Assert.Null(storage.GetAsync<SettingsInfo>(StorageConstants.Settings).Result);
+        Assert.Equal("ru-RU", Gml.Launcher.Assets.Resources.Resources.Culture?.Name);
+        // the stock default settings take the UI culture
+        Assert.Equal("ru-RU", SettingsInfo.Default.LanguageCode);
     }
 }
