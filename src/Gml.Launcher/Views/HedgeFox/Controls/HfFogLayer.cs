@@ -9,15 +9,16 @@ using Avalonia.Threading;
 namespace Gml.Launcher.Views.HedgeFox.Controls;
 
 /// <summary>
-///     One slow strip of the Pelena's fog (the site's tex/fog.png, 128×32, tiled at ×3 with nearest-neighbour),
-///     fading upward and drifting left about 7 px a second. It moves one pixel per tick at ~7 ticks a second and
-///     skips ticks while the window is hidden (the game is running) or minimised, so it stays cheap on weak PCs.
+///     One slow strip of the Pelena's fog (the site's tex/fog.png, 128×32, tiled sideways at ×6 = 768×192 with
+///     nearest-neighbour, like the site's widest strip), fading upward and drifting left about 7 px a second.
+///     It moves one pixel per tick at ~7 ticks a second and skips ticks while the window is hidden (the game is
+///     running) or minimised, so it stays cheap on weak PCs.
 ///     <see cref="Enabled" /> turns every fog layer off (for a future «без анимации» setting).
 /// </summary>
 public class HfFogLayer : Control
 {
     public static readonly StyledProperty<double> ScaleProperty =
-        AvaloniaProperty.Register<HfFogLayer, double>(nameof(Scale), 3);
+        AvaloniaProperty.Register<HfFogLayer, double>(nameof(Scale), 6);
 
     private const string FogUri = "avares://Gml.Launcher/Assets/HedgeFox/Images/fog.png";
     private static readonly TimeSpan Step = TimeSpan.FromMilliseconds(140);
@@ -39,7 +40,7 @@ public class HfFogLayer : Control
 
     public static bool Enabled { get; set; } = true;
 
-    /// <summary>Whole-pixel scale of the 128×32 texture: 3 gives the site's 384×96 strip.</summary>
+    /// <summary>Whole-pixel scale of the 128×32 texture; the strip is drawn along the bottom edge, one tile high.</summary>
     public double Scale
     {
         get => GetValue(ScaleProperty);
@@ -92,7 +93,9 @@ public class HfFogLayer : Control
             EndPoint = new RelativePoint(0, 0, RelativeUnit.Relative),
             GradientStops = { new GradientStop(Colors.White, 0), new GradientStop(Colors.White, 0.35), new GradientStop(Colors.Transparent, 1) }
         };
+        // one row of tiles along the bottom edge: the texture must not repeat upward
+        var strip = new Rect(0, Math.Max(0, area.Height - size.Height), area.Width, Math.Min(area.Height, size.Height));
         using (context.PushOpacityMask(fade, area))
-            context.FillRectangle(brush, area);
+            context.FillRectangle(brush, strip);
     }
 }

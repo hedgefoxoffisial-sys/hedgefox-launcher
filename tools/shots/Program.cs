@@ -46,6 +46,7 @@ var shots = new List<string>();
 void Save(TopLevel top, string name)
 {
     Ui.Settle(top);
+    Ui.WaitForFades(top);
     var frame = top.CaptureRenderedFrame() ?? throw new InvalidOperationException($"{name}: no frame");
     var path = Path.Combine(outDir, name + ".png");
     frame.Save(path);
@@ -172,6 +173,25 @@ internal static class Ui
             quiet = top.IsMeasureValid && top.IsArrangeValid ? quiet + 1 : 0;
             return quiet >= 3;
         }, "layout to settle");
+    }
+
+    /// <summary>
+    ///     Waits until no opacity in the tree changes between frames (the stock pages fade in, the app's own fades
+    ///     run on the wall clock). The fog drifts but never fades, so it does not hold this up.
+    /// </summary>
+    public static void WaitForFades(TopLevel top)
+    {
+        double[]? last = null;
+        var still = 0;
+        PumpUntil(() =>
+        {
+            Tick();
+            var now = top.GetVisualDescendants().Select(v => v.Opacity).ToArray();
+            still = last is not null && now.SequenceEqual(last) ? still + 1 : 0;
+            last = now;
+            return still >= 3;
+        }, "fades to finish");
+        Settle(top);
     }
 
     private static void Tick()
