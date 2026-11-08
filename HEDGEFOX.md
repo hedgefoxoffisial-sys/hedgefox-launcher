@@ -29,7 +29,8 @@
 | `src/Gml.Launcher/Assets/HedgeFox/` | шрифты Tiny5, Unbounded, Rubik с OFL; текстура тумана |
 | `src/Gml.Launcher/Assets/Styles/HedgeFoxTheme.axaml` | тема в стиле сайта: кнопки, рамки, текст, поля, полосы прокрутки |
 | `src/Gml.Launcher/Core/HedgeFox/` | ссылки, тексты, статус, новости, скин, карточки профилей, совет по железу |
-| `src/Gml.Launcher/Views/HedgeFox/` | свои контролы и полоса заголовка окна |
+| `src/Gml.Launcher/Views/HedgeFox/` | свои страницы (вход, главный экран, профиль, настройки), заставка, контролы, полоса заголовка |
+| `src/Gml.Launcher/ViewModels/HedgeFox/` | состояние своих страниц рядом со стоковыми view model: статус и новости, карточки профилей, выход |
 | `src/Gml.Launcher/Views/MainWindow.axaml(.cs)`, `Views/SplashScreen/SplashScreen.axaml` | окно и заставка (наши целиком) |
 
 Правки в файлах upstream:
@@ -38,6 +39,7 @@
 |---|---|
 | `App.axaml` | `RequestedThemeVariant="Dark"` и последней строкой `HedgeFoxTheme.axaml` |
 | `Core/Extensions/ServiceLocator.cs` | одна строка: `HedgeFoxServices.Register(storageService)` (наши сервисы, русский по умолчанию) |
+| `Core/Helpers/AppViewLocator.cs` | одна строка первой веткой: `HfViews.Resolve(viewModel)` (наши страницы; «Моды» остаётся стоковой) |
 | `Assets/Styles/Colors.axaml` | генерируется `tools/brand.py`, руками не правим |
 | `Assets/Resources/ResourceKeysDictionary.cs` | адрес API `https://api.hedgefox.ru` и папка данных `.hedgefox` |
 | `Assets/Resources/Resources.ru.resx` | строка про VPN |
@@ -85,8 +87,18 @@ dotnet test tests/HedgeFox.Launcher.Tests                                       
 dotnet run --project tools/shots -c Release -- /путь/к/папке/снимков
 ```
 
-Снимки: `theme-gallery` (все элементы темы и их состояния), `splash`, `splash-ready`, `login`, `overview`, `settings`,
-`profile`, `mods`, `data-preview` (данные сервисов в окне) и варианты `-macos` с местом под «светофоры».
+Снимки: `theme-gallery` (все элементы темы и их состояния), `splash`, `splash-ready`, затем каждый экран в двух размерах
+окна — `-1180x720` (по умолчанию) и `-1000x620` (минимум): `login`, `login-2fa`, `login-nodata` (наш API молчит:
+«Нет данных» и ошибка новостей), `overview`, `overview-download` (шкала и шаг под «ИГРАТЬ»), `overview-asleep`
+(«Сервер спит»), `overview-nodata`, `settings`, `profile`, `mods`; и `login-macos-1180x720` с местом под «светофоры».
+
+## Страницы
+
+Стоковые view model (`ViewModels/Pages`) остаются: роутер, вход и 2FA, профили, запуск игры, сохранение настроек.
+`AppViewLocator` отдаёт им наши страницы из `Views/HedgeFox` (`HfViews.Resolve`). Страница (`HfPageView`) создаёт
+рядом свою модель из `ViewModels/HedgeFox` и кладёт её в `DataContext` элемента `Root`; модель работает, пока страница
+на экране (опрос статуса, новости). Страница «Моды» стоковая, её перекрашивает тема. Если upstream меняет
+`Views/Pages/*.axaml`, новые привязки переносим в наши страницы руками.
 Каждый снимок ждёт условия (страница открыта, данные пришли, разметка устоялась), а не паузы. Переходы между страницами
 в харнессе выключены, чтобы снимок не попал на середину затухания.
 

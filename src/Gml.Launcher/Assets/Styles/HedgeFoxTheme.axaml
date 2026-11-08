@@ -3,7 +3,8 @@
     Included last from App.axaml, so it wins over FluentTheme, the stock GML component styles and the notifications.
 
     Primitives for the screens (see HEDGEFOX.md):
-      hf:HfButton            orange chamfered button; classes secondary, ghost; lg, sm; block
+      hf:HfButton            orange chamfered button; classes secondary, ghost; lg, sm; block;
+                             link (underlined text link), card (clickable .card frame, +selected)
       hf:HfCaptionButton     32 px title-bar button; class close
       hf:HfBadge             brass label; classes orange, purple, success, quiet
       hf:PixelBorder         frame primitive; classes hf-card (+orange, clickable), hf-plate (+orange), hf-well,
@@ -14,6 +15,8 @@
       TextBlock classes      hf-px16/24/32/48/64 (Tiny5), hf-h1/h2/h3 (Unbounded), hf-body, hf-lead, hf-label,
                              hf-small, hf-muted, hf-kicker, hf-link, hf-error, hf-success, hf-ink, hf-shadow
       Image class            hf-pixel (nearest-neighbour scaling for pixel art)
+      CheckBox, Slider       square night box with a pixel tick; void trough, orange run, chamfered thumb
+      Stock mods page        restyled here only (pages|ModsPageView …)
     No CornerRadius anywhere: corners are square or chamfered.
 -->
 <Styles xmlns="https://github.com/avaloniaui"
