@@ -68,15 +68,25 @@ public static class HfStrings
     public const string Help = "Помощь";
 
     // ----- profile page -----
+    public const string ProfileKicker = "ПРОФИЛЬ";
     public const string ChangeSkin = "Сменить скин на сайте";
     public const string NoSkin = "Скина пока нет — загрузи его в кабинете на сайте.";
 
     // ----- settings -----
+    public const string SettingsTitle = "Настройки";
     public const string MemorySetting = "Память для игры";
+    public const string MemoryHint = "Больше памяти — меньше подвисаний, но не отдавай игре всю память ПК.";
+    public const string MemoryAuto = "Автоматически по профилю";
+    public const string MemoryAutoShort = "АВТО";
     public const string MemoryRecommendedMark = "советуем";
+    public const string WindowSetting = "Окно игры";
     public const string FullScreen = "Полный экран";
+    public const string WindowWidth = "Ширина";
+    public const string WindowHeight = "Высота";
     public const string GameFolder = "Папка игры";
+    public const string GameFolderHint = "Сюда скачиваются игра и моды. Путь без пробелов.";
     public const string ChangeFolder = "Выбрать папку";
+    public const string OpenFolder = "Открыть";
     public const string Back = "Назад";
 
     // ----- window -----

@@ -53,7 +53,7 @@
 
                 <!-- Profile cards -->
                 <Grid RowDefinitions="Auto,*" RowSpacing="10">
-                    <TextBlock Classes="hf-kicker" Text="{x:Static core:HfStrings.ProfilesKicker}" />
+                    <TextBlock Classes="hf-kicker hf-shadow" Text="{x:Static core:HfStrings.ProfilesKicker}" />
                     <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,6,0">
                         <ItemsControl ItemsSource="{Binding Cards}">
                             <ItemsControl.ItemsPanel>
@@ -148,7 +148,7 @@
                 <!-- Status, the Pelena, news -->
                 <Grid Grid.Column="2" RowDefinitions="Auto,Auto,*" RowSpacing="10">
                     <hfv:HfStatusPanel DataContext="{Binding Info}" Margin="0,0,0,6" />
-                    <TextBlock Grid.Row="1" Classes="hf-kicker" Text="{x:Static core:HfStrings.NewsKicker}" />
+                    <TextBlock Grid.Row="1" Classes="hf-kicker hf-shadow" Text="{x:Static core:HfStrings.NewsKicker}" />
                     <Panel Grid.Row="2">
                         <hf:PixelBorder Classes="hf-well" Padding="14,12" VerticalAlignment="Top"
                                         IsVisible="{Binding Info.HasNewsMessage}">

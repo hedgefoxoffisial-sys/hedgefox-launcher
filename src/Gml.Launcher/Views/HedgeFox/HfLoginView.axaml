@@ -97,7 +97,7 @@
             <StackPanel Grid.Column="2" Width="344" VerticalAlignment="Top" Spacing="18">
                 <hfv:HfStatusPanel DataContext="{Binding Info}" />
                 <StackPanel Spacing="10">
-                    <TextBlock Classes="hf-kicker" Text="{x:Static core:HfStrings.NewsKicker}" />
+                    <TextBlock Classes="hf-kicker hf-shadow" Text="{x:Static core:HfStrings.NewsKicker}" />
                     <hf:PixelBorder Classes="hf-well" Padding="14,12" IsVisible="{Binding Info.HasNewsMessage}">
                         <TextBlock Classes="hf-small" Text="{Binding Info.NewsMessage}" />
                     </hf:PixelBorder>

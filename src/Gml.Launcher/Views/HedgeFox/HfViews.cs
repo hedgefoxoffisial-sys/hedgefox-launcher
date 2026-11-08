@@ -13,6 +13,8 @@ public static class HfViews
     {
         LoginPageViewModel page => new HfLoginView { DataContext = page },
         OverviewPageViewModel page => new HfOverviewView { DataContext = page },
+        ProfilePageViewModel page => new HfProfileView { DataContext = page },
+        SettingsPageViewModel page => new HfSettingsView { DataContext = page },
         _ => null
     };
 }

@@ -209,6 +209,14 @@ public class ScreenDataTests
     public void MarkFractionIsClamped(double value, double min, double max, double expected) =>
         Assert.Equal(expected, HfRamMark.Fraction(value, min, max), 5);
 
+    [Theory]
+    [InlineData(0.5, 178)]
+    [InlineData(0.226, 63)]
+    [InlineData(0, 0)]
+    [InlineData(1, 356)]
+    public void MarkLabelIsCentredOnTheThumbAndStaysInside(double fraction, double left) =>
+        Assert.Equal(left, HfMarkPanel.ChildLeft(436, 9, fraction, 80));
+
     // ----- logout -----
 
     [Fact]
