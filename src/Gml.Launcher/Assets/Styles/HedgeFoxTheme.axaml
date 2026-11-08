@@ -1,0 +1,602 @@
+<!--
+    HedgeFox theme: the site's v2 look (web/site/src/styles/global.css) for the launcher.
+    Included last from App.axaml, so it wins over FluentTheme, the stock GML component styles and the notifications.
+
+    Primitives for the screens (see HEDGEFOX.md):
+      hf:HfButton            orange chamfered button; classes secondary, ghost; lg, sm; block
+      hf:HfCaptionButton     32 px title-bar button; class close
+      hf:HfBadge             brass label; classes orange, purple, success, quiet
+      hf:PixelBorder         frame primitive; classes hf-card (+orange, clickable), hf-plate (+orange), hf-well,
+                             hf-ticket, hf-chip
+      hf:PixelIcon           8×8 pixel icon (Kind="check|warn|play|plane|gear|user|exit|…")
+      hf:HfStatusDot         status square; State Online|Waiting|Offline|Unknown
+      hf:HfMeter             striped orange progress meter (Value 0…100, IsIndeterminate)
+      TextBlock classes      hf-px16/24/32/48/64 (Tiny5), hf-h1/h2/h3 (Unbounded), hf-body, hf-lead, hf-label,
+                             hf-small, hf-muted, hf-kicker, hf-link, hf-error, hf-success, hf-ink, hf-shadow
+      Image class            hf-pixel (nearest-neighbour scaling for pixel art)
+    No CornerRadius anywhere: corners are square or chamfered.
+-->
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:hf="using:Gml.Launcher.Views.HedgeFox.Controls"
+        xmlns:components="using:Gml.Launcher.Views.Components"
+        xmlns:notifications="clr-namespace:GamerVII.Notification.Avalonia.Controls;assembly=GamerVII.Notification.Avalonia">
+
+    <Design.PreviewWith>
+        <Border Background="#100A22" Padding="24">
+            <StackPanel Spacing="16">
+                <TextBlock Classes="hf-px32 hf-shadow" Text="HEDGEFOX" />
+                <hf:HfButton Content="Играть" />
+                <hf:HfButton Classes="secondary" Content="Настройки" />
+                <TextBox Watermark="Ник или почта" />
+                <hf:HfMeter Width="280" Value="60" />
+            </StackPanel>
+        </Border>
+    </Design.PreviewWith>
+
+    <Styles.Resources>
+        <ResourceDictionary>
+            <!-- Fonts: static instances from the site's subsets (tools/fonts.py) -->
+            <FontFamily x:Key="HfFontPixel">avares://Gml.Launcher/Assets/HedgeFox/Fonts#Tiny5</FontFamily>
+            <FontFamily x:Key="HfFontHeading">avares://Gml.Launcher/Assets/HedgeFox/Fonts#Unbounded</FontFamily>
+            <FontFamily x:Key="HfFontBody">avares://Gml.Launcher/Assets/HedgeFox/Fonts#Rubik</FontFamily>
+
+            <!-- Type scale for a 1180×720 window: Tiny5 only at multiples of 8 px -->
+            <x:Double x:Key="HfFontSizeSmall">13</x:Double>
+            <x:Double x:Key="HfFontSizeBody">15</x:Double>
+            <x:Double x:Key="HfFontSizeLead">17</x:Double>
+            <x:Double x:Key="HfFontSizeH3">16</x:Double>
+            <x:Double x:Key="HfFontSizeH2">20</x:Double>
+            <x:Double x:Key="HfFontSizeH1">28</x:Double>
+
+            <!-- Fluent everywhere: square corners, orange accent, night inputs -->
+            <CornerRadius x:Key="ControlCornerRadius">0</CornerRadius>
+            <CornerRadius x:Key="OverlayCornerRadius">0</CornerRadius>
+            <Color x:Key="SystemAccentColor">#FF9D45</Color>
+            <Color x:Key="SystemAccentColorDark1">#ED8731</Color>
+            <Color x:Key="SystemAccentColorDark2">#D9701F</Color>
+            <Color x:Key="SystemAccentColorDark3">#7A3A0C</Color>
+            <Color x:Key="SystemAccentColorLight1">#FFB36E</Color>
+            <Color x:Key="SystemAccentColorLight2">#FFC48A</Color>
+            <Color x:Key="SystemAccentColorLight3">#FFF1DF</Color>
+
+            <SolidColorBrush x:Key="TextControlBackground" Color="{DynamicResource HfWellColor}" />
+            <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="{DynamicResource HfWellColor}" />
+            <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="{DynamicResource HfWellColor}" />
+            <SolidColorBrush x:Key="TextControlBorderBrush" Color="{DynamicResource HfLineColor}" />
+            <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="{DynamicResource HfPurpleColor}" />
+            <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="{DynamicResource HfOrangeColor}" />
+            <SolidColorBrush x:Key="TextControlForeground" Color="{DynamicResource HfTextColor}" />
+            <SolidColorBrush x:Key="TextControlForegroundPointerOver" Color="{DynamicResource HfTextColor}" />
+            <SolidColorBrush x:Key="TextControlForegroundFocused" Color="{DynamicResource HfTextColor}" />
+            <SolidColorBrush x:Key="TextControlPlaceholderForeground" Color="{DynamicResource HfMutedColor}" Opacity="0.7" />
+            <SolidColorBrush x:Key="TextControlPlaceholderForegroundPointerOver" Color="{DynamicResource HfMutedColor}" Opacity="0.7" />
+            <SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused" Color="{DynamicResource HfMutedColor}" Opacity="0.7" />
+            <SolidColorBrush x:Key="TextControlSelectionHighlightColor" Color="{DynamicResource HfPurpleDeepColor}" />
+            <Thickness x:Key="TextControlBorderThemeThickness">1</Thickness>
+            <Thickness x:Key="TextControlBorderThemeThicknessFocused">1</Thickness>
+            <Thickness x:Key="TextControlThemePadding">14,12</Thickness>
+            <x:Double x:Key="TextControlThemeMinHeight">48</x:Double>
+
+            <!-- Chamfered pixel button (global.css: btn, its secondary and quiet variants) -->
+            <ControlTheme x:Key="{x:Type hf:HfButton}" TargetType="hf:HfButton">
+                <Setter Property="Background" Value="{DynamicResource HfOrangeBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource HfInkBrush}" />
+                <Setter Property="FontFamily" Value="{StaticResource HfFontHeading}" />
+                <Setter Property="FontWeight" Value="Bold" />
+                <Setter Property="FontSize" Value="15" />
+                <Setter Property="MinHeight" Value="48" />
+                <Setter Property="Padding" Value="22,12" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="HorizontalContentAlignment" Value="Center" />
+                <Setter Property="VerticalContentAlignment" Value="Center" />
+                <Setter Property="Cursor" Value="Hand" />
+                <!-- the hard shadow and the focus ring are drawn outside the button -->
+                <Setter Property="ClipToBounds" Value="False" />
+                <!-- the focus ring is part of the template (:focus-visible), so it follows the chamfer -->
+                <Setter Property="FocusAdorner" Value="{x:Null}" />
+                <Setter Property="Template">
+                    <ControlTemplate>
+                        <Panel>
+                        <hf:PixelBorder Name="PART_Frame"
+                                        Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        Padding="{TemplateBinding Padding}">
+                            <ContentPresenter Name="PART_ContentPresenter"
+                                              Content="{TemplateBinding Content}"
+                                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                              Foreground="{TemplateBinding Foreground}"
+                                              RecognizesAccessKey="True" />
+                        </hf:PixelBorder>
+                        <!-- site: 3 px orange outline 4 px outside the button -->
+                        <hf:PixelBorder Name="PART_FocusRing" Margin="-7" IsHitTestVisible="False" />
+                        </Panel>
+                    </ControlTemplate>
+                </Setter>
+
+                <!-- template parts get their values from styles, not in the template, so the states below can change them -->
+                <Style Selector="^ /template/ hf|PixelBorder#PART_Frame">
+                    <Setter Property="Notch" Value="4" />
+                    <Setter Property="ShadowBrush" Value="{DynamicResource HfVoidBrush}" />
+                    <Setter Property="ShadowOffset" Value="3" />
+                    <Setter Property="BevelTopBrush" Value="{DynamicResource HfBevelLightBrush}" />
+                    <Setter Property="BevelTop" Value="2" />
+                    <Setter Property="BevelBottomBrush" Value="{DynamicResource HfBevelDarkBrush}" />
+                    <Setter Property="BevelBottom" Value="3" />
+                </Style>
+                <Style Selector="^ /template/ hf|PixelBorder#PART_FocusRing">
+                    <Setter Property="Notch" Value="8" />
+                    <Setter Property="BorderThickness" Value="3" />
+                    <Setter Property="IsVisible" Value="False" />
+                </Style>
+                <Style Selector="^:focus-visible /template/ hf|PixelBorder#PART_FocusRing">
+                    <Setter Property="BorderBrush" Value="{DynamicResource HfOrangeBrush}" />
+                    <Setter Property="IsVisible" Value="True" />
+                </Style>
+                <Style Selector="^:pointerover">
+                    <Setter Property="Background" Value="{DynamicResource HfOrangeLightBrush}" />
+                </Style>
+                <Style Selector="^:pressed">
+                    <Setter Property="Background" Value="{DynamicResource HfLipOrangeBrush}" />
+                    <Setter Property="RenderTransform" Value="translate(0px, 1px)" />
+                </Style>
+                <Style Selector="^:pressed /template/ hf|PixelBorder#PART_Frame">
+                    <Setter Property="BevelTopBrush" Value="{DynamicResource HfBevelPressedDarkBrush}" />
+                    <Setter Property="BevelTop" Value="3" />
+                    <Setter Property="BevelBottomBrush" Value="{DynamicResource HfBevelPressedLightBrush}" />
+                    <Setter Property="BevelBottom" Value="1" />
+                </Style>
+
+                <Style Selector="^.secondary">
+                    <Setter Property="Background" Value="{DynamicResource HfRaisedBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource HfTextBrush}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource HfLineBrush}" />
+                </Style>
+                <Style Selector="^.secondary /template/ hf|PixelBorder#PART_Frame">
+                    <Setter Property="BorderThickness" Value="2" />
+                </Style>
+                <Style Selector="^.secondary:pointerover">
+                    <Setter Property="Background" Value="{DynamicResource HfRaisedHoverBrush}" />
+                </Style>
+                <Style Selector="^.secondary:pressed">
+                    <Setter Property="Background" Value="{DynamicResource HfNightBrush}" />
+                </Style>
+
+                <Style Selector="^.ghost">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Foreground" Value="{DynamicResource HfTextBrush}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource HfLineBrush}" />
+                </Style>
+                <Style Selector="^.ghost /template/ hf|PixelBorder#PART_Frame">
+                    <Setter Property="BorderThickness" Value="2" />
+                    <Setter Property="ShadowOffset" Value="0" />
+                    <Setter Property="BevelTop" Value="0" />
+                    <Setter Property="BevelBottom" Value="0" />
+                </Style>
+                <Style Selector="^.ghost:pointerover">
+                    <Setter Property="Background" Value="{DynamicResource HfSurfaceBrush}" />
+                </Style>
+                <Style Selector="^.ghost:pressed">
+                    <Setter Property="Background" Value="{DynamicResource HfNightBrush}" />
+                </Style>
+
+                <Style Selector="^.lg">
+                    <Setter Property="MinHeight" Value="56" />
+                    <Setter Property="Padding" Value="28,15" />
+                    <Setter Property="FontSize" Value="17" />
+                </Style>
+                <Style Selector="^.lg /template/ hf|PixelBorder#PART_Frame">
+                    <Setter Property="Notch" Value="8" />
+                </Style>
+                <Style Selector="^.sm">
+                    <Setter Property="MinHeight" Value="40" />
+                    <Setter Property="Padding" Value="16,8" />
+                    <Setter Property="FontSize" Value="13" />
+                </Style>
+                <Style Selector="^.block">
+                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                </Style>
+                <Style Selector="^:disabled">
+                    <Setter Property="Opacity" Value="0.55" />
+                    <Setter Property="Cursor" Value="Arrow" />
+                </Style>
+            </ControlTheme>
+
+            <!-- Title-bar buttons (Windows and Linux; macOS keeps its traffic lights) -->
+            <ControlTheme x:Key="{x:Type hf:HfCaptionButton}" TargetType="hf:HfCaptionButton">
+                <Setter Property="Width" Value="44" />
+                <Setter Property="Height" Value="32" />
+                <Setter Property="Background" Value="Transparent" />
+                <Setter Property="Foreground" Value="{DynamicResource HfMutedBrush}" />
+                <Setter Property="Focusable" Value="False" />
+                <Setter Property="Template">
+                    <ControlTemplate>
+                        <Border Background="{TemplateBinding Background}">
+                            <ContentPresenter Name="PART_ContentPresenter"
+                                              Content="{TemplateBinding Content}"
+                                              Foreground="{TemplateBinding Foreground}"
+                                              HorizontalContentAlignment="Center"
+                                              VerticalContentAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter>
+                <Style Selector="^:pointerover">
+                    <Setter Property="Background" Value="{DynamicResource HfRaisedBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource HfTextBrush}" />
+                </Style>
+                <Style Selector="^:pressed">
+                    <Setter Property="Background" Value="{DynamicResource HfNightBrush}" />
+                </Style>
+                <Style Selector="^.close:pointerover">
+                    <Setter Property="Background" Value="{DynamicResource HfErrorBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource HfInkBrush}" />
+                </Style>
+            </ControlTheme>
+
+            <!-- Badge (global.css .badge): Tiny5 capitals in ink, 3 px chamfer, bevel -->
+            <ControlTheme x:Key="{x:Type hf:HfBadge}" TargetType="hf:HfBadge">
+                <Setter Property="Background" Value="{DynamicResource HfBrassBrush}" />
+                <Setter Property="Foreground" Value="{DynamicResource HfInkBrush}" />
+                <Setter Property="FontFamily" Value="{StaticResource HfFontPixel}" />
+                <Setter Property="FontSize" Value="16" />
+                <Setter Property="Padding" Value="8,3,8,3" />
+                <Setter Property="HorizontalAlignment" Value="Left" />
+                <Setter Property="VerticalAlignment" Value="Top" />
+                <Setter Property="Template">
+                    <ControlTemplate>
+                        <hf:PixelBorder Name="PART_Frame"
+                                        Background="{TemplateBinding Background}"
+                                        Padding="{TemplateBinding Padding}"
+                                        Notch="3"
+                                        BevelTopBrush="{DynamicResource HfBevelLightBrush}"
+                                        BevelTop="2"
+                                        BevelBottomBrush="{DynamicResource HfBevelDarkBrush}"
+                                        BevelBottom="2">
+                            <ContentPresenter Name="PART_ContentPresenter"
+                                              Content="{TemplateBinding Content}"
+                                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                                              Foreground="{TemplateBinding Foreground}"
+                                              VerticalContentAlignment="Center" />
+                        </hf:PixelBorder>
+                    </ControlTemplate>
+                </Setter>
+                <Style Selector="^.orange">
+                    <Setter Property="Background" Value="{DynamicResource HfOrangeBrush}" />
+                </Style>
+                <Style Selector="^.purple">
+                    <Setter Property="Background" Value="{DynamicResource HfPurpleLightBrush}" />
+                </Style>
+                <Style Selector="^.success">
+                    <Setter Property="Background" Value="{DynamicResource HfSuccessBrush}" />
+                </Style>
+                <Style Selector="^.quiet">
+                    <Setter Property="Background" Value="{DynamicResource HfRaisedBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource HfTextBrush}" />
+                </Style>
+            </ControlTheme>
+        </ResourceDictionary>
+    </Styles.Resources>
+
+    <!-- ===== Base: night window, Rubik text, dark Fluent ===== -->
+
+    <Style Selector=":is(Window)">
+        <Setter Property="FontFamily" Value="{StaticResource HfFontBody}" />
+        <Setter Property="Foreground" Value="{DynamicResource HfTextBrush}" />
+    </Style>
+
+    <!-- Classes.axaml forces every TextBlock to a font the launcher does not ship; Rubik takes its place, and text
+         inside HedgeFox controls takes the control's font again -->
+    <Style Selector="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource HfFontBody}" />
+    </Style>
+    <Style Selector="hf|HfButton TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource HfFontHeading}" />
+    </Style>
+    <Style Selector="hf|HfBadge TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource HfFontPixel}" />
+    </Style>
+
+    <!-- ===== Text ===== -->
+
+    <Style Selector="TextBlock.hf-px16, TextBlock.hf-px24, TextBlock.hf-px32, TextBlock.hf-px48, TextBlock.hf-px64, TextBlock.hf-kicker">
+        <Setter Property="FontFamily" Value="{StaticResource HfFontPixel}" />
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="hf:HfRender.CrispText" Value="True" />
+    </Style>
+    <Style Selector="TextBlock.hf-px16">
+        <Setter Property="FontSize" Value="16" />
+    </Style>
+    <Style Selector="TextBlock.hf-px24">
+        <Setter Property="FontSize" Value="24" />
+    </Style>
+    <Style Selector="TextBlock.hf-px32">
+        <Setter Property="FontSize" Value="32" />
+    </Style>
+    <Style Selector="TextBlock.hf-px48">
+        <Setter Property="FontSize" Value="48" />
+    </Style>
+    <Style Selector="TextBlock.hf-px64">
+        <Setter Property="FontSize" Value="64" />
+    </Style>
+    <Style Selector="TextBlock.hf-kicker">
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="Foreground" Value="{DynamicResource HfOrangeBrush}" />
+    </Style>
+    <!-- the pixel title's hard shadow (.h-pixel: 3px 3px 0 void) -->
+    <Style Selector="TextBlock.hf-shadow">
+        <Setter Property="Effect">
+            <DropShadowEffect OffsetX="3" OffsetY="3" BlurRadius="0" Opacity="1" Color="#080511" />
+        </Setter>
+    </Style>
+
+    <Style Selector="TextBlock.hf-h1, TextBlock.hf-h2">
+        <Setter Property="FontFamily" Value="{StaticResource HfFontHeading}" />
+        <Setter Property="FontWeight" Value="ExtraBold" />
+        <Setter Property="Foreground" Value="{DynamicResource HfTextBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+    <Style Selector="TextBlock.hf-h1">
+        <Setter Property="FontSize" Value="{StaticResource HfFontSizeH1}" />
+    </Style>
+    <Style Selector="TextBlock.hf-h2">
+        <Setter Property="FontSize" Value="{StaticResource HfFontSizeH2}" />
+    </Style>
+    <Style Selector="TextBlock.hf-h3">
+        <Setter Property="FontFamily" Value="{StaticResource HfFontHeading}" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="{StaticResource HfFontSizeH3}" />
+        <Setter Property="Foreground" Value="{DynamicResource HfTextBrush}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <Style Selector="TextBlock.hf-body, TextBlock.hf-lead, TextBlock.hf-small, TextBlock.hf-label">
+        <Setter Property="FontFamily" Value="{StaticResource HfFontBody}" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+    <Style Selector="TextBlock.hf-body">
+        <Setter Property="FontSize" Value="{StaticResource HfFontSizeBody}" />
+        <Setter Property="Foreground" Value="{DynamicResource HfTextBrush}" />
+        <Setter Property="LineHeight" Value="22" />
+    </Style>
+    <Style Selector="TextBlock.hf-lead">
+        <Setter Property="FontSize" Value="{StaticResource HfFontSizeLead}" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Foreground" Value="{DynamicResource HfMutedBrush}" />
+    </Style>
+    <Style Selector="TextBlock.hf-small">
+        <Setter Property="FontSize" Value="{StaticResource HfFontSizeSmall}" />
+        <Setter Property="Foreground" Value="{DynamicResource HfMutedBrush}" />
+    </Style>
+    <Style Selector="TextBlock.hf-label">
+        <Setter Property="FontSize" Value="{StaticResource HfFontSizeBody}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource HfTextBrush}" />
+    </Style>
+    <Style Selector="TextBlock.hf-muted">
+        <Setter Property="Foreground" Value="{DynamicResource HfMutedBrush}" />
+    </Style>
+    <Style Selector="TextBlock.hf-error">
+        <Setter Property="Foreground" Value="{DynamicResource HfErrorBrush}" />
+    </Style>
+    <Style Selector="TextBlock.hf-success">
+        <Setter Property="Foreground" Value="{DynamicResource HfSuccessBrush}" />
+    </Style>
+    <Style Selector="TextBlock.hf-ink">
+        <Setter Property="Foreground" Value="{DynamicResource HfInkBrush}" />
+    </Style>
+    <Style Selector="TextBlock.hf-link">
+        <Setter Property="Foreground" Value="{DynamicResource HfPurpleLightBrush}" />
+        <Setter Property="TextDecorations" Value="Underline" />
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="TextBlock.hf-link:pointerover">
+        <Setter Property="Foreground" Value="{DynamicResource HfOrangeLightBrush}" />
+    </Style>
+
+    <!-- ===== Frames (global.css .card, .plate, wells, the hero status ticket, chips) ===== -->
+
+    <Style Selector="hf|PixelBorder.hf-card">
+        <Setter Property="Background" Value="{DynamicResource HfSurfaceBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource HfLineBrush}" />
+        <Setter Property="BorderThickness" Value="2" />
+        <Setter Property="AccentBrush" Value="{DynamicResource HfPurpleBrush}" />
+        <Setter Property="AccentTop" Value="2" />
+        <Setter Property="ShadowBrush" Value="{DynamicResource HfVoidBrush}" />
+        <Setter Property="ShadowOffset" Value="4" />
+        <Setter Property="Padding" Value="18" />
+    </Style>
+    <Style Selector="hf|PixelBorder.hf-card.orange, hf|PixelBorder.hf-plate.orange">
+        <Setter Property="AccentBrush" Value="{DynamicResource HfOrangeBrush}" />
+    </Style>
+    <Style Selector="hf|PixelBorder.hf-card.clickable">
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="hf|PixelBorder.hf-card.clickable:pointerover, hf|PixelBorder.hf-card.selected">
+        <Setter Property="Background" Value="{DynamicResource HfRaisedBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource HfPurpleBrush}" />
+    </Style>
+    <Style Selector="hf|PixelBorder.hf-card.selected">
+        <Setter Property="BorderBrush" Value="{DynamicResource HfOrangeBrush}" />
+        <Setter Property="AccentBrush" Value="{DynamicResource HfOrangeBrush}" />
+        <Setter Property="AccentTop" Value="4" />
+        <Setter Property="ShadowOffset" Value="6" />
+    </Style>
+    <Style Selector="hf|PixelBorder.hf-plate">
+        <Setter Property="Background" Value="{DynamicResource HfSurfaceBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource HfLineBrush}" />
+        <Setter Property="BorderThickness" Value="2" />
+        <Setter Property="AccentBrush" Value="{DynamicResource HfPurpleBrush}" />
+        <Setter Property="AccentTop" Value="4" />
+        <Setter Property="ShadowBrush" Value="{DynamicResource HfVoidBrush}" />
+        <Setter Property="ShadowOffset" Value="6" />
+        <Setter Property="Padding" Value="24" />
+    </Style>
+    <Style Selector="hf|PixelBorder.hf-well">
+        <Setter Property="Background" Value="{DynamicResource HfNightBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource HfLineBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="12" />
+    </Style>
+    <Style Selector="hf|PixelBorder.hf-ticket">
+        <Setter Property="Background" Value="{DynamicResource HfTicketBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource HfLineBrush}" />
+        <Setter Property="BorderThickness" Value="2" />
+        <Setter Property="AccentBrush" Value="{DynamicResource HfOrangeBrush}" />
+        <Setter Property="AccentLeft" Value="4" />
+        <Setter Property="ShadowBrush" Value="{DynamicResource HfVoidBrush}" />
+        <Setter Property="ShadowOffset" Value="4" />
+        <Setter Property="Padding" Value="20,16" />
+    </Style>
+    <Style Selector="hf|PixelBorder.hf-chip">
+        <Setter Property="Background" Value="{DynamicResource HfNightBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource HfLineBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="14,6" />
+        <Setter Property="MinHeight" Value="36" />
+    </Style>
+
+    <!-- ===== Status square, meter, icons, pixel images ===== -->
+
+    <Style Selector="hf|HfStatusDot">
+        <Setter Property="Fill" Value="{DynamicResource HfLineStrongBrush}" />
+    </Style>
+    <Style Selector="hf|HfStatusDot:waiting">
+        <Setter Property="Fill" Value="{DynamicResource HfBrassBrush}" />
+    </Style>
+    <Style Selector="hf|HfStatusDot:online">
+        <Setter Property="Fill" Value="{DynamicResource HfSuccessBrush}" />
+        <Setter Property="GlowColor" Value="{DynamicResource HfSuccessGlowColor}" />
+    </Style>
+    <Style Selector="hf|HfStatusDot:offline">
+        <Setter Property="Fill" Value="{DynamicResource HfErrorBrush}" />
+    </Style>
+
+    <Style Selector="hf|HfMeter">
+        <Setter Property="TroughBrush" Value="{DynamicResource HfVoidBrush}" />
+        <Setter Property="RingBrush" Value="{DynamicResource HfLineBrush}" />
+        <Setter Property="StripeBrush" Value="{DynamicResource HfOrangeBrush}" />
+        <Setter Property="StripeLightBrush" Value="{DynamicResource HfOrangeLightBrush}" />
+        <Setter Property="GlowColor" Value="{DynamicResource HfOrangeGlowColor}" />
+        <Setter Property="Transitions">
+            <Transitions>
+                <DoubleTransition Property="Value" Duration="0:0:0.25" />
+            </Transitions>
+        </Setter>
+    </Style>
+
+    <Style Selector="Image.hf-pixel">
+        <Setter Property="hf:HfRender.PixelArt" Value="True" />
+    </Style>
+
+    <!-- ===== Inputs (global.css .form input): night well, line, purple on hover, orange + halo on focus ===== -->
+
+    <Style Selector="TextBox">
+        <!-- the focus halo is drawn outside the field; the text itself is clipped by the inner scroll viewer -->
+        <Setter Property="ClipToBounds" Value="False" />
+        <Setter Property="FontSize" Value="16" />
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="CaretBrush" Value="{DynamicResource HfOrangeBrush}" />
+        <Setter Property="SelectionBrush" Value="{DynamicResource HfPurpleDeepBrush}" />
+    </Style>
+    <Style Selector="TextBox /template/ DataValidationErrors">
+        <Setter Property="ClipToBounds" Value="False" />
+    </Style>
+    <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+        <Setter Property="BoxShadow" Value="0 0 0 3 #66FF9D45" />
+    </Style>
+    <Style Selector="TextBox:error /template/ Border#PART_BorderElement">
+        <Setter Property="BorderBrush" Value="{DynamicResource HfErrorBrush}" />
+    </Style>
+
+    <!-- ===== Scrollbars: square 8 px, line-strong thumb ===== -->
+
+    <Style Selector="ScrollBar">
+        <Setter Property="Cursor" Value="Arrow" />
+        <Setter Property="AllowAutoHide" Value="False" />
+    </Style>
+    <Style Selector="ScrollBar:vertical">
+        <Setter Property="Width" Value="8" />
+        <Setter Property="MinWidth" Value="8" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Background="{DynamicResource HfNightBrush}">
+                    <Track Minimum="{TemplateBinding Minimum}"
+                           Maximum="{TemplateBinding Maximum}"
+                           Value="{TemplateBinding Value, Mode=TwoWay}"
+                           ViewportSize="{TemplateBinding ViewportSize}"
+                           Orientation="Vertical"
+                           IsDirectionReversed="True">
+                        <Thumb Classes="hf-thumb" MinHeight="24">
+                            <Thumb.Template>
+                                <ControlTemplate>
+                                    <Border Background="{TemplateBinding Background}" />
+                                </ControlTemplate>
+                            </Thumb.Template>
+                        </Thumb>
+                    </Track>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="ScrollBar:horizontal">
+        <Setter Property="Height" Value="8" />
+        <Setter Property="MinHeight" Value="8" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Background="{DynamicResource HfNightBrush}">
+                    <Track Minimum="{TemplateBinding Minimum}"
+                           Maximum="{TemplateBinding Maximum}"
+                           Value="{TemplateBinding Value, Mode=TwoWay}"
+                           ViewportSize="{TemplateBinding ViewportSize}"
+                           Orientation="Horizontal">
+                        <Thumb Classes="hf-thumb" MinWidth="24">
+                            <Thumb.Template>
+                                <ControlTemplate>
+                                    <Border Background="{TemplateBinding Background}" />
+                                </ControlTemplate>
+                            </Thumb.Template>
+                        </Thumb>
+                    </Track>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="Thumb.hf-thumb">
+        <Setter Property="Background" Value="{DynamicResource HfLineStrongBrush}" />
+    </Style>
+    <Style Selector="Thumb.hf-thumb:pointerover">
+        <Setter Property="Background" Value="{DynamicResource HfPurpleBrush}" />
+    </Style>
+    <Style Selector="Thumb.hf-thumb:pressed">
+        <Setter Property="Background" Value="{DynamicResource HfPurpleLightBrush}" />
+    </Style>
+
+    <!-- ===== Stock GML parts until the HedgeFox screens replace them: square corners, site colours ===== -->
+
+    <!-- The stock styles set their radii with class selectors (GmlButton.Icon …), which outrank plain type selectors;
+         ":not(.hf-stock)" gives these overrides the same rank, and being later they win. -->
+    <Style Selector="components|GmlButton:not(.hf-stock), components|StackFrameBorder:not(.hf-stock), components|BadgeComponent:not(.hf-stock), components|ProgressBar:not(.hf-stock), components|OnlineComponent:not(.hf-stock)">
+        <Setter Property="CornerRadius" Value="0" />
+    </Style>
+    <Style Selector="components|StackFrameBorder">
+        <Setter Property="BorderThickness" Value="2" />
+    </Style>
+    <Style Selector="TextBox.FormBox">
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="Padding" Value="14,12" />
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="Foreground" Value="{DynamicResource HfTextBrush}" />
+    </Style>
+    <Style Selector="TextBox.FormBox:focus /template/ Border#PART_BorderElement">
+        <Setter Property="BorderBrush" Value="{DynamicResource HfOrangeBrush}" />
+        <Setter Property="Background" Value="{DynamicResource HfWellBrush}" />
+    </Style>
+    <Style Selector="ComboBox.ComboBoxStyle">
+        <Setter Property="CornerRadius" Value="0" />
+    </Style>
+    <Style Selector="notifications|NotificationMessage">
+        <Setter Property="CornerRadius" Value="0" />
+    </Style>
+</Styles>

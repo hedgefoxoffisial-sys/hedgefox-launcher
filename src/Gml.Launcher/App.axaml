@@ -1,6 +1,7 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Gml.Launcher.App"
+             RequestedThemeVariant="Dark"
              xmlns:helpers="clr-namespace:Gml.Launcher.Core.Helpers">
 
     <Application.Resources>
@@ -36,6 +37,7 @@
         <StyleInclude Source="Assets/Styles/Classes.axaml" />
 
         <StyleInclude Source="avares://GamerVII.Notification.Avalonia/Themes/Generic.xaml" />
+        <StyleInclude Source="Assets/Styles/HedgeFoxTheme.axaml" />
 
     </Application.Styles>
 </Application>
