@@ -1,0 +1,172 @@
+<!-- Every HedgeFox theme primitive on one 1180×720 page, with hover, pressed, focus and disabled states forced
+     (ThemeGallery.axaml.cs). Rendered by the harness as theme-gallery.png. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:hf="using:Gml.Launcher.Views.HedgeFox.Controls"
+             x:Class="HedgeFox.Shots.ThemeGallery"
+             Background="{DynamicResource HfBgBrush}">
+    <Grid ColumnDefinitions="330,410,*" Margin="24,20" ColumnSpacing="28">
+
+        <!-- Type -->
+        <StackPanel Grid.Column="0" Spacing="8">
+            <TextBlock Classes="hf-kicker" Text="ТЕМА ЛАУНЧЕРА" />
+            <TextBlock Classes="hf-px48 hf-shadow" Text="HEDGEFOX" />
+            <TextBlock Classes="hf-px32 hf-shadow" Text="ПЕЛЕНА" />
+            <TextBlock Classes="hf-px24" Text="СЕЗОН 1 · БЕТА" />
+            <TextBlock Classes="hf-px16 hf-muted" Text="ЗАВОДИМ ШЕСТЕРЁНКИ…" />
+            <TextBlock Classes="hf-h1" Text="Пираты над Пеленой" />
+            <TextBlock Classes="hf-h2" Text="Обычный профиль" />
+            <TextBlock Classes="hf-h3" Text="Новости из Telegram" />
+            <TextBlock Classes="hf-lead" Text="Небо над Пеленой ждёт: ёлки, «ёлочки» — и №1." />
+            <TextBlock Classes="hf-body"
+                       Text="Лицензия Minecraft не нужна: заходишь через наш лаунчер. Ник или почта и пароль — те же, что на сайте." />
+            <TextBlock Classes="hf-label" Text="Ник или почта" />
+            <TextBlock Classes="hf-small" Text="Не пускает? Подтверди почту — письмо пришло при регистрации." />
+            <StackPanel Orientation="Horizontal" Spacing="16">
+                <TextBlock Classes="hf-link" Text="Забыли пароль?" />
+                <TextBlock Classes="hf-link" Name="LinkHover" Text="Регистрация" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Spacing="16">
+                <TextBlock Classes="hf-error" Text="Неверный ник или пароль." />
+                <TextBlock Classes="hf-success" Text="Готово" />
+            </StackPanel>
+            <WrapPanel ItemSpacing="10" LineSpacing="10" Margin="0,6,0,0">
+                <hf:PixelIcon Kind="check" Foreground="{DynamicResource HfSuccessBrush}" />
+                <hf:PixelIcon Kind="warn" Foreground="{DynamicResource HfOrangeBrush}" />
+                <hf:PixelIcon Kind="info" Foreground="{DynamicResource HfPurpleLightBrush}" />
+                <hf:PixelIcon Kind="error" Foreground="{DynamicResource HfErrorBrush}" />
+                <hf:PixelIcon Kind="play" Foreground="{DynamicResource HfOrangeBrush}" />
+                <hf:PixelIcon Kind="plane" Foreground="{DynamicResource HfOrangeBrush}" />
+                <hf:PixelIcon Kind="airship" Foreground="{DynamicResource HfTextBrush}" />
+                <hf:PixelIcon Kind="gear" Foreground="{DynamicResource HfTextBrush}" />
+                <hf:PixelIcon Kind="user" Foreground="{DynamicResource HfTextBrush}" />
+                <hf:PixelIcon Kind="exit" Foreground="{DynamicResource HfTextBrush}" />
+                <hf:PixelIcon Kind="folder" Foreground="{DynamicResource HfTextBrush}" />
+                <hf:PixelIcon Kind="globe" Foreground="{DynamicResource HfTextBrush}" />
+                <hf:PixelIcon Kind="book" Foreground="{DynamicResource HfTextBrush}" />
+                <hf:PixelIcon Kind="help" Foreground="{DynamicResource HfTextBrush}" />
+                <hf:PixelIcon Kind="arrow" Foreground="{DynamicResource HfTextBrush}" />
+                <hf:PixelIcon Kind="back" Foreground="{DynamicResource HfTextBrush}" />
+                <hf:PixelIcon Kind="minimize" Foreground="{DynamicResource HfTextBrush}" />
+                <hf:PixelIcon Kind="cross" Foreground="{DynamicResource HfTextBrush}" />
+                <hf:PixelIcon Kind="coin" Width="24" Height="24" Foreground="{DynamicResource HfBrassBrush}" />
+                <hf:PixelIcon Kind="helmet" Width="24" Height="24" Foreground="{DynamicResource HfBrassBrush}" />
+            </WrapPanel>
+        </StackPanel>
+
+        <!-- Buttons, badges -->
+        <StackPanel Grid.Column="1" Spacing="14">
+            <WrapPanel ItemSpacing="14" LineSpacing="14">
+                <hf:HfButton Content="Войти" />
+                <hf:HfButton Name="PrimaryHover" Content="Наведение" />
+                <hf:HfButton Name="PrimaryPressed" Content="Нажата" />
+                <hf:HfButton Content="Нельзя" IsEnabled="False" />
+                <hf:HfButton Name="PrimaryFocus" Content="Фокус" />
+            </WrapPanel>
+            <WrapPanel ItemSpacing="14" LineSpacing="14">
+                <hf:HfButton Classes="secondary sm" Content="Настройки" />
+                <hf:HfButton Classes="secondary sm" Name="SecondaryHover" Content="Наведение" />
+                <hf:HfButton Classes="secondary sm" Name="SecondaryPressed" Content="Нажата" />
+            </WrapPanel>
+            <WrapPanel ItemSpacing="14" LineSpacing="14">
+                <hf:HfButton Classes="ghost sm" Content="Назад" />
+                <hf:HfButton Classes="ghost sm" Name="GhostHover" Content="Наведение" />
+                <hf:HfButton Classes="ghost sm">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <hf:PixelIcon Kind="plane" />
+                        <TextBlock Text="Telegram" VerticalAlignment="Center" />
+                    </StackPanel>
+                </hf:HfButton>
+            </WrapPanel>
+            <hf:HfButton Classes="lg block">
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <hf:PixelIcon Kind="play" Width="24" Height="24" />
+                    <TextBlock Text="ИГРАТЬ" VerticalAlignment="Center" />
+                </StackPanel>
+            </hf:HfButton>
+            <WrapPanel ItemSpacing="10" LineSpacing="10">
+                <hf:HfBadge Content="СОВЕТУЕМ" />
+                <hf:HfBadge Classes="orange" Content="ОГОНЬ!" />
+                <hf:HfBadge Classes="purple" Content="TG" />
+                <hf:HfBadge Classes="success" Content="ОНЛАЙН" />
+                <hf:HfBadge Classes="quiet" Content="САЙТ" />
+            </WrapPanel>
+            <StackPanel Spacing="6">
+                <TextBlock Classes="hf-label" Text="Ник или почта" />
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                    <TextBox Watermark="Ник или почта" />
+                    <TextBox Grid.Column="1" Name="InputHover" Text="AppEzhik" />
+                </Grid>
+                <TextBox Name="InputFocus" PasswordChar="•" Text="секрет" />
+            </StackPanel>
+            <StackPanel Spacing="10">
+                <hf:HfMeter Value="62" />
+                <hf:HfMeter IsIndeterminate="True" />
+            </StackPanel>
+        </StackPanel>
+
+        <!-- Frames, status, scroll, pixel art -->
+        <StackPanel Grid.Column="2" Spacing="16">
+            <hf:PixelBorder Classes="hf-ticket">
+                <StackPanel Spacing="8">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <hf:HfStatusDot State="Online" VerticalAlignment="Center" />
+                        <TextBlock Classes="hf-px24" Foreground="{DynamicResource HfOrangeBrush}" Text="ОНЛАЙН: 7 ИЗ 45" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <hf:HfStatusDot State="Offline" VerticalAlignment="Center" />
+                        <TextBlock Classes="hf-body" Text="Сервер спит" />
+                        <hf:HfStatusDot State="Waiting" VerticalAlignment="Center" Margin="12,0,0,0" />
+                        <TextBlock Classes="hf-body" Text="Ждём" />
+                        <hf:HfStatusDot State="Unknown" VerticalAlignment="Center" Margin="12,0,0,0" />
+                        <TextBlock Classes="hf-body hf-muted" Text="Нет данных" />
+                    </StackPanel>
+                </StackPanel>
+            </hf:PixelBorder>
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                <hf:PixelBorder Classes="hf-card">
+                    <StackPanel Spacing="6">
+                        <TextBlock Classes="hf-h3" Text="Карточка" />
+                        <TextBlock Classes="hf-small" Text="Рамка, верхняя кромка, тень 4 px." />
+                    </StackPanel>
+                </hf:PixelBorder>
+                <hf:PixelBorder Grid.Column="1" Classes="hf-card selected">
+                    <StackPanel Spacing="6">
+                        <TextBlock Classes="hf-h3" Text="Выбрана" />
+                        <TextBlock Classes="hf-small" Text="Оранжевая рамка и кромка." />
+                    </StackPanel>
+                </hf:PixelBorder>
+            </Grid>
+            <hf:PixelBorder Classes="hf-plate orange">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="16">
+                    <Image Classes="hf-pixel" Source="avares://Gml.Launcher/Assets/Images/logo.png" Width="64" Height="64" />
+                    <StackPanel Grid.Column="1" Spacing="6" VerticalAlignment="Center">
+                        <TextBlock Classes="hf-h2" Text="Плашка" />
+                        <TextBlock Classes="hf-small" Text="Картинка 256 → 64 px без размытия." />
+                    </StackPanel>
+                </Grid>
+            </hf:PixelBorder>
+            <hf:PixelBorder Classes="hf-well" Height="120" Padding="0">
+                <ScrollViewer Name="Scroller" Padding="12,10,20,10">
+                    <StackPanel Spacing="6">
+                        <TextBlock Classes="hf-body" Text="Колодец с прокруткой: тонкая квадратная полоса справа." />
+                        <TextBlock Classes="hf-small" Text="Строка 2" />
+                        <TextBlock Classes="hf-small" Text="Строка 3" />
+                        <TextBlock Classes="hf-small" Text="Строка 4" />
+                        <TextBlock Classes="hf-small" Text="Строка 5" />
+                        <TextBlock Classes="hf-small" Text="Строка 6" />
+                        <TextBlock Classes="hf-small" Text="Строка 7" />
+                    </StackPanel>
+                </ScrollViewer>
+            </hf:PixelBorder>
+            <WrapPanel ItemSpacing="10" LineSpacing="10">
+                <hf:PixelBorder Classes="hf-chip">
+                    <TextBlock Classes="hf-px16" Text="БЕСПЛАТНО" VerticalAlignment="Center" />
+                </hf:PixelBorder>
+                <hf:PixelBorder Classes="hf-chip">
+                    <TextBlock Classes="hf-px16" Text="БЕЗ ЛИЦЕНЗИИ" VerticalAlignment="Center" />
+                </hf:PixelBorder>
+            </WrapPanel>
+        </StackPanel>
+    </Grid>
+</UserControl>

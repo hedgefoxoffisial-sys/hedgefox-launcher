@@ -1,0 +1,135 @@
+<!-- The services' fixed data drawn with the theme primitives inside the real shell (harness only). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:hf="using:Gml.Launcher.Views.HedgeFox.Controls"
+             xmlns:core="using:Gml.Launcher.Core.HedgeFox"
+             xmlns:shots="using:HedgeFox.Shots"
+             x:Class="HedgeFox.Shots.DataPreview"
+             x:DataType="shots:DataPreviewViewModel"
+             x:CompileBindings="True">
+    <Grid RowDefinitions="*,Auto" Margin="24,20,24,16">
+        <Grid ColumnDefinitions="340,*,360" ColumnSpacing="28">
+
+            <!-- Profile cards -->
+            <StackPanel Spacing="14">
+                <TextBlock Classes="hf-kicker" Text="{x:Static core:HfStrings.ProfilesKicker}" />
+                <ItemsControl ItemsSource="{Binding Profiles}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Spacing="14" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="shots:ProfileCard">
+                            <hf:PixelBorder Classes="hf-card clickable" Classes.selected="{Binding Selected}">
+                                <StackPanel Spacing="6">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Classes="hf-h3" Text="{Binding Title}" VerticalAlignment="Center" />
+                                        <hf:HfBadge Grid.Column="1" Content="{x:Static core:HfStrings.RecommendedBadge}"
+                                                    IsVisible="{Binding Recommended}" />
+                                    </Grid>
+                                    <TextBlock Classes="hf-small" Text="{Binding Hint}" />
+                                    <TextBlock Classes="hf-small" Foreground="{DynamicResource HfOrangeBrush}" Text="{Binding Ram}" />
+                                    <TextBlock Classes="hf-small hf-success" Text="{x:Static core:HfStrings.ShadersAlsoFit}"
+                                               IsVisible="{Binding ShadersAlsoFit}" />
+                                </StackPanel>
+                            </hf:PixelBorder>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+
+            <!-- Player and play -->
+            <StackPanel Grid.Column="1" Spacing="18" VerticalAlignment="Bottom" Margin="0,0,0,8">
+                <StackPanel Orientation="Horizontal" Spacing="14" HorizontalAlignment="Center">
+                    <hf:PixelBorder Classes="hf-well" Padding="4">
+                        <Image Classes="hf-pixel" Source="{Binding Face}" Width="48" Height="48" />
+                    </hf:PixelBorder>
+                    <TextBlock Classes="hf-px32 hf-shadow" Foreground="#FFE2BD" Text="{Binding Nick}" VerticalAlignment="Center" />
+                </StackPanel>
+                <hf:HfButton Classes="lg block">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <hf:PixelIcon Kind="play" Width="24" Height="24" />
+                        <TextBlock Text="{x:Static core:HfStrings.PlayCaps}" VerticalAlignment="Center" />
+                    </StackPanel>
+                </hf:HfButton>
+                <StackPanel Spacing="6">
+                    <hf:HfMeter Value="42" />
+                    <TextBlock Classes="hf-small" Text="Скачиваем моды · 42 %" HorizontalAlignment="Center" />
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Status, Pelena, news -->
+            <Grid Grid.Column="2" RowDefinitions="Auto,Auto,*" RowSpacing="16">
+                <hf:PixelBorder Classes="hf-ticket">
+                    <StackPanel Spacing="10">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <hf:HfStatusDot State="{Binding Dot}" VerticalAlignment="Center" />
+                            <TextBlock Classes="hf-h3" Text="{Binding StatusLine}" />
+                        </StackPanel>
+                        <TextBlock Classes="hf-small" Text="{x:Static core:HfStrings.ServerAddress}" />
+                    </StackPanel>
+                </hf:PixelBorder>
+                <hf:PixelBorder Grid.Row="1" Classes="hf-card" Padding="16,14">
+                    <StackPanel Spacing="8">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Classes="hf-px16" Foreground="{DynamicResource HfToxicBrush}" Text="{Binding Pelena.Title}" />
+                            <TextBlock Classes="hf-small" Text="{Binding PelenaTrend}" VerticalAlignment="Center" />
+                        </StackPanel>
+                        <hf:HfMeter Value="{Binding PelenaPercent}" IsVisible="{Binding Pelena.ShowBar}" />
+                    </StackPanel>
+                </hf:PixelBorder>
+                <Grid Grid.Row="2" RowDefinitions="Auto,*" RowSpacing="10">
+                    <TextBlock Classes="hf-kicker" Text="{x:Static core:HfStrings.NewsKicker}" />
+                    <ScrollViewer Grid.Row="1" Padding="0,0,14,0">
+                        <ItemsControl ItemsSource="{Binding News}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <StackPanel Spacing="12" Margin="0,0,0,6" />
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="shots:NewsCard">
+                                    <hf:PixelBorder Classes="hf-card clickable" Padding="14,12">
+                                        <StackPanel Spacing="6">
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <hf:HfBadge Classes="purple" Content="{Binding Source}" />
+                                                <TextBlock Classes="hf-small" Text="{Binding Date}" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                            <TextBlock Classes="hf-h3" Text="{Binding Title}" />
+                                            <TextBlock Classes="hf-small" Text="{Binding Text}" MaxLines="4" TextTrimming="CharacterEllipsis" />
+                                        </StackPanel>
+                                    </hf:PixelBorder>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <!-- Footer links -->
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="10" Margin="0,14,0,0">
+            <hf:HfButton Classes="ghost sm">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <hf:PixelIcon Kind="globe" />
+                    <TextBlock Text="{x:Static core:HfStrings.Site}" VerticalAlignment="Center" />
+                </StackPanel>
+            </hf:HfButton>
+            <hf:HfButton Classes="ghost sm">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <hf:PixelIcon Kind="plane" />
+                    <TextBlock Text="{x:Static core:HfStrings.Telegram}" VerticalAlignment="Center" />
+                </StackPanel>
+            </hf:HfButton>
+            <hf:HfButton Classes="ghost sm" Content="{x:Static core:HfStrings.Rules}" />
+            <hf:HfButton Classes="ghost sm" Content="{x:Static core:HfStrings.Wiki}" />
+            <hf:HfButton Classes="ghost sm">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <hf:PixelIcon Kind="help" />
+                    <TextBlock Text="{x:Static core:HfStrings.Help}" VerticalAlignment="Center" />
+                </StackPanel>
+            </hf:HfButton>
+        </StackPanel>
+    </Grid>
+</UserControl>
