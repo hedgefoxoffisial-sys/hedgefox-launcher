@@ -64,6 +64,7 @@ public sealed class HfOverviewModel : ReactiveObject, IHfScreenModel
     [Reactive] public bool IsIdle { get; private set; } = true;
     [Reactive] public double MeterValue { get; private set; }
     [Reactive] public bool MeterIndeterminate { get; private set; }
+    [Reactive] public string StepTitle { get; private set; } = string.Empty;
     [Reactive] public string StepText { get; private set; } = string.Empty;
     [Reactive] public string PercentText { get; private set; } = string.Empty;
     [Reactive] public string SpeedText { get; private set; } = string.Empty;
@@ -97,6 +98,8 @@ public sealed class HfOverviewModel : ReactiveObject, IHfScreenModel
                 CanReinstall = CanReinstallWith(selected is not null, busy, Page.BackendIsActive);
                 MeterIndeterminate = percent is null;
                 MeterValue = percent ?? 0;
+                // «Обновление» over the meter, «Осталось: 312 файлов» under it (or the headline alone)
+                StepTitle = string.IsNullOrWhiteSpace(description) ? string.Empty : headline?.Trim() ?? string.Empty;
                 StepText = HfPlayProgress.Step(headline, description);
                 PercentText = HfPlayProgress.Percent(percent);
                 SpeedText = HfPlayProgress.Speed(speed);

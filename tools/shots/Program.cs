@@ -188,6 +188,11 @@ void Screens(int width, int height, string size)
     overview.LoadingPercentage = 42;
     overview.LoadingSpeed = "3.5 MB/s";
     overview.IsProcessing = true;
+    // the meter eases to its value (a 0.25 s transition): capture it there, not on the way
+    Ui.PumpUntil(() => main.GetVisualDescendants().OfType<HfMeter>().Any(m => m.IsEffectivelyVisible && Math.Abs(m.Value - 42) < 0.01),
+        "download meter at 42 %");
+    // the stock speed counter clears the line every second when no bytes arrive (none do here)
+    overview.LoadingSpeed = "3.5 MB/s";
     Save(main, "overview-download" + size);
     overview.IsProcessing = false;
 

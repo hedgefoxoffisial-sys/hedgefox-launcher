@@ -104,29 +104,36 @@
                         <TextBlock Classes="hf-px16" Foreground="{DynamicResource HfMutedBrush}" Text="{Binding SelectedVersion}"
                                    HorizontalAlignment="Center" />
                     </StackPanel>
+                    <!-- «ИГРАТЬ» while idle; faded only when no profile is selected -->
                     <hf:HfButton Classes="lg block"
                                  MinHeight="64"
                                  FontSize="22"
                                  Command="{Binding Page.PlayCommand}"
-                                 IsEnabled="{Binding CanPlay}">
+                                 IsEnabled="{Binding CanPlay}"
+                                 IsVisible="{Binding IsIdle}">
                         <StackPanel Orientation="Horizontal" Spacing="14">
                             <hf:PixelIcon Kind="play" Width="24" Height="24" />
                             <TextBlock Text="{x:Static core:HfStrings.PlayCaps}" VerticalAlignment="Center" />
                         </StackPanel>
                     </hf:HfButton>
 
-                    <!-- the download: meter, step, percent and speed -->
-                    <StackPanel Spacing="8" IsVisible="{Binding IsBusy}">
-                        <hf:HfMeter Value="{Binding MeterValue}" IsIndeterminate="{Binding MeterIndeterminate}" />
-                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
-                            <TextBlock Classes="hf-small" Foreground="{DynamicResource HfTextBrush}" Text="{Binding StepText}"
-                                       TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
-                            <TextBlock Grid.Column="1" Classes="hf-small">
-                                <Run Text="{Binding PercentText}" FontWeight="SemiBold" Foreground="{DynamicResource HfOrangeLightBrush}" /><Run
-                                    Text="  " /><Run Text="{Binding SpeedText}" />
-                            </TextBlock>
-                        </Grid>
-                    </StackPanel>
+                    <!-- the download takes its place (spec: «шкала с процентом и текстом шага»): step, percent, meter, speed -->
+                    <hf:PixelBorder Classes="hf-plate orange" Padding="20,14,20,16" Margin="0,0,6,6" IsVisible="{Binding IsBusy}">
+                        <StackPanel Spacing="10">
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                                <TextBlock Classes="hf-h3" Text="{Binding StepTitle}" VerticalAlignment="Center"
+                                           TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
+                                <TextBlock Grid.Column="1" Classes="hf-h1" Foreground="{DynamicResource HfOrangeBrush}"
+                                           Text="{Binding PercentText}" TextWrapping="NoWrap" VerticalAlignment="Center" />
+                            </Grid>
+                            <hf:HfMeter Height="20" Value="{Binding MeterValue}" IsIndeterminate="{Binding MeterIndeterminate}" />
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
+                                <TextBlock Classes="hf-small" Foreground="{DynamicResource HfTextBrush}" Text="{Binding StepText}"
+                                           TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
+                                <TextBlock Grid.Column="1" Classes="hf-small" Text="{Binding SpeedText}" TextWrapping="NoWrap" />
+                            </Grid>
+                        </StackPanel>
+                    </hf:PixelBorder>
 
                     <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center" IsVisible="{Binding IsIdle}">
                         <hf:HfButton Classes="ghost sm"
