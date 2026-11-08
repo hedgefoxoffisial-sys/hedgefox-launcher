@@ -62,6 +62,11 @@ class BrandTest(unittest.TestCase):
         self.assertEqual(c["FormBorderColor"], d["line"])
         self.assertEqual(c["FormBorderHoverColor"], load_tokens(TOKENS)["purple"])
 
+    def test_right_column_has_its_own_scrim(self):
+        # the status card and the news sit over the airship; the right scrim darkens from the right edge (visual-3)
+        colors = read(COLORS)
+        self.assertRegex(colors, r'<LinearGradientBrush x:Key="HfScrimRightBrush" StartPoint="100%, 0%" EndPoint="0%, 0%">')
+
     def test_parse_site_root(self):
         css = """body { --hf-x: #111111; }
 :root {

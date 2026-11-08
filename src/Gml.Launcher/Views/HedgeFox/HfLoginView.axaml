@@ -10,6 +10,8 @@
     <Grid Name="Root" x:DataType="hfvm:HfLoginModel">
         <!-- darkens the scene under the form; empty background drags the window -->
         <Rectangle Fill="{DynamicResource HfScrimLeftBrush}" />
+        <!-- and under the status and news column, which sits over the airship -->
+        <Rectangle Fill="{DynamicResource HfScrimRightBrush}" />
 
         <!-- both columns start at the same height; the pair is centred in the window -->
         <Grid ColumnDefinitions="Auto,*,Auto" Margin="64,24,44,28" VerticalAlignment="Center">

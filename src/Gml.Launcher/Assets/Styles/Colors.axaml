@@ -115,13 +115,22 @@
     <SolidColorBrush x:Key="HfTicketBrush">#E619102F</SolidColorBrush>
     <SolidColorBrush x:Key="HfVeilBrush">#59100A22</SolidColorBrush>
 
-    <!-- Scrims over the night scene: under a text column on the left, and the fade at the bottom -->
+    <!-- Scrims over the night scene: under a text column on the left or on the right, and the fade at the bottom -->
     <LinearGradientBrush x:Key="HfScrimLeftBrush" StartPoint="0%, 0%" EndPoint="100%, 0%">
         <LinearGradientBrush.GradientStops>
             <GradientStop Offset="0" Color="#EB100A22" />
             <GradientStop Offset="0.42" Color="#CC100A22" />
             <GradientStop Offset="0.58" Color="#73100A22" />
             <GradientStop Offset="0.72" Color="#00100A22" />
+        </LinearGradientBrush.GradientStops>
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="HfScrimRightBrush" StartPoint="100%, 0%" EndPoint="0%, 0%">
+        <LinearGradientBrush.GradientStops>
+            <GradientStop Offset="0" Color="#D9100A22" />
+            <GradientStop Offset="0.3" Color="#BF100A22" />
+            <GradientStop Offset="0.4" Color="#4C100A22" />
+            <GradientStop Offset="0.5" Color="#00100A22" />
         </LinearGradientBrush.GradientStops>
     </LinearGradientBrush>
 

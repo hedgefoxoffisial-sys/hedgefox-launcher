@@ -11,6 +11,8 @@
     <Grid Name="Root" x:DataType="hfvm:HfOverviewModel">
         <!-- darkens the scene under the cards; empty background drags the window -->
         <Rectangle Fill="{DynamicResource HfScrimLeftBrush}" Opacity="0.85" />
+        <!-- and under the status and news column, which sits over the airship -->
+        <Rectangle Fill="{DynamicResource HfScrimRightBrush}" />
 
         <Grid RowDefinitions="Auto,*,Auto" RowSpacing="16" Margin="24,14,24,16">
 
