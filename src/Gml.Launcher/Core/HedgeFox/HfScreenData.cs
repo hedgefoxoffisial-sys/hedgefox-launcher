@@ -69,9 +69,22 @@ public static class HfPlayProgress
         ["B"] = "Б", ["KB"] = "КБ", ["MB"] = "МБ", ["GB"] = "ГБ", ["TB"] = "ТБ"
     };
 
-    /// <summary>The detail («Осталось: 120 файлов») when there is one, else the headline («Обновление»).</summary>
-    public static string Step(string? headline, string? description) =>
-        !string.IsNullOrWhiteSpace(description) ? description.Trim() : headline?.Trim() ?? string.Empty;
+    private static readonly Regex FilesLeft = new(@"^Осталось: (\d+) файлов$", RegexOptions.Compiled);
+
+    /// <summary>
+    ///     The detail («Осталось: 120 файлов») when there is one, else the headline («Обновление»). The stock line
+    ///     says «файлов» for every number; it is made to agree («1 файл», «2 файла»).
+    /// </summary>
+    public static string Step(string? headline, string? description)
+    {
+        if (string.IsNullOrWhiteSpace(description))
+            return headline?.Trim() ?? string.Empty;
+        var text = description.Trim();
+        var m = FilesLeft.Match(text);
+        return m.Success && int.TryParse(m.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out var n)
+            ? $"Осталось: {n} {HfStrings.Plural(n, "файл", "файла", "файлов")}"
+            : text;
+    }
 
     public static string Percent(int? value) =>
         value is { } v ? Math.Clamp(v, 0, 100).ToString(CultureInfo.InvariantCulture) + " %" : string.Empty;

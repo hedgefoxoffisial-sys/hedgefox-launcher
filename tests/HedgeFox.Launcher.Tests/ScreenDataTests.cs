@@ -169,6 +169,18 @@ public class ScreenDataTests
     public void StepTextPrefersTheDetail(string? headline, string? description, string expected) =>
         Assert.Equal(expected, HfPlayProgress.Step(headline, description));
 
+    // the stock line is «Осталось: {N} файлов» for every N (copy-lore-6)
+    [Theory]
+    [InlineData(1, "Осталось: 1 файл")]
+    [InlineData(2, "Осталось: 2 файла")]
+    [InlineData(5, "Осталось: 5 файлов")]
+    [InlineData(11, "Осталось: 11 файлов")]
+    [InlineData(21, "Осталось: 21 файл")]
+    [InlineData(122, "Осталось: 122 файла")]
+    [InlineData(0, "Осталось: 0 файлов")]
+    public void FilesLeftAgreeWithTheNumber(int n, string expected) =>
+        Assert.Equal(expected, HfPlayProgress.Step("Обновление", $"Осталось: {n} файлов"));
+
     [Theory]
     [InlineData(42, "42 %")]
     [InlineData(0, "0 %")]
