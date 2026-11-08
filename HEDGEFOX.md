@@ -28,8 +28,8 @@
 | `.github/workflows/hedgefox-release.yml` | релиз по тегу `v*` под Windows, macOS и Linux |
 | `src/Gml.Launcher/Assets/HedgeFox/` | шрифты Tiny5, Unbounded, Rubik с OFL; текстура тумана |
 | `src/Gml.Launcher/Assets/Styles/HedgeFoxTheme.axaml` | тема в стиле сайта: кнопки, рамки, текст, поля, полосы прокрутки |
-| `src/Gml.Launcher/Core/HedgeFox/` | ссылки, тексты, статус, новости, скин, карточки профилей, совет по железу |
-| `src/Gml.Launcher/Views/HedgeFox/` | свои страницы (вход, главный экран, профиль, настройки), заставка, контролы, полоса заголовка |
+| `src/Gml.Launcher/Core/HedgeFox/` | ссылки, тексты, статус, новости, скин, карточки профилей, совет по железу, ошибки входа по-русски (`HfAuthGuard`), меню приложения на macOS, тон тостов |
+| `src/Gml.Launcher/Views/HedgeFox/` | свои страницы (вход, главный экран, профиль, настройки), заставка, контролы, полоса заголовка, размер окна под рабочую область (`HfWindowFit`) |
 | `src/Gml.Launcher/ViewModels/HedgeFox/` | состояние своих страниц рядом со стоковыми view model: статус и новости, карточки профилей, выход |
 | `src/Gml.Launcher/Views/MainWindow.axaml(.cs)`, `Views/SplashScreen/SplashScreen.axaml` | окно и заставка (наши целиком) |
 
@@ -55,7 +55,9 @@
 ## Тема
 
 `HedgeFoxTheme.axaml` подключается последней и перекрывает Fluent и стоковые компоненты: углы прямые (`CornerRadius` 0
-везде), акцент оранжевый. Список классов и контролов — в шапке файла. Пиксельные картинки — с классом `hf-pixel`
+везде), акцент оранжевый. Тосты сабмодуля уведомлений рисуются ночной плашкой: цвет, который передаёт стоковая view
+model, выбирает только полоску слева (ошибка, успех, остальное), английский бейдж «WARNING» не рисуется. Меню поля ввода
+(«Вырезать / Копировать / Вставить»), подсказки и меню — в цветах сайта. Список классов и контролов — в шапке файла. Пиксельные картинки — с классом `hf-pixel`
 (без размытия). Цвета берём только из ключей `Hf…Brush` / `Hf…Color` в `Colors.axaml`.
 
 ## Шрифты
@@ -87,10 +89,13 @@ dotnet test tests/HedgeFox.Launcher.Tests                                       
 dotnet run --project tools/shots -c Release -- /путь/к/папке/снимков
 ```
 
-Снимки: `theme-gallery` (все элементы темы и их состояния), `splash`, `splash-ready`, затем каждый экран в двух размерах
-окна — `-1180x720` (по умолчанию) и `-1000x620` (минимум): `login`, `login-2fa`, `login-nodata` (наш API молчит:
-«Нет данных» и ошибка новостей), `overview`, `overview-download` (шкала и шаг под «ИГРАТЬ»), `overview-asleep`
-(«Сервер спит»), `overview-nodata`, `settings`, `profile`, `mods`; и `login-macos-1180x720` с местом под «светофоры».
+Снимки: `theme-gallery` (все элементы темы и их состояния), `splash`, `splash-ready`, `splash-offline` (сервер входа
+не отвечает), затем каждый экран в двух размерах окна — `-1180x720` (по умолчанию) и `-1000x620` (минимум): `login`,
+`login-2fa`, `login-nodata` (наш API молчит: «Нет данных» и ошибка новостей), `overview`, `overview-reinstall`
+(вопрос перед переустановкой), `overview-download` (плашка со шкалой вместо «ИГРАТЬ»), `overview-asleep` («Сервер
+спит»), `overview-nodata`, `settings`, `profile`, `mods`, `login-offline` (сервер входа не ответил при запуске: строка
+под «Войти» и тост); `overview-toasts-1180x720` (тосты ошибки, успеха, VPN и переподключения) и
+`login-macos-1180x720` с местом под «светофоры».
 
 ## Страницы
 
