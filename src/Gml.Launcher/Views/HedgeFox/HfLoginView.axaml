@@ -50,6 +50,12 @@
                                          IsEnabled="{Binding Page.BackendIsActive}"
                                          Content="{x:Static core:HfStrings.SignIn}" />
                             <hf:HfMeter IsIndeterminate="True" Height="14" IsVisible="{Binding Page.IsProcessing}" />
+                            <!-- the GML sign-in server did not answer at start: offline mode, «Войти» is off -->
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10" IsVisible="{Binding !Page.BackendIsActive}">
+                                <hf:PixelIcon Kind="warn" Foreground="{DynamicResource HfBrassBrush}" VerticalAlignment="Top" Margin="0,1,0,0" />
+                                <TextBlock Grid.Column="1" Classes="hf-small" Foreground="{DynamicResource HfTextBrush}"
+                                           Text="{x:Static core:HfStrings.LoginOffline}" />
+                            </Grid>
                         </StackPanel>
 
                         <!-- the second step for accounts with 2FA -->

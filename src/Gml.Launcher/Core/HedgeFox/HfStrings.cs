@@ -97,16 +97,31 @@ public static class HfStrings
     public const string NoConnection = "Нет связи с сервером. Проверь интернет и попробуй ещё раз.";
     public const string TooSlow = "Сервер долго не отвечает. Попробуй ещё раз.";
     public const string WrongLogin = "Неверный ник, почта или пароль.";
+    public const string FillLogin = "Введи ник или почту и пароль.";
+    public const string TwoFactorWrong = "Код не подошёл. Попробуй ещё раз.";
+    public const string LoginOffline = "Сервер входа не отвечает, поэтому войти сейчас нельзя. Перезапусти лаунчер чуть позже.";
 
-    /// <summary>Tiny5 hints under the splash meter, changing every 1.6 s.</summary>
+    /// <summary>Tiny5 hints under the splash meter, changing every 1.6 s and stopping at the last (as on the site).</summary>
     public static readonly IReadOnlyList<string> SplashHints =
         ["ЗАВОДИМ ШЕСТЕРЁНКИ…", "ПОДНИМАЕМ ДИРИЖАБЛЬ…", "ПОЧТИ ГОТОВО…"];
 
     public static readonly TimeSpan SplashHintEvery = TimeSpan.FromSeconds(1.6);
 
+    public const string SplashSlow = "СЕРВЕР ВХОДА ДОЛГО ОТВЕЧАЕТ…";
+    public const string SplashOffline = "СЕРВЕР ВХОДА НЕ ОТВЕЧАЕТ";
+
+    /// <summary>
+    ///     The line under the splash meter: the hints, unless the stock checks report the sign-in server slow
+    ///     (<paramref name="slowStatus" />) or down (<paramref name="offlineStatus" />), their own localized texts.
+    /// </summary>
+    public static string SplashLine(string? status, TimeSpan elapsed, string slowStatus, string offlineStatus) =>
+        status == offlineStatus ? SplashOffline
+        : status == slowStatus ? SplashSlow
+        : SplashHintAt(elapsed);
+
     /// <summary>The hint shown <paramref name="elapsed" /> after the splash appeared.</summary>
     public static string SplashHintAt(TimeSpan elapsed) =>
-        SplashHints[(int)(Math.Max(0, elapsed.Ticks) / SplashHintEvery.Ticks % SplashHints.Count)];
+        SplashHints[(int)Math.Min(Math.Max(0, elapsed.Ticks) / SplashHintEvery.Ticks, SplashHints.Count - 1)];
 
     private static readonly string[] MonthsGenitive =
     [

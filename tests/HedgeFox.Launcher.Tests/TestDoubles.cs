@@ -19,3 +19,25 @@ internal sealed class TestStorage : IStorageService
     public Task<int> SaveRecord<T>(T value) => Task.FromResult(0);
     public Task<string> GetLogsAsync(int rowCount) => Task.FromResult(string.Empty);
 }
+
+/// <summary>An interface fake: the handler answers each call (by method name and arguments).</summary>
+public class TestProxy : System.Reflection.DispatchProxy
+{
+    private Func<System.Reflection.MethodInfo, object?[]?, object?> _handler = (_, _) => null;
+    public readonly List<string> Calls = [];
+
+    public static T Create<T>(Func<System.Reflection.MethodInfo, object?[]?, object?> handler) where T : class
+    {
+        var proxy = Create<T, TestProxy>();
+        ((TestProxy)(object)proxy)._handler = handler;
+        return proxy;
+    }
+
+    public static TestProxy Of(object proxy) => (TestProxy)proxy;
+
+    protected override object? Invoke(System.Reflection.MethodInfo? method, object?[]? args)
+    {
+        Calls.Add(method!.Name);
+        return _handler(method, args);
+    }
+}

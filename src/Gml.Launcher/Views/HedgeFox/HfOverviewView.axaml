@@ -131,6 +131,7 @@
                     <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center" IsVisible="{Binding IsIdle}">
                         <hf:HfButton Classes="ghost sm"
                                      Command="{Binding Page.GoModsCommand}"
+                                     IsEnabled="{Binding Page.BackendIsActive}"
                                      IsVisible="{Binding Page.IsModsButtonVisible}">
                             <StackPanel Orientation="Horizontal" Spacing="8">
                                 <hf:PixelIcon Kind="folder" />

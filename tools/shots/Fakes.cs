@@ -121,6 +121,9 @@ public static class Fakes
     /// <summary>The fake feed fails, as our API does until it ships the endpoint.</summary>
     public static bool NewsFails { get; set; }
 
+    /// <summary>The GML sign-in server did not answer at start: the launcher runs in offline mode.</summary>
+    public static bool BackendOffline { get; set; }
+
     private sealed class FixedStatus : IStatusService
     {
         public HfStatusSnapshot Current => StatusNow;
@@ -185,9 +188,9 @@ public static class Fakes
 
     private sealed class OnlineBackend : IBackendChecker
     {
-        public Task<bool> BackendIsActive() => Task.FromResult(true);
+        public Task<bool> BackendIsActive() => Task.FromResult(!BackendOffline);
         public Task UpdateBackendStatus() => Task.CompletedTask;
-        public bool IsOffline => false;
+        public bool IsOffline => BackendOffline;
     }
 
     private sealed class MemoryStorage : IStorageService

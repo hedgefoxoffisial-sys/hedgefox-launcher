@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
+using Gml.Client.Interfaces;
 using Gml.Launcher.Core.Services;
 using Gml.Launcher.Models;
 using Splat;
@@ -40,6 +41,9 @@ public static class HedgeFoxServices
 
         var http = CreateHttpClient();
         var m = Locator.CurrentMutable;
+        // sign-in failures in Russian on the form (the stock page would toast the raw exception text)
+        if (Locator.Current.GetService<IGmlClientManager>() is { } gml)
+            m.RegisterConstant(HfAuthGuard.Wrap(gml));
         m.RegisterConstant<IStatusService>(new StatusService(http));
         m.RegisterConstant<INewsService>(new NewsService(http));
         m.RegisterConstant<ISkinService>(new SkinService(http));

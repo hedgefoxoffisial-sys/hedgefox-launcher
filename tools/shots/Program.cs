@@ -6,6 +6,7 @@
 // Every capture waits on a condition (page shown, data loaded, layout settled), never on a fixed sleep.
 // Screens are drawn at the default 1180×720 and at the minimum 1000×620 window size.
 using System.Collections.ObjectModel;
+using System.Reflection;
 using System.Reactive.Linq;
 using Avalonia;
 using Avalonia.Controls;
@@ -13,7 +14,9 @@ using Avalonia.Headless;
 using Avalonia.ReactiveUI;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using GamerVII.Notification.Avalonia.Controls;
 using Gml.Launcher;
+using Gml.Launcher.Core;
 using Gml.Launcher.Core.HedgeFox;
 using Gml.Launcher.ViewModels;
 using Gml.Launcher.ViewModels.HedgeFox;
@@ -87,6 +90,11 @@ var init = splashVm.InitializeAsync();
 Ui.PumpUntil(() => init.IsCompleted, "splash checks");
 Console.SetOut(stdout);
 Save(splash, "splash-ready");
+// the sign-in server does not answer: the stock check's status replaces the hints
+splashVm.StatusText = splashVm.LocalizationService.GetString(SystemConstants.BackendOffline);
+Ui.PumpUntil(() => splash.GetVisualDescendants().OfType<TextBlock>().Any(t => t.Text == HfStrings.SplashOffline),
+    "splash offline line");
+Save(splash, "splash-offline");
 splash.Close();
 
 // 3. The screens with the Windows frame (own pixel buttons), at the default and at the minimum size
@@ -117,7 +125,7 @@ void Screens(int width, int height, string size)
     Save(main, "login" + size);
     login.Login = Fakes.User.Name;
     login.Is2FaVisible = true;
-    login.Errors = new ObservableCollection<string> { "Код не подошёл. Попробуй ещё раз." };
+    login.Errors = new ObservableCollection<string> { HfStrings.TwoFactorWrong };
     Save(main, "login-2fa" + size);
 
     // our API not deployed yet: «Нет данных» and the news error, never a «0»
@@ -187,6 +195,18 @@ void Screens(int width, int height, string size)
     Fakes.StatusNow = Fakes.Status;
     Fakes.NewsFails = false;
     main.Close();
+
+    // the sign-in server was down at start: offline mode, «Войти» is off and says why, the stock toast comes in 2 s
+    Fakes.BackendOffline = true;
+    var (offline, offlineVm) = OpenMain(width, height);
+    Ui.PumpUntil(() => offlineVm.Router.GetCurrentViewModel() is LoginPageViewModel, "offline login page");
+    // the stock check runs 2 s after start on a dispatcher timer, which the headless loop does not fire
+    typeof(MainWindowViewModel).GetMethod("CheckBackend", BindingFlags.NonPublic | BindingFlags.Instance)!
+        .Invoke(offlineVm, null);
+    Ui.PumpUntil(() => offline.GetVisualDescendants().OfType<NotificationMessage>().Any(), "offline toast", 10000);
+    Save(offline, "login-offline" + size);
+    offline.Close();
+    Fakes.BackendOffline = false;
 }
 
 // the HedgeFox model of the page on screen

@@ -132,7 +132,21 @@ public class PixelGearTests
     [InlineData(1.59, 0)]
     [InlineData(1.6, 1)]
     [InlineData(3.3, 2)]
-    [InlineData(4.8, 0)]
-    public void SplashHintsChangeEveryOnePointSixSeconds(double seconds, int index) =>
+    // the site's loader (intro-ui.ts) stops on the last hint: «ПОЧТИ ГОТОВО…» never goes back to the first one
+    [InlineData(4.8, 2)]
+    [InlineData(60, 2)]
+    public void SplashHintsChangeEveryOnePointSixSecondsAndStopAtTheLast(double seconds, int index) =>
         Assert.Equal(HfStrings.SplashHints[index], HfStrings.SplashHintAt(TimeSpan.FromSeconds(seconds)));
+
+    // the stock checks' own status, shown only when the sign-in server is slow or down (code-5)
+    [Fact]
+    public void TheSplashSaysWhenTheSignInServerIsSlowOrDown()
+    {
+        const string slow = "Всё еще проверка сервера", down = "Сервер не отвечает";
+        var at = TimeSpan.FromSeconds(1.7);
+        Assert.Equal(HfStrings.SplashHintAt(at), HfStrings.SplashLine("Проверка сервера", at, slow, down));
+        Assert.Equal(HfStrings.SplashHintAt(at), HfStrings.SplashLine(null, at, slow, down));
+        Assert.Equal(HfStrings.SplashSlow, HfStrings.SplashLine(slow, at, slow, down));
+        Assert.Equal(HfStrings.SplashOffline, HfStrings.SplashLine(down, at, slow, down));
+    }
 }
