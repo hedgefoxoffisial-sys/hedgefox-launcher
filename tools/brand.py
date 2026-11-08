@@ -1,47 +1,108 @@
 #!/usr/bin/env python3
-"""HedgeFox branding for the launcher: Colors.axaml from branding/tokens.json, plus brand checks. Stdlib only.
+"""HedgeFox branding for the launcher: Colors.axaml from the site's colours, plus brand checks. Stdlib only.
 
-  python3 tools/brand.py            # regenerate src/Gml.Launcher/Assets/Styles/Colors.axaml
+  python3 tools/brand.py                   # regenerate src/Gml.Launcher/Assets/Styles/Colors.axaml
+  python3 tools/brand.py sync-site [css]   # refresh branding/site-derived.json from the site's global.css :root
+
+Colour sources (the site is the authority, docs/specs/2026-11-08-launcher-v2-design.md):
+  branding/tokens.json        copy of web/site/brand/tokens.json (12 colours; its keys are a contract, never extend it)
+  branding/site-derived.json  copy of the derived values in web/site/src/styles/global.css :root (void, night, line …)
+Both copies are checked against the monorepo by tools/tests/test_brand.py when it is next door.
 """
 import json
 import re
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 TOKENS = ROOT / "branding" / "tokens.json"
-COLORS = ROOT / "src" / "Gml.Launcher" / "Assets" / "Styles" / "Colors.axaml"
+DERIVED = ROOT / "branding" / "site-derived.json"
+SITE_CSS = Path.home() / "hedgefox-work" / "web" / "site" / "src" / "styles" / "global.css"
+APP = ROOT / "src" / "Gml.Launcher"
+COLORS = APP / "Assets" / "Styles" / "Colors.axaml"
 
-# Buttons need white-ish text at 4.5:1; the token purple is too light for that, so buttons use a deeper purple
-# and the token purple becomes the hover colour.
-PRIMARY_DEEP = "#6A3DF0"
-LEAK = re.compile(r"(?i)gml\s?craft|gml\.launcher|recloud")
+# Upstream names in text a player reads (view attributes, resources).
+LEAK = re.compile(r"(?i)gml\s?craft|gml\.launcher|gmllauncher|recloud|clipartkey")
+# Upstream links and identifiers in places a player is sent or that ship with the app (links, code, packaging).
+LINK_LEAK = re.compile(r"(?i)recloud|vk\.com|gmllauncher|gml\s?craft|clipartkey")
+# Not shipped: build output and the upstream template that the csproj excludes from compilation.
+SKIP_PARTS = {"bin", "obj"}
+SKIP_FILES = {"ResourceKeysDictionary.Template.cs"}
+
+# Derived colours the launcher uses, in Colors.axaml order (everything else in :root is kept in the copy only).
+DERIVED_KEYS = ["void", "night", "raised", "raised-hover", "line", "line-strong", "well", "ink", "purple-deep",
+                "toxic", "lip-orange", "lip-purple", "bevel-light", "bevel-dark", "bevel-pressed-dark",
+                "bevel-pressed-light"]
+TOKEN_KEYS = ["bg", "surface", "purple", "purpleLight", "orange", "orangeLight", "brass", "brassDark", "text",
+              "muted", "error", "success"]
 
 
 def load_tokens(path=TOKENS) -> dict:
     return {k: v.upper() for k, v in json.loads(Path(path).read_text())["color"].items()}
 
 
+def load_derived(path=DERIVED) -> dict:
+    return {k: v.upper() for k, v in json.loads(Path(path).read_text(encoding="utf-8"))["color"].items()}
+
+
+def _rgba(match) -> str:
+    r, g, b, a = match.groups()
+    return f"#{round(float(a) * 255):02X}{int(r):02X}{int(g):02X}{int(b):02X}"
+
+
+def parse_site_root(css: str) -> dict:
+    """Hex colours of the first :root block (`--hf-name: #hex`) plus the bevel's rgb() colours as #AARRGGBB."""
+    block = re.search(r"(?m)^:root\s*\{(.*?)^\}", css, re.S)
+    if not block:
+        raise ValueError("no :root block")
+    out = {}
+    for name, value in re.findall(r"--hf-([a-z0-9-]+)\s*:\s*([^;]+);", block.group(1)):
+        value = value.strip()
+        if re.fullmatch(r"#[0-9A-Fa-f]{6}", value):
+            out[name] = value.upper()
+        elif name in ("bevel", "bevel-pressed"):
+            rgbs = [_rgba(m) for m in re.finditer(r"rgb\((\d+) (\d+) (\d+) / ([\d.]+)\)", value)]
+            first, second = ("light", "dark") if name == "bevel" else ("dark", "light")
+            out[f"{name}-{first}"], out[f"{name}-{second}"] = rgbs[0], rgbs[1]
+    return out
+
+
+def _pascal(name: str) -> str:
+    return "".join(p[:1].upper() + p[1:] for p in re.split(r"-", name))
+
+
+def _alpha(hex_color: str, opacity: float) -> str:
+    return f"#{round(opacity * 255):02X}{hex_color.lstrip('#')[-6:]}"
+
+
 def _brush(key: str, value: str) -> str:
     return f'    <SolidColorBrush x:Key="{key}">{value}</SolidColorBrush>'
 
 
+def _color(key: str, value: str) -> str:
+    return f'    <Color x:Key="{key}">{value}</Color>'
+
+
 def _gradient(key: str, start: str, end: str, opacity: str, stops) -> str:
     rows = "\n".join(f'            <GradientStop Offset="{o}" Color="{c}" />' for o, c in stops)
-    return (f'    <LinearGradientBrush x:Key="{key}" StartPoint="{start}" EndPoint="{end}" Opacity="{opacity}">\n'
+    opacity_attr = f' Opacity="{opacity}"' if opacity else ""
+    return (f'    <LinearGradientBrush x:Key="{key}" StartPoint="{start}" EndPoint="{end}"{opacity_attr}>\n'
             f"        <LinearGradientBrush.GradientStops>\n{rows}\n"
             f"        </LinearGradientBrush.GradientStops>\n    </LinearGradientBrush>")
 
 
-def render_colors_axaml(t: dict) -> str:
-    orange_soft = "#10" + t["orange"][1:]
+def render_colors_axaml(t: dict, d: dict) -> str:
+    hf = {**{k: t[k] for k in TOKEN_KEYS}, **{k: d[k] for k in DERIVED_KEYS}}
+    bg = t["bg"]
     parts = [
-        "<!-- generated by tools/brand.py from branding/tokens.json, do not edit -->",
+        "<!-- generated by tools/brand.py from branding/tokens.json and branding/site-derived.json, do not edit -->",
         '<ResourceDictionary xmlns="https://github.com/avaloniaui"',
         '                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">',
         "",
-        _brush("PrimaryColor", PRIMARY_DEEP),
+        "    <!-- Stock GML keys, now on the site's palette -->",
+        _brush("PrimaryColor", d["purple-deep"]),
         _brush("PrimaryColorHover", t["purple"]),
-        _brush("PrimaryTransparentColor", "#1A1230"),
+        _brush("PrimaryTransparentColor", d["night"]),
         _brush("AccentColor", t["orange"]),
         "",
         _brush("HeadlineColor", t["text"]),
@@ -50,26 +111,51 @@ def render_colors_axaml(t: dict) -> str:
         _brush("BackgroundColor", t["bg"]),
         "",
         _brush("FrameBackgroundColor", t["surface"]),
-        _brush("FrameBackgroundBorderColor", "#34265A"),
+        _brush("FrameBackgroundBorderColor", d["line"]),
         "",
-        _brush("SecondaryColor", "#0B0718"),
-        _brush("SecondaryColorHover", "#1A1230"),
+        _brush("SecondaryColor", d["void"]),
+        _brush("SecondaryColorHover", d["night"]),
         "",
-        _brush("FormBackgroundColor", "#1B1233"),
-        _brush("FormBackgroundHoverColor", "#251A44"),
-        _brush("FormBorderColor", "#2E2150"),
-        _brush("FormBorderHoverColor", "#44336E"),
+        _brush("FormBackgroundColor", d["well"]),
+        _brush("FormBackgroundHoverColor", d["well"]),
+        _brush("FormBorderColor", d["line"]),
+        _brush("FormBorderHoverColor", t["purple"]),
         "",
         _brush("BadgeBorder", "#20FFFFFF"),
         "",
         _gradient("ProfileLinearGradient", "0%, 0%", "0%, 100%", ".3",
-                  [("0", "Transparent"), ("0.2", orange_soft), ("1", t["orange"])]),
+                  [("0", "Transparent"), ("1", d["purple-deep"])]),
         "",
         _gradient("ProfileImageLinearGradient", "50%, -80%", "50%, 100%", ".2",
                   [("0", t["surface"]), ("1", t["surface"])]),
         "",
         _gradient("BackgroundOverlay", "50%, -80%", "50%, 100%", ".9",
                   [("0", "Transparent"), ("0.3", t["bg"]), ("1", t["bg"])]),
+        "",
+        "    <!-- HedgeFox palette: tokens.json, then the derived values of the site's :root -->",
+    ]
+    for name, value in hf.items():
+        parts.append(_color(f"Hf{_pascal(name)}Color", value))
+    parts.append("")
+    for name, value in hf.items():
+        parts.append(_brush(f"Hf{_pascal(name)}Brush", value))
+    parts += [
+        "",
+        "    <!-- Tints: placeholder text, focus halo, progress glow, status ticket well -->",
+        _color("HfOrangeHaloColor", _alpha(t["orange"], 0.4)),
+        _color("HfOrangeGlowColor", _alpha(t["orange"], 0.6)),
+        _color("HfSuccessGlowColor", _alpha(t["success"], 0.85)),
+        _brush("HfPlaceholderBrush", _alpha(t["muted"], 0.7)),
+        _brush("HfTicketBrush", _alpha(d["night"], 0.9)),
+        _brush("HfVeilBrush", _alpha(bg, 0.35)),
+        "",
+        "    <!-- Scrims over the night scene: under a text column on the left, and the fade at the bottom -->",
+        _gradient("HfScrimLeftBrush", "0%, 0%", "100%, 0%", "",
+                  [("0", _alpha(bg, 0.92)), ("0.42", _alpha(bg, 0.8)), ("0.58", _alpha(bg, 0.45)),
+                   ("0.72", _alpha(bg, 0))]),
+        "",
+        _gradient("HfScrimBottomBrush", "0%, 100%", "0%, 0%", "",
+                  [("0", bg), ("0.06", _alpha(bg, 0.55)), ("0.16", _alpha(bg, 0))]),
         "",
         "</ResourceDictionary>",
         "",
@@ -97,21 +183,78 @@ def contrast(fg: str, bg: str) -> float:
     return (a + 0.05) / (b + 0.05)
 
 
+CS_STRING = re.compile(r'@"(?:[^"]|"")*"|\$?"(?:[^"\\\n]|\\.)*"')
+
+
+def _cs_strings(source: str) -> list:
+    """C# string literals, with // and /* */ comments removed first (a comment is not shipped text)."""
+    out, i, n = [], 0, len(source)
+    while i < n:
+        if source.startswith("//", i):
+            i = source.find("\n", i)
+            i = n if i < 0 else i
+        elif source.startswith("/*", i):
+            j = source.find("*/", i + 2)
+            i = n if j < 0 else j + 2
+        elif source[i] in '@$"':
+            m = CS_STRING.match(source, i)
+            if m:
+                out.append(m.group(0))
+                i = m.end()
+            else:
+                i += 1
+        elif source[i] == "'":
+            m = re.compile(r"'(?:[^'\\\n]|\\.)*'").match(source, i)
+            i = m.end() if m else i + 1
+        else:
+            i += 1
+    return out
+
+
+def _shipped(app_dir: Path, pattern: str):
+    for f in sorted(Path(app_dir).rglob(pattern)):
+        rel = f.relative_to(app_dir)
+        if SKIP_PARTS.intersection(rel.parts[:-1]) or f.name in SKIP_FILES:
+            continue
+        yield f, rel
+
+
 def find_brand_leaks(app_dir: Path) -> list:
-    """Upstream brand names in user-visible text: Text/Title/Content attributes in views and Russian resources."""
+    """Upstream brand in the app: user text and links in views, C# string literals, every .resx and the parcel."""
     leaks = []
-    for f in Path(app_dir).rglob("*.axaml"):
-        for m in re.finditer(r'(?:Text|Title|Content|Watermark)="([^"]*)"', f.read_text(encoding="utf-8-sig")):
+    for f, rel in _shipped(app_dir, "*.axaml"):
+        text = f.read_text(encoding="utf-8-sig")
+        for m in re.finditer(r'(?:Text|Title|Content|Watermark)="([^"]*)"', text):
             if LEAK.search(m.group(1)):
-                leaks.append(f"{f.relative_to(app_dir)}: {m.group(1)}")
-    ru = Path(app_dir) / "Assets" / "Resources" / "Resources.ru.resx"
-    if ru.exists():
-        for v in re.findall(r"<value>(.*?)</value>", ru.read_text(encoding="utf-8-sig"), re.S):
-            if LEAK.search(v):
-                leaks.append(f"Resources.ru.resx: {v.strip()[:80]}")
+                leaks.append(f"{rel}: {m.group(1)}")
+        for m in re.finditer(r'(?:CommandParameter|NavigateUri|Source|Path)="([^"]*)"', text):
+            if LINK_LEAK.search(m.group(1)):
+                leaks.append(f"{rel}: {m.group(1)}")
+    for f, rel in _shipped(app_dir, "*.cs"):
+        for literal in _cs_strings(f.read_text(encoding="utf-8-sig")):
+            if LINK_LEAK.search(literal):
+                leaks.append(f"{rel}: {literal[:80]}")
+    for f, rel in _shipped(app_dir, "*.resx"):
+        for v in re.findall(r"<value>(.*?)</value>", f.read_text(encoding="utf-8-sig"), re.S):
+            if LEAK.search(v) or LINK_LEAK.search(v):
+                leaks.append(f"{rel}: {v.strip()[:80]}")
+    for f, rel in _shipped(app_dir, "*.parcel"):
+        for value in re.findall(r'"([^"]*)"', f.read_text(encoding="utf-8-sig")):
+            if LINK_LEAK.search(value):
+                leaks.append(f"{rel}: {value[:80]}")
     return leaks
 
 
+def sync_site(css_path: Path = SITE_CSS) -> dict:
+    colors = parse_site_root(css_path.read_text(encoding="utf-8"))
+    doc = {"_source": "web/site/src/styles/global.css :root (copied by tools/brand.py sync-site)", "color": colors}
+    DERIVED.write_text(json.dumps(doc, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    return colors
+
+
 if __name__ == "__main__":
-    COLORS.write_text(render_colors_axaml(load_tokens()), encoding="utf-8")
+    if sys.argv[1:2] == ["sync-site"]:
+        sync_site(Path(sys.argv[2]).expanduser() if len(sys.argv) > 2 else SITE_CSS)
+        print(f"wrote {DERIVED.relative_to(ROOT)}")
+    COLORS.write_text(render_colors_axaml(load_tokens(), load_derived()), encoding="utf-8")
     print(f"wrote {COLORS.relative_to(ROOT)}")

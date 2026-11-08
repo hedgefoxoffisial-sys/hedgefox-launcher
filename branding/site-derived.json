@@ -1,0 +1,28 @@
+{
+  "_source": "web/site/src/styles/global.css :root (copied by tools/brand.py sync-site)",
+  "color": {
+    "void": "#080511",
+    "night": "#19102F",
+    "raised": "#30204E",
+    "raised-hover": "#46307D",
+    "line": "#5F4285",
+    "line-strong": "#7956B7",
+    "well": "#19102F",
+    "ink": "#1B1124",
+    "purple-deep": "#6A3FD1",
+    "fog-base": "#19102F",
+    "toxic": "#A5C98D",
+    "lip-orange": "#ED8731",
+    "lip-purple": "#46307D",
+    "paper": "#F3E6C4",
+    "paper-shade": "#E3CFA2",
+    "paper-edge": "#B8955E",
+    "paper-text": "#1B1124",
+    "paper-muted": "#6B5236",
+    "paper-accent": "#A33D06",
+    "bevel-light": "#47FFFFFF",
+    "bevel-dark": "#47000000",
+    "bevel-pressed-dark": "#47000000",
+    "bevel-pressed-light": "#2EFFFFFF"
+  }
+}

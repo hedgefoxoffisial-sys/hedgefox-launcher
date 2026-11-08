@@ -16,11 +16,11 @@ public class ProfileUserControl : ItemsControl
 
     public static readonly StyledProperty<string> SkinUrlProperty =
         AvaloniaProperty.Register<ProfileUserControl, string>(
-            nameof(SkinUrl), "https://www.clipartkey.com/mpngs/m/215-2156859_fond-transparent-steve-minecraft.png");
+            nameof(SkinUrl), string.Empty);
 
     public static readonly StyledProperty<string> UserNameProperty =
         AvaloniaProperty.Register<ProfileUserControl, string>(
-            nameof(UserName), "GamerVII");
+            nameof(UserName), string.Empty);
 
     public string UserName
     {

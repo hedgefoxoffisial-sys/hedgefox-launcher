@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Gml.Launcher.ViewModels.Pages"
              xmlns:lang="clr-namespace:Gml.Launcher.Assets.Resources"
+             xmlns:hf="clr-namespace:Gml.Launcher.Core.HedgeFox"
              xmlns:components="clr-namespace:Gml.Launcher.Views.Components"
              xmlns:converters="clr-namespace:Gml.Launcher.Core.Converters"
              mc:Ignorable="d"
@@ -45,7 +46,7 @@
                         <components:GmlButton Classes="Icon Additional"
                                               Margin="0, 15, 0, 0"
                                               Command="{Binding OpenLinkCommand}"
-                                              CommandParameter="https://recloud.tech"
+                                              CommandParameter="{x:Static hf:HfLinks.Cabinet}"
                                               IconPath="/Assets/Images/profile.svg"
                                               Text="{x:Static lang:Resources.Cabinet}"
                                               HorizontalAlignment="Center" />
@@ -55,7 +56,7 @@
                                               Padding="15, 10, 10, 10"
 
                                               Command="{Binding OpenLinkCommand}"
-                                              CommandParameter="https://recloud.tech"
+                                              CommandParameter="{x:Static hf:HfLinks.Cabinet}"
                                               IconSize="20"
                                               IconPath="/Assets/Images/home.svg"
                                               Text="{x:Static lang:Resources.Cabinet}"

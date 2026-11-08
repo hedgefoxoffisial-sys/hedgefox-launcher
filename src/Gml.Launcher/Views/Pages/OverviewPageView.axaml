@@ -4,6 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:Gml.Launcher.ViewModels.Pages"
              xmlns:lang="clr-namespace:Gml.Launcher.Assets.Resources"
+             xmlns:hf="clr-namespace:Gml.Launcher.Core.HedgeFox"
              xmlns:components="clr-namespace:Gml.Launcher.Views.Components"
              xmlns:converters="clr-namespace:Gml.Launcher.Core.Converters"
              xmlns:news="clr-namespace:Gml.Dto.News;assembly=Gml.Dto"
@@ -98,7 +99,7 @@
                     <components:GmlButton Grid.Column="0"
                                           IconPath="/Assets/Images/document.svg"
                                           Command="{Binding OpenLinkCommand}"
-                                          CommandParameter="https://vk.com/recloud.studio"
+                                          CommandParameter="{x:Static hf:HfLinks.Credits}"
                                           IconSize="22"
                                           Classes="TextIcon Additional"
                                           Text="{x:Static lang:Resources.ModsList}" />
@@ -107,18 +108,18 @@
                                 Orientation="Horizontal"
                                 Spacing="10">
 
-                        <components:GmlButton IconPath="/Assets/Images/vk.svg"
+                        <components:GmlButton IconPath="/Assets/Images/users.svg"
                                               IconSize="24"
                                               Padding="0, 2, 0, 0"
                                               Command="{Binding OpenLinkCommand}"
-                                              CommandParameter="https://vk.com/recloud.studio"
+                                              CommandParameter="{x:Static hf:HfLinks.Telegram}"
                                               Classes="Icon Additional"
                                               Text="{x:Static lang:Resources.Website}" />
 
                         <components:GmlButton IconPath="/Assets/Images/app.svg"
                                               IconSize="22"
                                               Command="{Binding OpenLinkCommand}"
-                                              CommandParameter="https://recloud.tech"
+                                              CommandParameter="{x:Static hf:HfLinks.Site}"
                                               Padding="15, 0, 15, 0"
                                               Classes="TextIcon Additional"
                                               Text="{x:Static lang:Resources.Website}" />
