@@ -81,11 +81,11 @@ public class StatusWordingTests
 {
     [Fact]
     public void Online() =>
-        Assert.Equal("Онлайн: 7 из 45", HfStrings.StatusLine(HfStatusParser.Parse("""{"online":true,"players":7,"max":45}""")));
+        Assert.Equal("Онлайн 7 из 45", HfStrings.StatusLine(HfStatusParser.Parse("""{"online":true,"players":7,"max":45}""")));
 
     [Fact]
     public void OnlineWithNobodyStillSaysZeroBecauseTheServerAnswered() =>
-        Assert.Equal("Онлайн: 0 из 45", HfStrings.StatusLine(HfStatusParser.Parse("""{"online":true,"players":0,"max":45}""")));
+        Assert.Equal("Онлайн 0 из 45", HfStrings.StatusLine(HfStatusParser.Parse("""{"online":true,"players":0,"max":45}""")));
 
     [Fact]
     public void Offline() => Assert.Equal("Сервер спит", HfStrings.StatusLine(HfStatusParser.Parse("""{"online":false}""")));
@@ -95,6 +95,31 @@ public class StatusWordingTests
 
     [Fact]
     public void Loading() => Assert.Equal("Проверяем…", HfStrings.StatusLine(HfStatusSnapshot.Loading));
+
+    [Theory]
+    [InlineData(80, 96, "Онлайн 7 из 45 · Пелена поднимается")]
+    [InlineData(96, 80, "Онлайн 7 из 45 · Пелена опускается")]
+    [InlineData(80, 80, "Онлайн 7 из 45 · Пелена: Y 80")]
+    [InlineData(-64, -64, "Онлайн 7 из 45 · Пелена спит")]
+    [InlineData(-64, 10, "Онлайн 7 из 45 · Пелена просыпается")]
+    public void ShortLineAddsThePelenaInAFewWords(double y, double target, string expected) =>
+        Assert.Equal(expected, HfStrings.StatusShort(new HfStatusSnapshot(HfStatusKind.Online, 7, 45, Pelena: new HfPelena(y, target))));
+
+    [Fact]
+    public void ShortLineWithoutThePelenaOrWithoutAnyIsJustTheOnline()
+    {
+        var online = new HfStatusSnapshot(HfStatusKind.Online, 0, 45, Pelena: new HfPelena(80, 96));
+        Assert.Equal("Онлайн 0 из 45", HfStrings.StatusShort(online, withPelena: false));
+        Assert.Equal("Онлайн 0 из 45", HfStrings.StatusShort(online with { Pelena = null }));
+    }
+
+    [Fact]
+    public void ShortLineIsHiddenWithoutAnAnswerAndSaysTheServerSleeps()
+    {
+        Assert.Null(HfStrings.StatusShort(HfStatusSnapshot.NoData));
+        Assert.Null(HfStrings.StatusShort(HfStatusSnapshot.Loading));
+        Assert.Equal("Сервер спит", HfStrings.StatusShort(HfStatusParser.Parse("""{"online":false}""")));
+    }
 }
 
 public class PelenaWordingTests

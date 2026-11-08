@@ -14,8 +14,8 @@ using Splat;
 namespace Gml.Launcher.ViewModels.HedgeFox;
 
 /// <summary>
-///     The right column of the login and main screens: server status, the Pelena and the latest news from our API
-///     (spec «Пелена на виджете», «Статус»). Never shows a made-up «0»: no answer is «Нет данных».
+///     The status line of the login and main screens (online, the Pelena) and the latest news from our API
+///     (spec «Пелена на виджете», «Статус»). Never shows a made-up «0»: without an answer the line is hidden.
 ///     <see cref="Start" /> polls while a screen shows it; dispose the result when the screen goes.
 /// </summary>
 public sealed class HfServerInfoModel : ReactiveObject
@@ -41,11 +41,19 @@ public sealed class HfServerInfoModel : ReactiveObject
     /// <summary>«Now» for the news dates; the screenshot harness fixes it so its pictures do not change.</summary>
     public static Func<DateTimeOffset> Clock { get; set; } = () => DateTimeOffset.Now;
 
-    /// <summary>With the app's services (Splat).</summary>
+    /// <summary>With the app's services (Splat); <paramref name="newsLimit" /> 0 reads no news at all.</summary>
     public static HfServerInfoModel FromServices(int newsLimit) =>
-        new(Locator.Current.GetService<IStatusService>(), Locator.Current.GetService<INewsService>(), Clock, newsLimit);
+        new(Locator.Current.GetService<IStatusService>(),
+            newsLimit > 0 ? Locator.Current.GetService<INewsService>() : null, Clock, newsLimit);
 
     [Reactive] public string StatusLine { get; private set; } = HfStrings.StatusLoading;
+
+    /// <summary>«Онлайн 7 из 45 · Пелена поднимается» or «Сервер спит»; empty (and hidden) without data.</summary>
+    [Reactive] public string ShortLine { get; private set; } = string.Empty;
+    [Reactive] public bool HasShortLine { get; private set; }
+
+    /// <summary>The same without the Pelena (the sign-in screen): «Онлайн 7 из 45» or «Сервер спит».</summary>
+    [Reactive] public string OnlineLine { get; private set; } = string.Empty;
     [Reactive] public HfDotState Dot { get; private set; } = HfDotState.Waiting;
     [Reactive] public bool HasPelena { get; private set; }
     [Reactive] public string PelenaTitle { get; private set; } = string.Empty;
@@ -57,6 +65,10 @@ public sealed class HfServerInfoModel : ReactiveObject
     public ObservableCollection<HfNewsCard> News { get; } = [];
     [Reactive] public string? NewsMessage { get; private set; }
     [Reactive] public bool HasNewsMessage { get; private set; }
+
+    /// <summary>The newest post (the one strip on the main screen), or null.</summary>
+    [Reactive] public HfNewsCard? Latest { get; private set; }
+    [Reactive] public bool HasLatest { get; private set; }
 
     public ReactiveCommand<HfNewsCard, Unit> OpenNewsCommand { get; }
 
@@ -71,6 +83,9 @@ public sealed class HfServerInfoModel : ReactiveObject
     public void Apply(HfStatusSnapshot snapshot)
     {
         StatusLine = HfStrings.StatusLine(snapshot);
+        ShortLine = HfStrings.StatusShort(snapshot) ?? string.Empty;
+        HasShortLine = ShortLine.Length > 0;
+        OnlineLine = HfStrings.StatusShort(snapshot, withPelena: false) ?? string.Empty;
         Dot = DotFor(snapshot.Kind);
         // the Pelena only means something while the server is up
         var pelena = snapshot.Kind == HfStatusKind.Online ? HfPelenaView.From(snapshot.Pelena) : null;
@@ -94,6 +109,8 @@ public sealed class HfServerInfoModel : ReactiveObject
             News.Add(HfNewsCard.From(item, now));
         NewsMessage = HfNewsCard.Message(result);
         HasNewsMessage = NewsMessage is not null;
+        Latest = News.Count > 0 ? News[0] : null;
+        HasLatest = Latest is not null;
     }
 
     /// <summary>Follows the status (our API is polled every 30 s while this runs) and reloads the news now and then.</summary>

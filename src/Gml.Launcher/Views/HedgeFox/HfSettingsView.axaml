@@ -1,108 +1,134 @@
-<!-- Настройки (spec «Экраны» 5): memory with the «советуем» mark, the game window, the game folder. Russian only.
+<!-- Настройки: one quiet night plate in the middle. Memory with the «советуем» mark, the game window and the game
+     folder side by side; under them «Игра»: the mods of the chosen profile and «Переустановить» (asks first).
      The stock SettingsPageViewModel loads and saves (it saves 0.4 s after a change); HfSettingsModel adds the
-     gigabytes and the mark. -->
+     gigabytes, the mark and the main screen's mods and reinstall. -->
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:hf="using:Gml.Launcher.Views.HedgeFox.Controls"
              xmlns:core="using:Gml.Launcher.Core.HedgeFox"
              xmlns:hfvm="using:Gml.Launcher.ViewModels.HedgeFox"
              x:Class="Gml.Launcher.Views.HedgeFox.HfSettingsView">
-    <Grid Name="Root" x:DataType="hfvm:HfSettingsModel">
-        <Rectangle Fill="{DynamicResource HfScrimLeftBrush}" />
-
-        <Grid RowDefinitions="Auto,*" RowSpacing="22" Margin="24,14,24,24">
-            <StackPanel Orientation="Horizontal" Spacing="20">
-                <hf:HfButton Classes="secondary sm" Command="{Binding Page.GoBackCommand}">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <hf:PixelIcon Kind="back" />
-                        <TextBlock Text="{x:Static core:HfStrings.Back}" VerticalAlignment="Center" />
-                    </StackPanel>
-                </hf:HfButton>
-                <TextBlock Classes="hf-h1 hf-shadow" Text="{x:Static core:HfStrings.SettingsTitle}" VerticalAlignment="Center" />
+    <Grid Name="Root" x:DataType="hfvm:HfSettingsModel" RowDefinitions="Auto,*" Margin="16,4,16,16">
+        <hf:HfButton Classes="text" HorizontalAlignment="Left" Command="{Binding Page.GoBackCommand}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <hf:PixelIcon Kind="back" />
+                <TextBlock Text="{x:Static core:HfStrings.Back}" VerticalAlignment="Center" />
             </StackPanel>
+        </hf:HfButton>
 
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,10,0">
-                <Grid ColumnDefinitions="*,*" ColumnSpacing="24" MaxWidth="1000" HorizontalAlignment="Left" VerticalAlignment="Top">
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,8,0" Margin="0,4,0,0">
+            <StackPanel Width="760" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16">
+                <TextBlock Classes="hf-px32" Text="{x:Static core:HfStrings.SettingsCaps}" HorizontalAlignment="Center">
+                    <TextBlock.Effect>
+                        <DropShadowEffect OffsetX="3" OffsetY="3" BlurRadius="0" Opacity="1" Color="#080511" />
+                    </TextBlock.Effect>
+                </TextBlock>
 
-                    <!-- Memory -->
-                    <hf:PixelBorder Classes="hf-card" Padding="22,20,22,22" Margin="0,0,4,4" VerticalAlignment="Top">
-                        <StackPanel Spacing="14">
-                            <StackPanel Spacing="6">
-                                <TextBlock Classes="hf-h2" Text="{x:Static core:HfStrings.MemorySetting}" />
-                                <TextBlock Classes="hf-small" Text="{x:Static core:HfStrings.MemoryHint}" />
-                            </StackPanel>
-                            <CheckBox Content="{x:Static core:HfStrings.MemoryAuto}" IsChecked="{Binding Page.DynamicRamValue}" />
-                            <StackPanel Spacing="2" IsEnabled="{Binding IsManualRam}" Margin="0,6,0,0">
-                                <Grid ColumnDefinitions="*,Auto">
-                                    <TextBlock Classes="hf-label" Text="{x:Static core:HfStrings.MemoryForGame}" VerticalAlignment="Bottom" />
-                                    <TextBlock Grid.Column="1" Classes="hf-h1 hf-shadow" Foreground="{DynamicResource HfOrangeBrush}"
-                                               Text="{Binding RamText}" />
-                                </Grid>
-                                <hf:HfMarkPanel Fraction="{Binding MarkFraction}" Inset="9" IsVisible="{Binding HasMark}" Margin="0,6,0,0">
-                                    <StackPanel Spacing="2">
-                                        <TextBlock Classes="hf-small" Foreground="{DynamicResource HfBrassBrush}" Text="{Binding MarkText}"
-                                                   HorizontalAlignment="Center" />
-                                        <Border Width="2" Height="8" Background="{DynamicResource HfBrassBrush}" HorizontalAlignment="Center" />
-                                    </StackPanel>
-                                </hf:HfMarkPanel>
-                                <Slider Minimum="{Binding Page.MinRamValue}"
-                                        Maximum="{Binding Page.MaxRamValue}"
-                                        Value="{Binding Page.RamValue}"
-                                        TickFrequency="{Binding Page.RamTickValue}"
-                                        IsSnapToTickEnabled="True" />
-                                <Grid ColumnDefinitions="*,*">
-                                    <TextBlock Classes="hf-small" Text="{Binding MinText}" />
-                                    <TextBlock Grid.Column="1" Classes="hf-small" Text="{Binding MaxText}" HorizontalAlignment="Right" />
-                                </Grid>
-                            </StackPanel>
-                        </StackPanel>
-                    </hf:PixelBorder>
-
-                    <StackPanel Grid.Column="1" Spacing="20">
-                        <!-- Game window -->
-                        <hf:PixelBorder Classes="hf-card" Padding="22,20,22,22" Margin="0,0,4,4">
-                            <StackPanel Spacing="14">
-                                <TextBlock Classes="hf-h2" Text="{x:Static core:HfStrings.WindowSetting}" />
-                                <CheckBox Content="{x:Static core:HfStrings.FullScreen}" IsChecked="{Binding Page.FullScreen}" />
-                                <Grid ColumnDefinitions="*,Auto,*" ColumnSpacing="12" IsVisible="{Binding IsWindowed}">
-                                    <StackPanel Spacing="6">
-                                        <TextBlock Classes="hf-small" Text="{x:Static core:HfStrings.WindowWidth}" />
-                                        <TextBox Text="{Binding Page.WindowWidth}" />
-                                    </StackPanel>
-                                    <TextBlock Grid.Column="1" Classes="hf-body hf-muted" Text="×" VerticalAlignment="Bottom" Margin="0,0,0,12" />
-                                    <StackPanel Grid.Column="2" Spacing="6">
-                                        <TextBlock Classes="hf-small" Text="{x:Static core:HfStrings.WindowHeight}" />
-                                        <TextBox Text="{Binding Page.WindowHeight}" />
-                                    </StackPanel>
-                                </Grid>
-                            </StackPanel>
-                        </hf:PixelBorder>
-
-                        <!-- Game folder -->
-                        <hf:PixelBorder Classes="hf-card" Padding="22,20,22,22" Margin="0,0,4,4">
+                <Border Background="{DynamicResource HfTicketBrush}" BorderBrush="{DynamicResource HfLineBrush}"
+                        BorderThickness="1" Padding="28,24,28,24">
+                    <StackPanel Spacing="22">
+                        <Grid ColumnDefinitions="*,40,*">
+                            <!-- Memory -->
                             <StackPanel Spacing="12">
-                                <StackPanel Spacing="6">
-                                    <TextBlock Classes="hf-h2" Text="{x:Static core:HfStrings.GameFolder}" />
-                                    <TextBlock Classes="hf-small" Text="{x:Static core:HfStrings.GameFolderHint}" />
+                                <TextBlock Classes="hf-label" Text="{x:Static core:HfStrings.MemorySetting}" />
+                                <CheckBox Content="{x:Static core:HfStrings.MemoryAuto}" IsChecked="{Binding Page.DynamicRamValue}" />
+                                <StackPanel Spacing="2" IsEnabled="{Binding IsManualRam}" Margin="0,4,0,0">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock Classes="hf-small" Text="{x:Static core:HfStrings.MemoryForGame}" VerticalAlignment="Bottom" />
+                                        <TextBlock Grid.Column="1" Classes="hf-px24" Foreground="{DynamicResource HfOrangeBrush}"
+                                                   Text="{Binding RamText}" />
+                                    </Grid>
+                                    <hf:HfMarkPanel Fraction="{Binding MarkFraction}" Inset="9" IsVisible="{Binding HasMark}" Margin="0,6,0,0">
+                                        <StackPanel Spacing="2">
+                                            <TextBlock Classes="hf-small" Foreground="{DynamicResource HfBrassBrush}" Text="{Binding MarkText}"
+                                                       HorizontalAlignment="Center" />
+                                            <Border Width="2" Height="8" Background="{DynamicResource HfBrassBrush}" HorizontalAlignment="Center" />
+                                        </StackPanel>
+                                    </hf:HfMarkPanel>
+                                    <Slider Minimum="{Binding Page.MinRamValue}"
+                                            Maximum="{Binding Page.MaxRamValue}"
+                                            Value="{Binding Page.RamValue}"
+                                            TickFrequency="{Binding Page.RamTickValue}"
+                                            IsSnapToTickEnabled="True" />
+                                    <Grid ColumnDefinitions="*,*">
+                                        <TextBlock Classes="hf-small" Text="{Binding MinText}" />
+                                        <TextBlock Grid.Column="1" Classes="hf-small" Text="{Binding MaxText}" HorizontalAlignment="Right" />
+                                    </Grid>
                                 </StackPanel>
-                                <hf:PixelBorder Classes="hf-well" Padding="14,12">
-                                    <TextBlock Classes="hf-body" Text="{Binding Page.InstallationFolder}"
-                                               TextWrapping="NoWrap" TextTrimming="PathSegmentEllipsis" />
-                                </hf:PixelBorder>
-                                <StackPanel Orientation="Horizontal" Spacing="10">
-                                    <hf:HfButton Classes="secondary sm" Click="OnPickFolder">
+                            </StackPanel>
+
+                            <StackPanel Grid.Column="2" Spacing="22">
+                                <!-- Game window -->
+                                <StackPanel Spacing="12">
+                                    <TextBlock Classes="hf-label" Text="{x:Static core:HfStrings.WindowSetting}" />
+                                    <CheckBox Content="{x:Static core:HfStrings.FullScreen}" IsChecked="{Binding Page.FullScreen}" />
+                                    <Grid ColumnDefinitions="*,Auto,*" ColumnSpacing="10" IsVisible="{Binding IsWindowed}">
+                                        <TextBox Text="{Binding Page.WindowWidth}" Watermark="{x:Static core:HfStrings.WindowWidth}"
+                                                 ToolTip.Tip="{x:Static core:HfStrings.WindowWidth}" />
+                                        <TextBlock Grid.Column="1" Classes="hf-body hf-muted" Text="×" VerticalAlignment="Center" />
+                                        <TextBox Grid.Column="2" Text="{Binding Page.WindowHeight}" Watermark="{x:Static core:HfStrings.WindowHeight}"
+                                                 ToolTip.Tip="{x:Static core:HfStrings.WindowHeight}" />
+                                    </Grid>
+                                </StackPanel>
+
+                                <!-- Game folder -->
+                                <StackPanel Spacing="10">
+                                    <TextBlock Classes="hf-label" Text="{x:Static core:HfStrings.GameFolder}" />
+                                    <TextBlock Classes="hf-small" Foreground="{DynamicResource HfTextBrush}"
+                                               Text="{Binding Page.InstallationFolder}"
+                                               TextWrapping="NoWrap" TextTrimming="PathSegmentEllipsis"
+                                               ToolTip.Tip="{Binding Page.InstallationFolder}" />
+                                    <StackPanel Orientation="Horizontal" Spacing="4" Margin="-6,0,0,0">
+                                        <hf:HfButton Classes="text" Click="OnPickFolder" Content="{x:Static core:HfStrings.ChangeFolder}" />
+                                        <TextBlock Classes="hf-small" Text="·" VerticalAlignment="Center" />
+                                        <hf:HfButton Classes="text" Click="OnOpenFolder" Content="{x:Static core:HfStrings.OpenFolder}" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- The game: the chosen profile's mods, and the reinstall that asks first -->
+                        <StackPanel Spacing="10" IsVisible="{Binding HasGame}">
+                            <Border Height="1" Background="{DynamicResource HfLineBrush}" Margin="0,0,0,10" />
+                            <Grid ColumnDefinitions="Auto,*,Auto" IsVisible="{Binding !Reinstall.IsAsking}">
+                                <TextBlock Classes="hf-label" Text="{x:Static core:HfStrings.GameSetting}" VerticalAlignment="Center" />
+                                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10">
+                                    <hf:HfButton Classes="ghost sm"
+                                                 Command="{Binding ModsCommand}"
+                                                 IsVisible="{Binding HasMods}">
                                         <StackPanel Orientation="Horizontal" Spacing="8">
                                             <hf:PixelIcon Kind="folder" />
-                                            <TextBlock Text="{x:Static core:HfStrings.ChangeFolder}" VerticalAlignment="Center" />
+                                            <TextBlock Text="{x:Static core:HfStrings.Mods}" VerticalAlignment="Center" />
                                         </StackPanel>
                                     </hf:HfButton>
-                                    <hf:HfButton Classes="ghost sm" Click="OnOpenFolder" Content="{x:Static core:HfStrings.OpenFolder}" />
+                                    <hf:HfButton Classes="ghost sm"
+                                                 Command="{Binding Reinstall.AskCommand}"
+                                                 ToolTip.Tip="{x:Static core:HfStrings.ReinstallHint}"
+                                                 ToolTip.ShowOnDisabled="True"
+                                                 Content="{x:Static core:HfStrings.Reinstall}" />
+                                </StackPanel>
+                            </Grid>
+                            <TextBlock Classes="hf-small" Text="{x:Static core:HfStrings.ReinstallHint}"
+                                       IsVisible="{Binding !Reinstall.IsAsking}" />
+
+                            <!-- the question in place of the row -->
+                            <StackPanel Spacing="12" IsVisible="{Binding Reinstall.IsAsking}">
+                                <TextBlock Classes="hf-label" Text="{x:Static core:HfStrings.ReinstallAskTitle}" />
+                                <TextBlock Classes="hf-small" Foreground="{DynamicResource HfTextBrush}"
+                                           Text="{x:Static core:HfStrings.ReinstallAsk}" />
+                                <StackPanel Orientation="Horizontal" Spacing="10">
+                                    <hf:HfButton Classes="secondary sm"
+                                                 Command="{Binding Reinstall.ConfirmCommand}"
+                                                 Content="{x:Static core:HfStrings.ReinstallYes}" />
+                                    <hf:HfButton Classes="ghost sm"
+                                                 Command="{Binding Reinstall.CancelCommand}"
+                                                 Content="{x:Static core:HfStrings.Cancel}" />
                                 </StackPanel>
                             </StackPanel>
-                        </hf:PixelBorder>
+                        </StackPanel>
                     </StackPanel>
-                </Grid>
-            </ScrollViewer>
-        </Grid>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </UserControl>

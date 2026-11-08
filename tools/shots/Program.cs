@@ -54,6 +54,8 @@ AppBuilder.Configure<App>()
     .SetupWithoutStarting();
 Fakes.Register(scratch);
 HfServerInfoModel.Clock = () => Fakes.Now;
+// the night scene and the fog tuft hold their first frame: the same picture on every run
+HfMenuScene.Motion = false;
 
 var shots = new List<string>();
 
@@ -76,6 +78,15 @@ Ui.Settle(galleryWindow);
 gallery.ForceStates();
 Save(galleryWindow, "theme-gallery");
 galleryWindow.Close();
+
+// 1b. The game-menu primitives over the night scene: the sign, the tabs, the text links, the news strip, the status
+var menuGallery = new MenuGallery();
+var menuWindow = new Window { Width = 1180, Height = 720, Content = menuGallery };
+menuWindow.Show();
+Ui.Settle(menuWindow);
+menuGallery.ForceStates();
+Save(menuWindow, "theme-menu");
+menuWindow.Close();
 
 // 2. Splash, before and after its checks (all answered by the fakes); the cogs hold still for the picture
 var splashVm = new SplashScreenViewModel();
@@ -123,19 +134,20 @@ void Screens(int width, int height, string size)
     // login: empty form, then a typed nick, then the 2FA step with an error
     Ui.PumpUntil(() => vm.Router.GetCurrentViewModel() is LoginPageViewModel, "login page");
     var login = (LoginPageViewModel)vm.Router.GetCurrentViewModel()!;
-    Ui.PumpUntil(() => HfModel<HfLoginModel>(main)?.Info.News.Count == 3, "login news");
+    Ui.PumpUntil(() => HfModel<HfLoginModel>(main)?.Info.HasShortLine == true, "login status line");
     Save(main, "login" + size);
     login.Login = Fakes.User.Name;
     login.Is2FaVisible = true;
     login.Errors = new ObservableCollection<string> { HfStrings.TwoFactorWrong };
     Save(main, "login-2fa" + size);
 
-    // our API not deployed yet: «Нет данных» and the news error, never a «0»
+    // our API not deployed yet: no status line at all, never a «0»
     Fakes.StatusNow = HfStatusSnapshot.NoData;
     Fakes.NewsFails = true;
     var bare = new LoginPageViewModel(vm, vm.OnClosed);
     vm.Router.NavigateAndReset.Execute(bare).Subscribe();
-    Ui.PumpUntil(() => HfModel<HfLoginModel>(main) is { Page: var p, Info.HasNewsMessage: true } && p == bare, "login without data");
+    Ui.PumpUntil(() => HfModel<HfLoginModel>(main) is { Page: var p, Info.Dot: HfDotState.Unknown } && p == bare,
+        "login without data");
     Save(main, "login-nodata" + size);
     Fakes.StatusNow = Fakes.Status;
     Fakes.NewsFails = false;
@@ -145,8 +157,8 @@ void Screens(int width, int height, string size)
     vm.Router.NavigateAndReset.Execute(overview).Subscribe();
     Ui.PumpUntil(() => overview.ListViewModel.Profiles?.Count == 3 && overview.ListViewModel.SelectedProfile != null,
         "overview profiles");
-    Ui.PumpUntil(() => HfModel<HfOverviewModel>(main) is { Face: not null, Cards.Count: 3 } m && m.Info.News.Count > 0,
-        "overview face, cards and news");
+    Ui.PumpUntil(() => HfModel<HfOverviewModel>(main) is { Face: not null, Cards.Count: 3, Info.HasLatest: true },
+        "overview face, tabs and the latest post");
     Save(main, "overview" + size);
 
     // toasts as the stock view models queue them (their fills only pick the left bar): an error, a success, the VPN
@@ -175,22 +187,15 @@ void Screens(int width, int height, string size)
         Ui.PumpUntil(() => !main.GetVisualDescendants().OfType<NotificationMessage>().Any(), "toasts gone");
     }
 
-    // «Переустановить» asks before it deletes the profile's folder
-    var overviewModel = HfModel<HfOverviewModel>(main)!;
-    overviewModel.Reinstall.AskCommand.Execute().Subscribe();
-    Ui.PumpUntil(() => overviewModel.Reinstall.IsAsking, "reinstall question");
-    Save(main, "overview-reinstall" + size);
-    overviewModel.Reinstall.CancelCommand.Execute().Subscribe();
-
-    // downloading: the meter, the step and the speed under «ИГРАТЬ»
+    // downloading: the sign fills with light wood and shows the percent, the step and the speed under it
     overview.Headline = "Обновление";
     overview.Description = "Осталось: 312 файлов";
     overview.LoadingPercentage = 42;
     overview.LoadingSpeed = "3.5 MB/s";
     overview.IsProcessing = true;
-    // the meter eases to its value (a 0.25 s transition): capture it there, not on the way
-    Ui.PumpUntil(() => main.GetVisualDescendants().OfType<HfMeter>().Any(m => m.IsEffectivelyVisible && Math.Abs(m.Value - 42) < 0.01),
-        "download meter at 42 %");
+    // the sign eases to its value (a 0.25 s transition): capture it there, not on the way
+    Ui.PumpUntil(() => main.GetVisualDescendants().OfType<HfSignMeter>().Any(m => m.IsEffectivelyVisible && Math.Abs(m.Value - 42) < 0.01),
+        "download sign at 42 %");
     // the stock speed counter clears the line every second when no bytes arrive (none do here)
     overview.LoadingSpeed = "3.5 MB/s";
     Save(main, "overview-download" + size);
@@ -211,11 +216,21 @@ void Screens(int width, int height, string size)
             Ui.PumpUntil(() => settings.InstallationFolder != null && settings.MaxRamValue > 0, "saved settings");
             settings.DynamicRamValue = false;
             settings.RamValue = 6144;
-            Ui.PumpUntil(() => HfModel<HfSettingsModel>(main) is { HasMark: true, IsManualRam: true }, "settings and the mark");
+            Ui.PumpUntil(() => HfModel<HfSettingsModel>(main) is { HasMark: true, IsManualRam: true, CanReinstall: true },
+                "settings and the mark");
         }
         if (name == "profile")
             Ui.PumpUntil(() => HfModel<HfProfileModel>(main) is { Body: not null }, "skin render");
         Save(main, name + size);
+        if (name == "settings")
+        {
+            // «Переустановить» asks before it deletes the profile's folder
+            var settingsModel = HfModel<HfSettingsModel>(main)!;
+            settingsModel.Reinstall.AskCommand.Execute().Subscribe();
+            Ui.PumpUntil(() => settingsModel.Reinstall.IsAsking, "reinstall question");
+            Save(main, "settings-reinstall" + size);
+            settingsModel.Reinstall.CancelCommand.Execute().Subscribe();
+        }
         vm.Router.NavigateBack.Execute().Subscribe();
         Ui.PumpUntil(() => vm.Router.GetCurrentViewModel() == overview, "back to overview");
     }

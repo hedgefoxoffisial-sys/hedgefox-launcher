@@ -20,8 +20,9 @@ namespace Gml.Launcher.ViewModels.HedgeFox;
 
 /// <summary>
 ///     The main screen's own state next to the stock <see cref="OverviewPageViewModel" /> (profiles, «Играть», the
-///     download and the pages behind it stay upstream's): profile cards with the hardware advice, the skin's face,
-///     the download line in Russian, the server column and «Выйти» that resets the router.
+///     download and the pages behind it stay upstream's): the profile tabs with the hardware advice, the skin's face,
+///     the download on the sign in Russian, the status line, the latest post and «Выйти» that resets the router.
+///     «Моды» and «Переустановить» live in Настройки (<see cref="HfSettingsModel" />).
 /// </summary>
 public sealed class HfOverviewModel : ReactiveObject, IHfScreenModel
 {
@@ -33,7 +34,7 @@ public sealed class HfOverviewModel : ReactiveObject, IHfScreenModel
     public HfOverviewModel(OverviewPageViewModel page, HfServerInfoModel? info = null)
     {
         Page = page;
-        Info = info ?? HfServerInfoModel.FromServices(10);
+        Info = info ?? HfServerInfoModel.FromServices(1);
         _skins = Locator.Current.GetService<ISkinService>();
         _hardware = Locator.Current.GetService<IHardwareProbe>();
         _storage = Locator.Current.GetService<IStorageService>();
@@ -43,7 +44,6 @@ public sealed class HfOverviewModel : ReactiveObject, IHfScreenModel
         var idle = this.WhenAnyValue(x => x.IsIdle);
         SelectCommand = ReactiveCommand.Create<HfProfileCard>(card => Page.ListViewModel.SelectedProfile = card.Profile, idle);
         LogoutCommand = ReactiveCommand.CreateFromTask(LogoutAsync, idle);
-        Reinstall = new HfConfirmModel(() => Page.ReinstallCommand.Execute(null), this.WhenAnyValue(x => x.CanReinstall));
     }
 
     public OverviewPageViewModel Page { get; }
@@ -54,22 +54,18 @@ public sealed class HfOverviewModel : ReactiveObject, IHfScreenModel
     public ReactiveCommand<HfProfileCard, Unit> SelectCommand { get; }
     public ReactiveCommand<Unit, Unit> LogoutCommand { get; }
 
-    /// <summary>«Переустановить» asks first: it deletes the profile's game folder.</summary>
-    public HfConfirmModel Reinstall { get; }
-
     [Reactive] public Bitmap? Face { get; private set; }
-    [Reactive] public string SelectedTitle { get; private set; } = string.Empty;
-    [Reactive] public string SelectedVersion { get; private set; } = string.Empty;
     [Reactive] public bool CanPlay { get; private set; }
-    [Reactive] public bool CanReinstall { get; private set; }
     [Reactive] public bool IsBusy { get; private set; }
     [Reactive] public bool IsIdle { get; private set; } = true;
     [Reactive] public double MeterValue { get; private set; }
     [Reactive] public bool MeterIndeterminate { get; private set; }
-    [Reactive] public string StepTitle { get; private set; } = string.Empty;
-    [Reactive] public string StepText { get; private set; } = string.Empty;
-    [Reactive] public string PercentText { get; private set; } = string.Empty;
-    [Reactive] public string SpeedText { get; private set; } = string.Empty;
+
+    /// <summary>On the sign while it downloads: «42 %», or «ЗАГРУЗКА…» while the size is unknown.</summary>
+    [Reactive] public string SignLabel { get; private set; } = string.Empty;
+
+    /// <summary>Under the sign while it downloads: «Осталось: 312 файлов · 3,5 МБ/с».</summary>
+    [Reactive] public string StepLine { get; private set; } = string.Empty;
 
     /// <summary>
     ///     «Переустановить» deletes the profile's folder and downloads it again: never mid-download or mid-game, and
@@ -97,15 +93,10 @@ public sealed class HfOverviewModel : ReactiveObject, IHfScreenModel
                 IsBusy = busy;
                 IsIdle = !busy;
                 CanPlay = selected is not null && !busy;
-                CanReinstall = CanReinstallWith(selected is not null, busy, Page.BackendIsActive);
-                // the stripes march (a 10 Hz timer) only while the meter is on screen (code-6)
                 MeterIndeterminate = busy && percent is null;
                 MeterValue = percent ?? 0;
-                // «Обновление» over the meter, «Осталось: 312 файлов» under it (or the headline alone)
-                StepTitle = string.IsNullOrWhiteSpace(description) ? string.Empty : headline?.Trim() ?? string.Empty;
-                StepText = HfPlayProgress.Step(headline, description);
-                PercentText = HfPlayProgress.Percent(percent);
-                SpeedText = HfPlayProgress.Speed(speed);
+                SignLabel = HfPlayProgress.SignLabel(percent);
+                StepLine = HfPlayProgress.Line(headline, description, speed);
             }));
 
         _ = LoadAdviceAsync();
@@ -120,10 +111,6 @@ public sealed class HfOverviewModel : ReactiveObject, IHfScreenModel
         Cards.Clear();
         foreach (var card in cards)
             Cards.Add(card);
-        var selected = cards.FirstOrDefault(c => c.Selected);
-        SelectedTitle = selected?.Title ?? string.Empty;
-        // Tiny5 reads well only in capitals
-        SelectedVersion = selected?.Profile.GameVersion is { Length: > 0 } v ? "MINECRAFT " + v : string.Empty;
     }
 
     private async Task LoadAdviceAsync()

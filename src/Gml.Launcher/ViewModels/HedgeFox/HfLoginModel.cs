@@ -13,14 +13,14 @@ namespace Gml.Launcher.ViewModels.HedgeFox;
 
 /// <summary>
 ///     The login screen's own state next to the stock <see cref="LoginPageViewModel" /> (its commands, 2FA and
-///     checks run unchanged): the server column and the first error line.
+///     checks run unchanged): the status line (no news on this screen) and the first error line.
 /// </summary>
 public sealed class HfLoginModel : ReactiveObject, IHfScreenModel
 {
     public HfLoginModel(LoginPageViewModel page, HfServerInfoModel? info = null)
     {
         Page = page;
-        Info = info ?? HfServerInfoModel.FromServices(3);
+        Info = info ?? HfServerInfoModel.FromServices(0);
         CancelTwoFactorCommand = ReactiveCommand.Create(() =>
         {
             Page.TwoFactorCode = string.Empty;

@@ -1,0 +1,65 @@
+<!-- The game-menu primitives of the launcher on one 1180×720 page, over the night scene, with hover, pressed, focus
+     and disabled states forced (MenuGallery.axaml.cs). Rendered by the harness as theme-menu.png. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:hf="using:Gml.Launcher.Views.HedgeFox.Controls"
+             x:Class="HedgeFox.Shots.MenuGallery">
+    <Panel>
+        <hf:HfMenuScene />
+        <Grid ColumnDefinitions="*,*" Margin="48,40" ColumnSpacing="48">
+            <StackPanel Spacing="22">
+                <TextBlock Classes="hf-kicker" Text="ВЫВЕСКА" />
+                <hf:HfButton Classes="sign" HorizontalAlignment="Left" Content="ИГРАТЬ" />
+                <hf:HfButton Classes="sign" Name="SignHover" HorizontalAlignment="Left" Content="НАВЕДЕНИЕ" />
+                <hf:HfButton Classes="sign" Name="SignFocus" HorizontalAlignment="Left" Content="ФОКУС" />
+                <hf:HfButton Classes="sign" HorizontalAlignment="Left" IsEnabled="False" Content="ВЫКЛЮЧЕНО" />
+                <hf:HfButton Classes="sign narrow" HorizontalAlignment="Left" Content="ВОЙТИ" />
+                <Panel Width="448" Height="64" HorizontalAlignment="Left">
+                    <hf:HfSignMeter Value="42" />
+                    <TextBlock Classes="hf-px32" Text="42 %" Foreground="#FFE9A8" HorizontalAlignment="Center"
+                               VerticalAlignment="Center" Margin="0,0,0,4" />
+                </Panel>
+                <hf:HfSignMeter IsIndeterminate="True" HorizontalAlignment="Left" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Spacing="22">
+                <TextBlock Classes="hf-kicker" Text="ВКЛАДКИ, ССЫЛКИ, СТАТУС" />
+                <Border HorizontalAlignment="Left" Background="{DynamicResource HfTicketBrush}"
+                        BorderBrush="{DynamicResource HfLineBrush}" BorderThickness="1" Padding="2">
+                    <StackPanel Orientation="Horizontal" Spacing="2">
+                        <hf:HfButton Classes="tab selected" Content="Обычный" />
+                        <hf:HfButton Classes="tab" Name="TabHover">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="Слабый ПК" VerticalAlignment="Center" />
+                                <Border Classes="hf-tag"><TextBlock Text="советуем" /></Border>
+                            </StackPanel>
+                        </hf:HfButton>
+                        <hf:HfButton Classes="tab" Content="Шейдеры" />
+                    </StackPanel>
+                </Border>
+                <StackPanel Orientation="Horizontal" Spacing="6">
+                    <hf:HfButton Classes="text" Content="Настройки" />
+                    <hf:HfButton Classes="text" Name="TextHover" Content="Выйти" />
+                    <hf:HfButton Classes="text" Name="TextFocus" Content="Помощь" />
+                    <hf:HfButton Classes="text" IsEnabled="False" Content="Выключено" />
+                </StackPanel>
+                <hf:HfButton Classes="strip" HorizontalAlignment="Left">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <TextBlock Classes="hf-small" Text="сегодня" VerticalAlignment="Center" />
+                        <TextBlock Text="Лаунчер в стиле сайта" VerticalAlignment="Center" />
+                        <hf:PixelIcon Kind="arrow" Foreground="{DynamicResource HfOrangeBrush}" VerticalAlignment="Center" />
+                    </StackPanel>
+                </hf:HfButton>
+                <hf:HfButton Classes="strip" Name="StripHover" HorizontalAlignment="Left" Content="Наведение на полосу новости" />
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <hf:HfStatusDot State="Online" VerticalAlignment="Center" />
+                    <TextBlock Classes="hf-status" Text="Онлайн 7 из 45 · Пелена поднимается" VerticalAlignment="Center" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <hf:HfStatusDot State="Offline" VerticalAlignment="Center" />
+                    <TextBlock Classes="hf-status" Text="Сервер спит" VerticalAlignment="Center" />
+                </StackPanel>
+                <hf:HfSprite Source="cloud.png" Frames="6" Scale="2" HorizontalAlignment="Left" />
+            </StackPanel>
+        </Grid>
+    </Panel>
+</UserControl>

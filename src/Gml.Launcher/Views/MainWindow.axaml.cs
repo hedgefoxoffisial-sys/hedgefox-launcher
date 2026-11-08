@@ -4,11 +4,10 @@ using Avalonia.Controls;
 using Avalonia.Controls.Shapes;
 using Avalonia.Input;
 using Avalonia.Markup.Xaml;
-using Avalonia.Media;
-using Avalonia.Media.Imaging;
 using Avalonia.ReactiveUI;
 using Gml.Launcher.ViewModels;
 using Gml.Launcher.Views.HedgeFox;
+using Gml.Launcher.Views.HedgeFox.Controls;
 using ReactiveUI;
 
 namespace Gml.Launcher.Views;
@@ -24,8 +23,6 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         AvaloniaXamlLoader.Load(this);
         HfWindowChrome.Apply(this);
         Opened += (_, _) => FitIntoWorkArea();
-        // the 1920×1080 scene is scaled down: smooth here (pixel art elsewhere stays nearest-neighbour)
-        RenderOptions.SetBitmapInterpolationMode(this.Get<Image>("Scene"), BitmapInterpolationMode.HighQuality);
 
 #if DEBUG
         this.AttachDevTools();
@@ -87,8 +84,8 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             return;
         }
 
-        // empty background (the scene's veil) drags the window, as in the stock launcher
-        if (e.Source is Rectangle)
+        // empty background (the night scene) drags the window, as in the stock launcher
+        if (e.Source is Rectangle or HfMenuScene)
             BeginMoveDrag(e);
     }
 

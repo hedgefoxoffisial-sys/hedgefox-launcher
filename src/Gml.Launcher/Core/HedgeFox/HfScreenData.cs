@@ -89,6 +89,17 @@ public static class HfPlayProgress
     public static string Percent(int? value) =>
         value is { } v ? Math.Clamp(v, 0, 100).ToString(CultureInfo.InvariantCulture) + " %" : string.Empty;
 
+    /// <summary>The sign's label while it downloads: the percent, or «ЗАГРУЗКА…» while the size is unknown.</summary>
+    public static string SignLabel(int? percent) => percent is null ? HfStrings.LoadingCaps : Percent(percent);
+
+    /// <summary>The one line under the sign: the step and, while bytes arrive, the speed.</summary>
+    public static string Line(string? headline, string? description, string? speed)
+    {
+        var step = Step(headline, description);
+        var rate = Speed(speed);
+        return step.Length == 0 ? rate : rate.Length == 0 ? step : step + HfStrings.Dot + rate;
+    }
+
     /// <summary>The stock counter's «3.5 MB/s» as «3,5 МБ/с».</summary>
     public static string Speed(string? speed)
     {

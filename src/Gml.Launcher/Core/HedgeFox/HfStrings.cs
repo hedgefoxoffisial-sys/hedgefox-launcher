@@ -16,11 +16,11 @@ public static class HfStrings
     public const string Tagline = "Пираты над Пеленой";
     public const string TaglinePixel = "ПИРАТЫ НАД ПЕЛЕНОЙ";
 
-    // ----- status ticket -----
+    // ----- status line -----
     public const string StatusLoading = "Проверяем…";
     public const string StatusNoData = "Нет данных";
     public const string StatusOffline = "Сервер спит";
-    public const string ServerAddress = "mc.hedgefox.ru:28455";
+    public const string Dot = " · ";
 
     // ----- Pelena -----
     public const string PelenaKicker = "ПЕЛЕНА";
@@ -32,13 +32,11 @@ public static class HfStrings
     // ----- sign-in -----
     public const string LoginField = "Ник или почта";
     public const string PasswordField = "Пароль";
-    public const string SignIn = "Войти";
     public const string Register = "Регистрация";
     public const string Forgot = "Забыл пароль?";
-    public const string LoginHint = "Не пускает? Подтверди почту — письмо пришло при регистрации.";
+    public const string SignInCaps = "ВОЙТИ";
     public const string TwoFactorField = "Код из приложения";
-    public const string TwoFactorConfirm = "Подтвердить";
-    public const string TwoFactorHint = "Вход защищён: введи код из приложения-аутентификатора.";
+    public const string TwoFactorConfirmCaps = "ПОДТВЕРДИТЬ";
 
     // ----- main screen -----
     public const string Profile = "Профиль";
@@ -46,15 +44,13 @@ public static class HfStrings
     public const string Logout = "Выйти";
     public const string Play = "Играть";
     public const string PlayCaps = "ИГРАТЬ";
-    public const string ProfilesKicker = "ПРОФИЛЬ ИГРЫ";
-    public const string Recommended = "Советуем для твоего ПК";
-    public const string RecommendedBadge = "СОВЕТУЕМ";
-    public const string ShadersAlsoFit = "Твой ПК потянет и шейдеры";
+    public const string LoadingCaps = "ЗАГРУЗКА…";
+    public const string Advised = "советуем";
+    public const string AdvisedHint = "Советуем для твоего ПК";
     public const string MemoryForGame = "Памяти игре";
-    public const string MemoryNeeded = "Памяти нужно";
     public const string Mods = "Моды";
     public const string Reinstall = "Переустановить";
-    public const string ReinstallHint = "Скачать файлы игры заново, если она не запускается";
+    public const string ReinstallHint = "Если игра не запускается, скачаем её файлы заново.";
     public const string ReinstallAskTitle = "Переустановить игру?";
     public const string ReinstallAsk =
         "Удалим папку этого профиля: настройки игры, скриншоты, ресурспаки и шейдеры — и скачаем всё заново.";
@@ -62,27 +58,21 @@ public static class HfStrings
     public const string Cancel = "Отмена";
 
     // ----- news -----
-    public const string NewsKicker = "НОВОСТИ";
     public const string NewsEmpty = "Новостей пока нет. Летопись — на сайте.";
     public const string NewsFailed = "Новости не загрузились. Попробуем позже.";
-    public const string NewsOpen = "Открыть";
 
     // ----- footer -----
     public const string Site = "Сайт";
     public const string Telegram = "Telegram";
-    public const string Rules = "Правила";
-    public const string Wiki = "Вики";
     public const string Help = "Помощь";
 
     // ----- profile page -----
-    public const string ProfileKicker = "ПРОФИЛЬ";
     public const string ChangeSkin = "Сменить скин на сайте";
     public const string NoSkin = "Скина пока нет — загрузи его в кабинете на сайте.";
 
     // ----- settings -----
-    public const string SettingsTitle = "Настройки";
+    public const string SettingsCaps = "НАСТРОЙКИ";
     public const string MemorySetting = "Память для игры";
-    public const string MemoryHint = "Больше памяти — меньше подвисаний, но не отдавай игре всю память ПК.";
     public const string MemoryAuto = "Автоматически по профилю";
     public const string MemoryAutoShort = "АВТО";
     public const string MemoryRecommendedMark = "советуем";
@@ -91,11 +81,11 @@ public static class HfStrings
     public const string WindowWidth = "Ширина";
     public const string WindowHeight = "Высота";
     public const string GameFolder = "Папка игры";
-    public const string GameFolderHint = "Сюда скачиваются игра и моды. Путь без пробелов.";
     public const string FolderHasSpaces = "В пути есть пробелы. Выбери папку без них.";
     public const string FolderFailed = "Не получилось сменить папку. Попробуй другую.";
     public const string ChangeFolder = "Выбрать папку";
     public const string OpenFolder = "Открыть";
+    public const string GameSetting = "Игра";
     public const string Back = "Назад";
 
     // ----- window -----
@@ -138,15 +128,29 @@ public static class HfStrings
         "июля", "августа", "сентября", "октября", "ноября", "декабря"
     ];
 
-    public static string StatusOnline(int players, int max) => $"Онлайн: {players} из {max}";
+    public static string StatusOnline(int players, int max) => $"Онлайн {players} из {max}";
 
-    /// <summary>The one line of the status ticket: «Онлайн: N из M», «Сервер спит», «Нет данных» or «Проверяем…».</summary>
+    /// <summary>The status in full: «Онлайн N из M», «Сервер спит», «Нет данных» or «Проверяем…».</summary>
     public static string StatusLine(HfStatusSnapshot status) => status.Kind switch
     {
         HfStatusKind.Online => StatusOnline(status.Players ?? 0, status.Max ?? 0),
         HfStatusKind.Offline => StatusOffline,
         HfStatusKind.Loading => StatusLoading,
         _ => StatusNoData
+    };
+
+    /// <summary>
+    ///     The one small status line under the menu: «Онлайн 7 из 45 · Пелена поднимается» (the sign-in screen: without
+    ///     the Pelena) or «Сервер спит»; null while there is nothing to say (no answer yet, or no data): the line is then
+    ///     hidden, never a made-up «0».
+    /// </summary>
+    public static string? StatusShort(HfStatusSnapshot status, bool withPelena = true) => status.Kind switch
+    {
+        HfStatusKind.Online when withPelena && HfPelenaView.From(status.Pelena)?.Short is { } pelena =>
+            StatusOnline(status.Players ?? 0, status.Max ?? 0) + Dot + pelena,
+        HfStatusKind.Online => StatusOnline(status.Players ?? 0, status.Max ?? 0),
+        HfStatusKind.Offline => StatusOffline,
+        _ => null
     };
 
     /// <summary>«Пелена: Y 80»: whole blocks, a real minus sign below zero.</summary>

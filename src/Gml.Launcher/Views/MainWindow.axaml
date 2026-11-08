@@ -1,4 +1,4 @@
-<!-- HedgeFox shell (fork-owned): opaque night window, the Pelena scene with a veil and one slow fog strip, our own
+<!-- HedgeFox shell (fork-owned): opaque night window, the game menu's night scene behind every page, our own
      32 px title bar (HfWindowChrome sets the frame per OS), the routed pages and the notifications. -->
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -29,15 +29,8 @@
 
     <!-- a maximised window on Windows has its frame off-screen (OffScreenMargin): everything steps in by it -->
     <Grid Margin="{Binding $parent[Window].OffScreenMargin}">
-        <!-- The night scene: the site's Pelena composite (branding/background.jpg), scaled down smoothly -->
-        <Image Name="Scene"
-               Source="/Assets/Images/background.jpg"
-               Stretch="UniformToFill"
-               HorizontalAlignment="Center"
-               VerticalAlignment="Center" />
-        <hf:HfFogLayer Name="Fog" VerticalAlignment="Bottom" Height="192" Opacity="0.2" />
-        <Rectangle Name="Veil" Fill="{DynamicResource HfVeilBrush}" />
-        <Rectangle Name="ScrimBottom" Fill="{DynamicResource HfScrimBottomBrush}" />
+        <!-- The night of the game's main menu: sky, stars, moon, peaks, fog and the airship (HfMenuScene) -->
+        <hf:HfMenuScene Name="Scene" />
 
         <Grid RowDefinitions="32,*">
             <hfv:HfTitleBar Name="TitleBar" />

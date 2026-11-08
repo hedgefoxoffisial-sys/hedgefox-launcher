@@ -1,254 +1,148 @@
-<!-- Главный экран (spec «Экраны» 3): the player on top, profile cards on the left, «ИГРАТЬ» at the bottom centre,
-     status, the Pelena and the news on the right, site links at the bottom. The stock OverviewPageViewModel runs
-     the profiles, the download and the game; HfOverviewModel adds the rest. -->
+<!-- Главный экран: the game's main menu. In the middle the title, «Пираты над Пеленой» and the wooden sign «ИГРАТЬ»
+     hanging from the title on two ropes over its tuft of fog (the menu's sprites at ×2); under it the profile tabs
+     and one status line. The player in the top left corner (→ Профиль), «Настройки» and «Выйти» in the top right,
+     the site links and the latest post along the bottom. While the game downloads the sign fills with light wood
+     and shows the percent, the line under it the step.
+     The stock OverviewPageViewModel runs the profiles, the download and the game; HfOverviewModel adds the rest. -->
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:hf="using:Gml.Launcher.Views.HedgeFox.Controls"
-             xmlns:hfv="using:Gml.Launcher.Views.HedgeFox"
              xmlns:core="using:Gml.Launcher.Core.HedgeFox"
              xmlns:hfvm="using:Gml.Launcher.ViewModels.HedgeFox"
              x:Class="Gml.Launcher.Views.HedgeFox.HfOverviewView">
-    <Grid Name="Root" x:DataType="hfvm:HfOverviewModel">
-        <!-- darkens the scene under the cards; empty background drags the window -->
-        <Rectangle Fill="{DynamicResource HfScrimLeftBrush}" Opacity="0.85" />
-        <!-- and under the status and news column, which sits over the airship -->
-        <Rectangle Fill="{DynamicResource HfScrimRightBrush}" />
+    <Grid Name="Root" x:DataType="hfvm:HfOverviewModel" RowDefinitions="Auto,*,Auto" Margin="16,4,16,12">
 
-        <Grid RowDefinitions="Auto,*,Auto" RowSpacing="16" Margin="24,14,24,16">
-
-            <!-- The player and the pages -->
-            <Grid ColumnDefinitions="Auto,*,Auto">
-                <StackPanel Orientation="Horizontal" Spacing="12">
-                    <hf:PixelBorder Classes="hf-well" Padding="3" Width="48" Height="48">
+        <!-- The player (→ Профиль); Настройки and Выйти -->
+        <Grid ColumnDefinitions="Auto,*,Auto">
+            <hf:HfButton Classes="text" Padding="4" Command="{Binding Page.GoProfileCommand}"
+                         ToolTip.Tip="{x:Static core:HfStrings.Profile}">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <Border BorderBrush="{DynamicResource HfVoidBrush}" BorderThickness="2">
                         <Image Name="Face" Classes="hf-pixel" Source="{Binding Face}" Width="40" Height="40" />
-                    </hf:PixelBorder>
-                    <TextBlock Classes="hf-px24 hf-shadow" Text="{Binding Nick}" VerticalAlignment="Center" />
+                    </Border>
+                    <TextBlock Classes="hf-shadow" Text="{Binding Nick}" FontSize="15" FontWeight="SemiBold"
+                               Foreground="{DynamicResource HfTextBrush}" VerticalAlignment="Center" />
                 </StackPanel>
-                <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-                    <hf:HfButton Classes="secondary sm" Command="{Binding Page.GoProfileCommand}">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <hf:PixelIcon Kind="user" />
-                            <TextBlock Text="{x:Static core:HfStrings.Profile}" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </hf:HfButton>
-                    <hf:HfButton Classes="secondary sm" Command="{Binding Page.GoSettingsCommand}">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <hf:PixelIcon Kind="gear" />
-                            <TextBlock Text="{x:Static core:HfStrings.Settings}" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </hf:HfButton>
-                    <hf:HfButton Classes="ghost sm" Command="{Binding LogoutCommand}">
-                        <StackPanel Orientation="Horizontal" Spacing="8">
-                            <hf:PixelIcon Kind="exit" />
-                            <TextBlock Text="{x:Static core:HfStrings.Logout}" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </hf:HfButton>
-                </StackPanel>
-            </Grid>
-
-            <Grid Grid.Row="1" ColumnSpacing="28">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" MinWidth="280" MaxWidth="340" />
-                    <ColumnDefinition Width="*" MinWidth="260" />
-                    <ColumnDefinition Width="*" MinWidth="296" MaxWidth="360" />
-                </Grid.ColumnDefinitions>
-
-                <!-- Profile cards -->
-                <Grid RowDefinitions="Auto,*" RowSpacing="10">
-                    <TextBlock Classes="hf-kicker hf-shadow" Text="{x:Static core:HfStrings.ProfilesKicker}" />
-                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,6,0">
-                        <ItemsControl ItemsSource="{Binding Cards}">
-                            <ItemsControl.ItemsPanel>
-                                <ItemsPanelTemplate>
-                                    <StackPanel Spacing="12" Margin="0,0,0,6" />
-                                </ItemsPanelTemplate>
-                            </ItemsControl.ItemsPanel>
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate x:DataType="core:HfProfileCard">
-                                    <hf:HfButton Classes="card"
-                                                 Classes.selected="{Binding Selected}"
-                                                 Margin="0,0,6,6"
-                                                 Padding="16,12,16,14"
-                                                 Command="{Binding $parent[ItemsControl].((hfvm:HfOverviewModel)DataContext).SelectCommand}"
-                                                 CommandParameter="{Binding}">
-                                        <StackPanel Spacing="5">
-                                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
-                                                <TextBlock Classes="hf-h3" Text="{Binding Title}" VerticalAlignment="Center" />
-                                                <!-- brass, the site's default badge: orange marks only the chosen card and «ИГРАТЬ» -->
-                                                <hf:HfBadge Grid.Column="1"
-                                                            Content="{x:Static core:HfStrings.RecommendedBadge}"
-                                                            IsVisible="{Binding Recommended}"
-                                                            VerticalAlignment="Center" />
-                                            </Grid>
-                                            <TextBlock Classes="hf-small" Foreground="{DynamicResource HfBrassBrush}"
-                                                       Text="{x:Static core:HfStrings.Recommended}" IsVisible="{Binding Recommended}" />
-                                            <TextBlock Classes="hf-small" Text="{Binding Hint}" IsVisible="{Binding HasHint}" />
-                                            <!-- the profile's advice; the game gets what Настройки say -->
-                                            <TextBlock Classes="hf-small" IsVisible="{Binding HasRam}">
-                                                <Run Text="{x:Static core:HfStrings.MemoryNeeded}" /><Run Text=": " /><Run
-                                                    Text="{Binding Ram}" FontWeight="SemiBold" Foreground="{DynamicResource HfTextBrush}" />
-                                            </TextBlock>
-                                            <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding ShadersAlsoFit}">
-                                                <hf:PixelIcon Kind="check" Foreground="{DynamicResource HfSuccessBrush}" />
-                                                <TextBlock Classes="hf-small hf-success" Text="{x:Static core:HfStrings.ShadersAlsoFit}"
-                                                           VerticalAlignment="Center" />
-                                            </StackPanel>
-                                        </StackPanel>
-                                    </hf:HfButton>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </ScrollViewer>
-                </Grid>
-
-                <!-- Play -->
-                <StackPanel Grid.Column="1" VerticalAlignment="Bottom" MaxWidth="400" Spacing="14" Margin="0,0,0,4">
-                    <StackPanel Spacing="4" HorizontalAlignment="Center">
-                        <TextBlock Classes="hf-h1 hf-shadow" Text="{Binding SelectedTitle}" TextAlignment="Center" />
-                        <TextBlock Classes="hf-px16" Foreground="{DynamicResource HfMutedBrush}" Text="{Binding SelectedVersion}"
-                                   HorizontalAlignment="Center" />
-                    </StackPanel>
-                    <!-- «ИГРАТЬ» while idle; faded only when no profile is selected -->
-                    <hf:HfButton Classes="lg block"
-                                 MinHeight="64"
-                                 FontSize="22"
-                                 Command="{Binding Page.PlayCommand}"
-                                 IsEnabled="{Binding CanPlay}"
-                                 IsVisible="{Binding IsIdle}">
-                        <StackPanel Orientation="Horizontal" Spacing="14">
-                            <hf:PixelIcon Kind="play" Width="24" Height="24" />
-                            <TextBlock Text="{x:Static core:HfStrings.PlayCaps}" VerticalAlignment="Center" />
-                        </StackPanel>
-                    </hf:HfButton>
-
-                    <!-- the download takes its place (spec: «шкала с процентом и текстом шага»): step, percent, meter, speed -->
-                    <hf:PixelBorder Classes="hf-plate orange" Padding="20,14,20,16" Margin="0,0,6,6" IsVisible="{Binding IsBusy}">
-                        <StackPanel Spacing="10">
-                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
-                                <TextBlock Classes="hf-h3" Text="{Binding StepTitle}" VerticalAlignment="Center"
-                                           TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
-                                <TextBlock Grid.Column="1" Classes="hf-h1" Foreground="{DynamicResource HfOrangeBrush}"
-                                           Text="{Binding PercentText}" TextWrapping="NoWrap" VerticalAlignment="Center" />
-                            </Grid>
-                            <hf:HfMeter Height="20" Value="{Binding MeterValue}" IsIndeterminate="{Binding MeterIndeterminate}" />
-                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12">
-                                <TextBlock Classes="hf-small" Foreground="{DynamicResource HfTextBrush}" Text="{Binding StepText}"
-                                           TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
-                                <TextBlock Grid.Column="1" Classes="hf-small" Text="{Binding SpeedText}" TextWrapping="NoWrap" />
-                            </Grid>
-                        </StackPanel>
-                    </hf:PixelBorder>
-
-                    <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center" IsVisible="{Binding IsIdle}">
-                        <hf:HfButton Classes="ghost sm"
-                                     Command="{Binding Page.GoModsCommand}"
-                                     IsEnabled="{Binding Page.BackendIsActive}"
-                                     IsVisible="{Binding Page.IsModsButtonVisible}">
-                            <StackPanel Orientation="Horizontal" Spacing="8">
-                                <hf:PixelIcon Kind="folder" />
-                                <TextBlock Text="{x:Static core:HfStrings.Mods}" VerticalAlignment="Center" />
-                            </StackPanel>
-                        </hf:HfButton>
-                        <!-- deletes the profile's game folder: asks first, off offline (HfConfirmModel) -->
-                        <hf:HfButton Classes="ghost sm"
-                                     Command="{Binding Reinstall.AskCommand}"
-                                     IsVisible="{Binding !Reinstall.IsAsking}"
-                                     ToolTip.Tip="{x:Static core:HfStrings.ReinstallHint}"
-                                     ToolTip.ShowOnDisabled="True"
-                                     Content="{x:Static core:HfStrings.Reinstall}" />
-                    </StackPanel>
-
-                    <hf:PixelBorder Classes="hf-plate" Padding="18,14,18,16" Margin="0,0,6,6"
-                                    IsVisible="{Binding Reinstall.IsAsking}">
-                        <StackPanel Spacing="12">
-                            <TextBlock Classes="hf-h3" Text="{x:Static core:HfStrings.ReinstallAskTitle}" />
-                            <TextBlock Classes="hf-small" Foreground="{DynamicResource HfTextBrush}"
-                                       Text="{x:Static core:HfStrings.ReinstallAsk}" />
-                            <WrapPanel ItemSpacing="10" LineSpacing="10">
-                                <hf:HfButton Classes="secondary sm"
-                                             Command="{Binding Reinstall.ConfirmCommand}"
-                                             Content="{x:Static core:HfStrings.ReinstallYes}" />
-                                <hf:HfButton Classes="ghost sm"
-                                             Command="{Binding Reinstall.CancelCommand}"
-                                             Content="{x:Static core:HfStrings.Cancel}" />
-                            </WrapPanel>
-                        </StackPanel>
-                    </hf:PixelBorder>
-                </StackPanel>
-
-                <!-- Status, the Pelena, news -->
-                <Grid Grid.Column="2" RowDefinitions="Auto,Auto,*" RowSpacing="10">
-                    <hfv:HfStatusPanel DataContext="{Binding Info}" Margin="0,0,0,6" />
-                    <TextBlock Grid.Row="1" Classes="hf-kicker hf-shadow" Text="{x:Static core:HfStrings.NewsKicker}" />
-                    <Panel Grid.Row="2">
-                        <hf:PixelBorder Classes="hf-well" Padding="14,12" VerticalAlignment="Top"
-                                        IsVisible="{Binding Info.HasNewsMessage}">
-                            <TextBlock Classes="hf-small" Text="{Binding Info.NewsMessage}" />
-                        </hf:PixelBorder>
-                        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,10,0">
-                            <ItemsControl ItemsSource="{Binding Info.News}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <StackPanel Spacing="12" Margin="0,0,0,6" />
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate x:DataType="core:HfNewsCard">
-                                        <hf:HfButton Classes="card"
-                                                     Margin="0,0,4,4"
-                                                     Padding="14,10,14,12"
-                                                     Command="{Binding $parent[ItemsControl].((hfvm:HfOverviewModel)DataContext).Info.OpenNewsCommand}"
-                                                     CommandParameter="{Binding}">
-                                            <StackPanel Spacing="6">
-                                                <StackPanel Orientation="Horizontal" Spacing="8">
-                                                    <hf:HfBadge Classes="purple" Content="{Binding Source}" />
-                                                    <TextBlock Classes="hf-small" Text="{Binding Date}" VerticalAlignment="Center" />
-                                                </StackPanel>
-                                                <TextBlock Classes="hf-h3" Text="{Binding Title}" MaxLines="2" TextTrimming="CharacterEllipsis" />
-                                                <TextBlock Classes="hf-small" Text="{Binding Text}" MaxLines="4" TextTrimming="CharacterEllipsis" />
-                                            </StackPanel>
-                                        </hf:HfButton>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </ScrollViewer>
-                    </Panel>
-                </Grid>
-            </Grid>
-
-            <!-- Site links -->
-            <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="10">
-                <hf:HfButton Classes="ghost sm" Command="{Binding Page.OpenLinkCommand}" CommandParameter="{x:Static core:HfLinks.Site}">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <hf:PixelIcon Kind="globe" />
-                        <TextBlock Text="{x:Static core:HfStrings.Site}" VerticalAlignment="Center" />
-                    </StackPanel>
-                </hf:HfButton>
-                <hf:HfButton Classes="ghost sm" Command="{Binding Page.OpenLinkCommand}" CommandParameter="{x:Static core:HfLinks.Telegram}">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <hf:PixelIcon Kind="plane" />
-                        <TextBlock Text="{x:Static core:HfStrings.Telegram}" VerticalAlignment="Center" />
-                    </StackPanel>
-                </hf:HfButton>
-                <hf:HfButton Classes="ghost sm" Command="{Binding Page.OpenLinkCommand}" CommandParameter="{x:Static core:HfLinks.Rules}">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <hf:PixelIcon Kind="info" />
-                        <TextBlock Text="{x:Static core:HfStrings.Rules}" VerticalAlignment="Center" />
-                    </StackPanel>
-                </hf:HfButton>
-                <hf:HfButton Classes="ghost sm" Command="{Binding Page.OpenLinkCommand}" CommandParameter="{x:Static core:HfLinks.Wiki}">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <hf:PixelIcon Kind="book" />
-                        <TextBlock Text="{x:Static core:HfStrings.Wiki}" VerticalAlignment="Center" />
-                    </StackPanel>
-                </hf:HfButton>
-                <hf:HfButton Classes="ghost sm" Command="{Binding Page.OpenLinkCommand}" CommandParameter="{x:Static core:HfLinks.Install}">
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <hf:PixelIcon Kind="help" />
-                        <TextBlock Text="{x:Static core:HfStrings.Help}" VerticalAlignment="Center" />
-                    </StackPanel>
-                </hf:HfButton>
+            </hf:HfButton>
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                <hf:HfButton Classes="text" Command="{Binding Page.GoSettingsCommand}"
+                             Content="{x:Static core:HfStrings.Settings}" />
+                <hf:HfButton Classes="text" Command="{Binding LogoutCommand}" Content="{x:Static core:HfStrings.Logout}" />
             </StackPanel>
+        </Grid>
+
+        <!-- The menu -->
+        <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,8">
+            <!-- 576 wide: the title at ×2 of the game's 288×54; the sign 64 px in, 146 px down -->
+            <Panel Width="576" Height="230">
+                <!-- the ropes start behind the title's lower edge and end in rings on the plank's rivets -->
+                <Image Classes="hf-pixel" Source="/Assets/HedgeFox/Images/Menu/ropes.png" Width="448" Height="54"
+                       HorizontalAlignment="Left" VerticalAlignment="Top" Margin="64,96,0,0" />
+                <Image Source="/Assets/HedgeFox/Images/Menu/title.png" Width="576" Height="108"
+                       HorizontalAlignment="Left" VerticalAlignment="Top" RenderOptions.BitmapInterpolationMode="HighQuality" />
+                <TextBlock Classes="hf-px24" Text="{x:Static core:HfStrings.TaglinePixel}"
+                           Foreground="{DynamicResource HfTextBrush}"
+                           HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,107,0,0">
+                    <TextBlock.Effect>
+                        <DropShadowEffect OffsetX="2" OffsetY="2" BlurRadius="0" Opacity="1" Color="#080511" />
+                    </TextBlock.Effect>
+                </TextBlock>
+                <!-- the tuft of Pelena fog the sign rests on: 84 px out to the left, 36 px under the plank's top -->
+                <hf:HfSprite Source="cloud.png" Frames="6" Scale="2" FrameMs="450"
+                             HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-20,182,0,0" />
+
+                <!-- «ИГРАТЬ» while idle; faded only when no profile is chosen -->
+                <hf:HfButton Classes="sign"
+                             HorizontalAlignment="Left" VerticalAlignment="Top" Margin="64,146,0,0"
+                             Command="{Binding Page.PlayCommand}"
+                             IsEnabled="{Binding CanPlay}"
+                             IsVisible="{Binding IsIdle}"
+                             Content="{x:Static core:HfStrings.PlayCaps}" />
+                <!-- downloading: the wood lights up from the left, the percent on it -->
+                <Panel Width="448" Height="64" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="64,146,0,0"
+                       IsVisible="{Binding IsBusy}">
+                    <hf:HfSignMeter Value="{Binding MeterValue}" IsIndeterminate="{Binding MeterIndeterminate}">
+                        <hf:HfSignMeter.Transitions>
+                            <Transitions>
+                                <DoubleTransition Property="Value" Duration="0:0:0.25" />
+                            </Transitions>
+                        </hf:HfSignMeter.Transitions>
+                    </hf:HfSignMeter>
+                    <TextBlock Classes="hf-px32" Text="{Binding SignLabel}" Foreground="#FFE9A8"
+                               HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,4">
+                        <TextBlock.Effect>
+                            <DropShadowEffect OffsetX="2" OffsetY="2" BlurRadius="0" Opacity="1" Color="#080511" />
+                        </TextBlock.Effect>
+                    </TextBlock>
+                </Panel>
+            </Panel>
+
+            <!-- the profile tabs; while downloading, the step in their place -->
+            <Panel Height="38" Margin="0,16,0,0">
+                <Border HorizontalAlignment="Center" Background="{DynamicResource HfTicketBrush}"
+                        BorderBrush="{DynamicResource HfLineBrush}" BorderThickness="1" Padding="2"
+                        IsVisible="{Binding IsIdle}">
+                    <ItemsControl ItemsSource="{Binding Cards}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" Spacing="2" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="core:HfProfileCard">
+                                <hf:HfButton Classes="tab"
+                                             Classes.selected="{Binding Selected}"
+                                             Command="{Binding $parent[ItemsControl].((hfvm:HfOverviewModel)DataContext).SelectCommand}"
+                                             CommandParameter="{Binding}"
+                                             ToolTip.Tip="{Binding Hint}">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="{Binding Title}" VerticalAlignment="Center" />
+                                        <Border Classes="hf-tag" IsVisible="{Binding Recommended}"
+                                                ToolTip.Tip="{x:Static core:HfStrings.AdvisedHint}">
+                                            <TextBlock Text="{x:Static core:HfStrings.Advised}" />
+                                        </Border>
+                                    </StackPanel>
+                                </hf:HfButton>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Border>
+                <TextBlock Classes="hf-status" Text="{Binding StepLine}"
+                           HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="NoWrap"
+                           IsVisible="{Binding IsBusy}" />
+            </Panel>
+
+            <!-- one status line: online and the Pelena, or «Сервер спит»; nothing without data -->
+            <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center" Margin="0,14,0,0"
+                        IsVisible="{Binding Info.HasShortLine}">
+                <hf:HfStatusDot State="{Binding Info.Dot}" VerticalAlignment="Center" />
+                <TextBlock Classes="hf-status" Text="{Binding Info.ShortLine}" VerticalAlignment="Center" />
+            </StackPanel>
+        </StackPanel>
+
+        <!-- Site links; the latest post -->
+        <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Bottom">
+            <StackPanel Orientation="Horizontal" Spacing="2" VerticalAlignment="Center">
+                <hf:HfButton Classes="text" FontSize="13" Command="{Binding Page.OpenLinkCommand}"
+                             CommandParameter="{x:Static core:HfLinks.Site}" Content="{x:Static core:HfStrings.Site}" />
+                <TextBlock Classes="hf-small" Text="·" VerticalAlignment="Center" />
+                <hf:HfButton Classes="text" FontSize="13" Command="{Binding Page.OpenLinkCommand}"
+                             CommandParameter="{x:Static core:HfLinks.Telegram}" Content="{x:Static core:HfStrings.Telegram}" />
+                <TextBlock Classes="hf-small" Text="·" VerticalAlignment="Center" />
+                <hf:HfButton Classes="text" FontSize="13" Command="{Binding Page.OpenLinkCommand}"
+                             CommandParameter="{x:Static core:HfLinks.Install}" Content="{x:Static core:HfStrings.Help}" />
+            </StackPanel>
+            <hf:HfButton Grid.Column="2" Classes="strip" MaxWidth="440"
+                         IsVisible="{Binding Info.HasLatest}"
+                         Command="{Binding Info.OpenNewsCommand}"
+                         CommandParameter="{Binding Info.Latest}">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <TextBlock Classes="hf-small" Text="{Binding Info.Latest.Date, FallbackValue=''}" VerticalAlignment="Center" />
+                    <TextBlock Text="{Binding Info.Latest.Title, FallbackValue=''}" VerticalAlignment="Center"
+                               MaxWidth="320" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
+                    <hf:PixelIcon Kind="arrow" Foreground="{DynamicResource HfOrangeBrush}" VerticalAlignment="Center" />
+                </StackPanel>
+            </hf:HfButton>
         </Grid>
     </Grid>
 </UserControl>

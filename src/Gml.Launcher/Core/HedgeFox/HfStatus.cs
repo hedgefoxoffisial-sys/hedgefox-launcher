@@ -106,6 +106,9 @@ public sealed record HfPelenaView(bool Sleeping, string Title, bool ShowBar, dou
     public const double Bottom = -64;
     public const double Top = 200;
 
+    /// <summary>For the status line: «Пелена спит», «Пелена поднимается», «Пелена: Y 80».</summary>
+    public string Short => Trend is { } trend ? "Пелена " + trend : Title;
+
     /// <summary>Changes smaller than this are noise in the 1-decimal value `hf fog` prints.</summary>
     private const double Still = 0.05;
 

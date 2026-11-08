@@ -35,6 +35,10 @@ public class ScreenDataTests
         Assert.Equal("Нет данных", info.StatusLine);
         Assert.DoesNotContain("0", info.StatusLine);
         Assert.False(info.HasPelena);
+        // the screens hide their status line instead
+        Assert.False(info.HasShortLine);
+        Assert.Equal("", info.ShortLine);
+        Assert.Equal("", info.OnlineLine);
     }
 
     [Fact]
@@ -42,7 +46,10 @@ public class ScreenDataTests
     {
         var info = new HfServerInfoModel(null, null, () => Now);
         info.Apply(new HfStatusSnapshot(HfStatusKind.Online, 7, 45, "1.21.1", Now, new HfPelena(80, 96)));
-        Assert.Equal("Онлайн: 7 из 45", info.StatusLine);
+        Assert.Equal("Онлайн 7 из 45", info.StatusLine);
+        Assert.Equal("Онлайн 7 из 45 · Пелена поднимается", info.ShortLine);
+        Assert.Equal("Онлайн 7 из 45", info.OnlineLine);
+        Assert.True(info.HasShortLine);
         Assert.Equal(HfDotState.Online, info.Dot);
         Assert.True(info.HasPelena);
         Assert.Equal("ПЕЛЕНА: Y 80", info.PelenaTitle);
@@ -108,6 +115,18 @@ public class ScreenDataTests
         await info.LoadNewsAsync();
         Assert.Equal(new[] { "Новость 1", "Новость 2", "Новость 3" }, info.News.Select(n => n.Title));
         Assert.False(info.HasNewsMessage);
+        // the main screen shows only the newest one
+        Assert.True(info.HasLatest);
+        Assert.Equal("Новость 1", info.Latest!.Title);
+    }
+
+    [Fact]
+    public async Task NoPostsNoLatestStrip()
+    {
+        var info = new HfServerInfoModel(null, new ListNews([]), () => Now, newsLimit: 1);
+        await info.LoadNewsAsync();
+        Assert.False(info.HasLatest);
+        Assert.Null(info.Latest);
     }
 
     private sealed class ListNews(IReadOnlyList<HfNewsItem> items) : INewsService
@@ -196,6 +215,20 @@ public class ScreenDataTests
     [InlineData("", "")]
     [InlineData(null, "")]
     public void SpeedIsInRussianUnits(string? speed, string expected) => Assert.Equal(expected, HfPlayProgress.Speed(speed));
+
+    [Theory]
+    [InlineData(42, "42 %")]
+    [InlineData(null, "ЗАГРУЗКА…")]
+    public void SignShowsThePercentOrThatItLoads(int? percent, string expected) =>
+        Assert.Equal(expected, HfPlayProgress.SignLabel(percent));
+
+    [Theory]
+    [InlineData("Обновление", "Осталось: 312 файлов", "3.5 MB/s", "Осталось: 312 файлов · 3,5 МБ/с")]
+    [InlineData("Обновление", "Осталось: 312 файлов", "", "Осталось: 312 файлов")]
+    [InlineData(null, null, "3.5 MB/s", "3,5 МБ/с")]
+    [InlineData(null, null, null, "")]
+    public void LineUnderTheSignIsTheStepAndTheSpeed(string? headline, string? description, string? speed, string expected) =>
+        Assert.Equal(expected, HfPlayProgress.Line(headline, description, speed));
 
     // ----- settings: the memory slider's «советуем» mark -----
 

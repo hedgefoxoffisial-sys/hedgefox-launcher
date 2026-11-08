@@ -1,49 +1,47 @@
-<!-- Профиль (spec «Экраны» 4): the skin full-length (the stock front render, nearest-neighbour), the nick and the way
-     to change the skin on the site. DataContext: the stock ProfilePageViewModel; HfProfileModel loads the skin. -->
+<!-- Профиль: the skin full-length in the middle of the night (the stock front render, nearest-neighbour), the nick
+     under it and the way to change the skin on the site. DataContext: the stock ProfilePageViewModel; HfProfileModel
+     loads the skin. -->
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:hf="using:Gml.Launcher.Views.HedgeFox.Controls"
              xmlns:core="using:Gml.Launcher.Core.HedgeFox"
              xmlns:hfvm="using:Gml.Launcher.ViewModels.HedgeFox"
              x:Class="Gml.Launcher.Views.HedgeFox.HfProfileView">
-    <Grid Name="Root" x:DataType="hfvm:HfProfileModel">
-        <Rectangle Fill="{DynamicResource HfScrimLeftBrush}" />
+    <Grid Name="Root" x:DataType="hfvm:HfProfileModel" RowDefinitions="Auto,*" Margin="16,4,16,16">
+        <hf:HfButton Classes="text" HorizontalAlignment="Left" Command="{Binding Page.GoBackCommand}">
+            <StackPanel Orientation="Horizontal" Spacing="8">
+                <hf:PixelIcon Kind="back" />
+                <TextBlock Text="{x:Static core:HfStrings.Back}" VerticalAlignment="Center" />
+            </StackPanel>
+        </hf:HfButton>
 
-        <Grid RowDefinitions="Auto,*" Margin="24,14,24,24">
-            <hf:HfButton Classes="secondary sm" Command="{Binding Page.GoBackCommand}">
-                <StackPanel Orientation="Horizontal" Spacing="8">
-                    <hf:PixelIcon Kind="back" />
-                    <TextBlock Text="{x:Static core:HfStrings.Back}" VerticalAlignment="Center" />
+        <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="18" Margin="0,0,0,24">
+            <Image Name="Body"
+                   Classes="hf-pixel"
+                   Source="{Binding Body}"
+                   Width="160"
+                   Height="320">
+                <Image.Effect>
+                    <DropShadowEffect OffsetX="6" OffsetY="6" BlurRadius="0" Opacity="0.6" Color="#080511" />
+                </Image.Effect>
+            </Image>
+            <TextBlock Classes="hf-px32" Text="{Binding Nick}" HorizontalAlignment="Center" TextTrimming="CharacterEllipsis"
+                       MaxWidth="560">
+                <TextBlock.Effect>
+                    <DropShadowEffect OffsetX="3" OffsetY="3" BlurRadius="0" Opacity="1" Color="#080511" />
+                </TextBlock.Effect>
+            </TextBlock>
+            <TextBlock Classes="hf-small" Text="{x:Static core:HfStrings.NoSkin}" IsVisible="{Binding HasNoSkin}"
+                       HorizontalAlignment="Center" />
+            <hf:HfButton Classes="secondary sm"
+                         HorizontalAlignment="Center"
+                         Command="{Binding Page.OpenLinkCommand}"
+                         CommandParameter="{x:Static core:HfLinks.Cabinet}">
+                <StackPanel Orientation="Horizontal" Spacing="10">
+                    <TextBlock Text="{x:Static core:HfStrings.ChangeSkin}" VerticalAlignment="Center" />
+                    <hf:PixelIcon Kind="arrow" />
                 </StackPanel>
             </hf:HfButton>
-
-            <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="48" Margin="40,0,0,0" VerticalAlignment="Center">
-                <!-- the skin on a night plate -->
-                <hf:PixelBorder Classes="hf-plate orange" Padding="40,32" Margin="0,0,6,6">
-                    <Image Name="Body"
-                           Classes="hf-pixel"
-                           Source="{Binding Body}"
-                           Width="160"
-                           Height="320" />
-                </hf:PixelBorder>
-
-                <StackPanel VerticalAlignment="Center" Spacing="14" MaxWidth="440">
-                    <TextBlock Classes="hf-kicker" Text="{x:Static core:HfStrings.ProfileKicker}" />
-                    <TextBlock Classes="hf-px48 hf-shadow" Text="{Binding Nick}" TextTrimming="CharacterEllipsis" />
-                    <hf:PixelBorder Classes="hf-well" Padding="14,12" IsVisible="{Binding HasNoSkin}">
-                        <TextBlock Classes="hf-small" Text="{x:Static core:HfStrings.NoSkin}" />
-                    </hf:PixelBorder>
-                    <hf:HfButton Classes="lg"
-                                 Margin="0,10,0,0"
-                                 Command="{Binding Page.OpenLinkCommand}"
-                                 CommandParameter="{x:Static core:HfLinks.Cabinet}">
-                        <StackPanel Orientation="Horizontal" Spacing="12">
-                            <TextBlock Text="{x:Static core:HfStrings.ChangeSkin}" VerticalAlignment="Center" />
-                            <hf:PixelIcon Kind="arrow" Width="16" Height="16" />
-                        </StackPanel>
-                    </hf:HfButton>
-                </StackPanel>
-            </StackPanel>
-        </Grid>
+        </StackPanel>
     </Grid>
 </UserControl>

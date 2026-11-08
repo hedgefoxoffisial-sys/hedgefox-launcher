@@ -4,7 +4,11 @@
 
     Primitives for the screens (see HEDGEFOX.md):
       hf:HfButton            orange chamfered button; classes secondary, ghost; lg, sm; block;
-                             link (underlined text link), card (clickable .card frame, +selected)
+                             link (underlined text link), card (clickable .card frame, +selected);
+                             the game menu's: sign (+narrow: the wooden sign, the screen's one main action),
+                             text (quiet text button), tab (+selected: a profile tab), strip (the news headline)
+      hf:HfMenuScene         the game menu's night behind every page (MainWindow); hf:HfSprite (pixel sprite with
+                             frames, the fog tuft); hf:HfSignMeter (the sign while the game downloads)
       hf:HfCaptionButton     32 px title-bar button; class close
       hf:HfBadge             brass label; classes orange, purple, success, quiet
       hf:PixelBorder         frame primitive; classes hf-card (+orange, clickable), hf-plate (+orange), hf-well,
@@ -13,7 +17,9 @@
       hf:HfStatusDot         status square; State Online|Waiting|Offline|Unknown
       hf:HfMeter             striped orange progress meter (Value 0…100, IsIndeterminate)
       TextBlock classes      hf-px16/24/32/48/64 (Tiny5), hf-h1/h2/h3 (Unbounded), hf-body, hf-lead, hf-label,
-                             hf-small, hf-muted, hf-kicker, hf-link, hf-error, hf-success, hf-ink, hf-shadow
+                             hf-small, hf-muted, hf-kicker, hf-link, hf-error, hf-success, hf-ink, hf-shadow,
+                             hf-status (the status line over the night)
+      Border class           hf-tag (the small «советуем» on a profile tab)
       Image class            hf-pixel (nearest-neighbour scaling for pixel art)
       CheckBox, Slider       square night box with a pixel tick; void trough, orange run, chamfered thumb
       Stock mods page        restyled here only (pages|ModsPageView …)
@@ -45,9 +51,6 @@
             <FontFamily x:Key="HfFontPixel">avares://Gml.Launcher/Assets/HedgeFox/Fonts#Tiny5</FontFamily>
             <FontFamily x:Key="HfFontHeading">avares://Gml.Launcher/Assets/HedgeFox/Fonts#Unbounded</FontFamily>
             <FontFamily x:Key="HfFontBody">avares://Gml.Launcher/Assets/HedgeFox/Fonts#Rubik</FontFamily>
-
-            <!-- The site's top bars: rgb(12 7 25) at 95 % (a scene colour, not a token) -->
-            <SolidColorBrush x:Key="HfTitleBarBrush">#F20C0719</SolidColorBrush>
 
             <!-- Type scale for a 1180×720 window: Tiny5 only at multiples of 8 px -->
             <x:Double x:Key="HfFontSizeSmall">13</x:Double>
@@ -300,6 +303,165 @@
                     <Setter Property="RenderTransform" Value="none" />
                 </Style>
 
+                <!-- a quiet text button: no frame, no underline («Настройки», «Выйти», the footer links) -->
+                <Style Selector="^.text, ^.tab, ^.strip">
+                    <Setter Property="FontFamily" Value="{StaticResource HfFontBody}" />
+                    <Setter Property="FontWeight" Value="Medium" />
+                </Style>
+                <Style Selector="^.text">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Foreground" Value="{DynamicResource HfTextBrush}" />
+                    <Setter Property="Padding" Value="6,4" />
+                    <Setter Property="MinHeight" Value="0" />
+                    <Setter Property="FontSize" Value="14" />
+                </Style>
+                <Style Selector="^.text /template/ hf|PixelBorder#PART_Frame">
+                    <Setter Property="Notch" Value="0" />
+                    <Setter Property="ShadowOffset" Value="0" />
+                    <Setter Property="BevelTop" Value="0" />
+                    <Setter Property="BevelBottom" Value="0" />
+                </Style>
+                <Style Selector="^.text /template/ hf|PixelBorder#PART_FocusRing">
+                    <Setter Property="Margin" Value="-2" />
+                    <Setter Property="Notch" Value="0" />
+                    <Setter Property="BorderThickness" Value="2" />
+                </Style>
+                <Style Selector="^.text:pointerover">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Foreground" Value="{DynamicResource HfOrangeLightBrush}" />
+                </Style>
+                <Style Selector="^.text:pressed">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="RenderTransform" Value="none" />
+                </Style>
+
+                <!-- the one news headline at the bottom of the main screen: a thin night strip -->
+                <Style Selector="^.strip">
+                    <Setter Property="Background" Value="{DynamicResource HfTicketBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource HfTextBrush}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource HfLineBrush}" />
+                    <Setter Property="Padding" Value="12,6,12,7" />
+                    <Setter Property="MinHeight" Value="0" />
+                    <Setter Property="FontSize" Value="13" />
+                </Style>
+                <Style Selector="^.strip /template/ hf|PixelBorder#PART_Frame">
+                    <Setter Property="Notch" Value="0" />
+                    <Setter Property="BorderThickness" Value="1" />
+                    <Setter Property="ShadowOffset" Value="0" />
+                    <Setter Property="BevelTop" Value="0" />
+                    <Setter Property="BevelBottom" Value="0" />
+                </Style>
+                <Style Selector="^.strip /template/ hf|PixelBorder#PART_FocusRing">
+                    <Setter Property="Margin" Value="-4" />
+                    <Setter Property="Notch" Value="0" />
+                    <Setter Property="BorderThickness" Value="2" />
+                </Style>
+                <Style Selector="^.strip:pointerover">
+                    <Setter Property="Background" Value="{DynamicResource HfSurfaceBrush}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource HfPurpleBrush}" />
+                </Style>
+                <Style Selector="^.strip:pressed">
+                    <Setter Property="Background" Value="{DynamicResource HfSurfaceBrush}" />
+                    <Setter Property="RenderTransform" Value="none" />
+                </Style>
+
+                <!-- one of the profile tabs under the sign: text on the night strip, the chosen one lit with an
+                     orange top edge -->
+                <Style Selector="^.tab">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Foreground" Value="{DynamicResource HfMutedBrush}" />
+                    <Setter Property="Padding" Value="14,7,14,8" />
+                    <Setter Property="MinHeight" Value="0" />
+                    <Setter Property="FontSize" Value="14" />
+                </Style>
+                <Style Selector="^.tab /template/ hf|PixelBorder#PART_Frame">
+                    <Setter Property="Notch" Value="0" />
+                    <Setter Property="ShadowOffset" Value="0" />
+                    <Setter Property="BevelTop" Value="0" />
+                    <Setter Property="BevelBottom" Value="0" />
+                </Style>
+                <Style Selector="^.tab /template/ hf|PixelBorder#PART_FocusRing">
+                    <Setter Property="Margin" Value="-3" />
+                    <Setter Property="Notch" Value="0" />
+                    <Setter Property="BorderThickness" Value="2" />
+                </Style>
+                <Style Selector="^.tab:pointerover">
+                    <Setter Property="Background" Value="{DynamicResource HfSurfaceBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource HfTextBrush}" />
+                </Style>
+                <Style Selector="^.tab:pressed">
+                    <Setter Property="Background" Value="{DynamicResource HfSurfaceBrush}" />
+                    <Setter Property="RenderTransform" Value="none" />
+                </Style>
+                <Style Selector="^.tab.selected">
+                    <Setter Property="Background" Value="{DynamicResource HfRaisedBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource HfTextBrush}" />
+                </Style>
+                <Style Selector="^.tab.selected /template/ hf|PixelBorder#PART_Frame">
+                    <Setter Property="AccentBrush" Value="{DynamicResource HfOrangeBrush}" />
+                    <Setter Property="AccentTop" Value="2" />
+                </Style>
+
+                <!-- the wooden sign of the game menu (Images/Menu/sign*.png, 224×32 at exactly ×2): one per screen,
+                     the main action. Hover lights the wood and lifts it 2 px, a press pushes it 2 px down; the keyboard
+                     focus is the orange ring. Class narrow: the 160×32 plank (320×64) -->
+                <Style Selector="^.sign">
+                    <Setter Property="Width" Value="448" />
+                    <Setter Property="Height" Value="64" />
+                    <Setter Property="Padding" Value="48,0,48,4" />
+                    <Setter Property="Foreground" Value="#FFE9A8" />
+                    <Setter Property="FontFamily" Value="{StaticResource HfFontPixel}" />
+                    <Setter Property="FontWeight" Value="Normal" />
+                    <Setter Property="FontSize" Value="32" />
+                    <Setter Property="HorizontalAlignment" Value="Center" />
+                    <Setter Property="Template">
+                        <ControlTemplate>
+                            <Panel>
+                                <Image Name="PART_Plank" Classes="hf-pixel" Stretch="Fill"
+                                       Source="/Assets/HedgeFox/Images/Menu/sign.png" />
+                                <Image Name="PART_Lit" Classes="hf-pixel" Stretch="Fill" Opacity="0"
+                                       Source="/Assets/HedgeFox/Images/Menu/sign-hover.png" />
+                                <ContentPresenter Name="PART_ContentPresenter"
+                                                  Content="{TemplateBinding Content}"
+                                                  ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                  Padding="{TemplateBinding Padding}"
+                                                  HorizontalContentAlignment="Center"
+                                                  VerticalContentAlignment="Center"
+                                                  Foreground="{TemplateBinding Foreground}"
+                                                  hf:HfRender.CrispText="True"
+                                                  RecognizesAccessKey="True">
+                                    <ContentPresenter.Effect>
+                                        <DropShadowEffect OffsetX="2" OffsetY="2" BlurRadius="0" Opacity="1" Color="#080511" />
+                                    </ContentPresenter.Effect>
+                                </ContentPresenter>
+                                <hf:PixelBorder Name="PART_FocusRing" Margin="-4" IsHitTestVisible="False" />
+                            </Panel>
+                        </ControlTemplate>
+                    </Setter>
+                </Style>
+                <Style Selector="^.sign.narrow">
+                    <Setter Property="Width" Value="320" />
+                    <Setter Property="Padding" Value="32,0,32,4" />
+                </Style>
+                <Style Selector="^.sign.narrow /template/ Image#PART_Plank">
+                    <Setter Property="Source" Value="/Assets/HedgeFox/Images/Menu/sign-narrow.png" />
+                </Style>
+                <Style Selector="^.sign.narrow /template/ Image#PART_Lit">
+                    <Setter Property="Source" Value="/Assets/HedgeFox/Images/Menu/sign-narrow-hover.png" />
+                </Style>
+                <Style Selector="^.sign /template/ hf|PixelBorder#PART_FocusRing">
+                    <Setter Property="Notch" Value="0" />
+                </Style>
+                <Style Selector="^.sign:pointerover">
+                    <Setter Property="RenderTransform" Value="translate(0px, -2px)" />
+                </Style>
+                <Style Selector="^.sign:pointerover /template/ Image#PART_Lit, ^.sign:focus-visible /template/ Image#PART_Lit, ^.sign:pressed /template/ Image#PART_Lit">
+                    <Setter Property="Opacity" Value="1" />
+                </Style>
+                <Style Selector="^.sign:pressed">
+                    <Setter Property="RenderTransform" Value="translate(0px, 2px)" />
+                </Style>
+
                 <Style Selector="^:disabled">
                     <Setter Property="Opacity" Value="0.55" />
                     <Setter Property="Cursor" Value="Arrow" />
@@ -451,6 +613,16 @@
         <Setter Property="FontFamily" Value="{StaticResource HfFontPixel}" />
         <Setter Property="hf:HfRender.CrispText" Value="True" />
     </Style>
+    <Style Selector="hf|HfButton.text TextBlock, hf|HfButton.tab TextBlock, hf|HfButton.strip TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource HfFontBody}" />
+        <Setter Property="FontWeight" Value="Medium" />
+    </Style>
+    <!-- the sign's label: Tiny5 (the presenter draws a plain string itself, the button sets the font) -->
+    <Style Selector="hf|HfButton.sign TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource HfFontPixel}" />
+        <Setter Property="FontWeight" Value="Normal" />
+    </Style>
+
 
     <!-- ===== Text ===== -->
 
@@ -528,6 +700,16 @@
         <Setter Property="FontWeight" Value="SemiBold" />
         <Setter Property="Foreground" Value="{DynamicResource HfTextBrush}" />
     </Style>
+    <!-- the one status line over the night (online, the Pelena): light, with a hard 1 px shadow over the snow -->
+    <Style Selector="TextBlock.hf-status">
+        <Setter Property="FontFamily" Value="{StaticResource HfFontBody}" />
+        <Setter Property="FontSize" Value="{StaticResource HfFontSizeSmall}" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="Foreground" Value="{DynamicResource HfTextBrush}" />
+        <Setter Property="Effect">
+            <DropShadowEffect OffsetX="1" OffsetY="1" BlurRadius="0" Opacity="1" Color="#080511" />
+        </Setter>
+    </Style>
     <Style Selector="TextBlock.hf-muted">
         <Setter Property="Foreground" Value="{DynamicResource HfMutedBrush}" />
     </Style>
@@ -603,6 +785,19 @@
         <Setter Property="ShadowBrush" Value="{DynamicResource HfVoidBrush}" />
         <Setter Property="ShadowOffset" Value="4" />
         <Setter Property="Padding" Value="20,16" />
+    </Style>
+    <!-- a small outlined word next to a name: «советуем» on a profile tab -->
+    <Style Selector="Border.hf-tag">
+        <Setter Property="BorderBrush" Value="{DynamicResource HfBrassBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="4,0,4,1" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Border.hf-tag TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource HfFontBody}" />
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="Foreground" Value="{DynamicResource HfBrassBrush}" />
     </Style>
     <Style Selector="hf|PixelBorder.hf-chip">
         <Setter Property="Background" Value="{DynamicResource HfNightBrush}" />
