@@ -1,0 +1,144 @@
+name: HedgeFox release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  PUBLISH_FLAGS: -c Release -p:PublishSingleFile=true -p:SelfContained=true -p:IncludeNativeLibrariesForSelfExtract=true
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+      - run: python3 -m unittest discover -s tools/tests
+      - id: v
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            echo "version=$(python3 tools/package_release.py version "$GITHUB_REF_NAME")" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=0.0.0.0" >> "$GITHUB_OUTPUT"
+          fi
+
+  build-win:
+    needs: checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { submodules: recursive }
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: '8.0.x' }
+      - run: dotnet publish src/Gml.Launcher -r win-x64 $PUBLISH_FLAGS -p:AssemblyVersion=${{ needs.checks.outputs.version }} -p:FileVersion=${{ needs.checks.outputs.version }} -o out/win-x64
+      - uses: actions/upload-artifact@v4
+        with: { name: win-x64, path: out/win-x64/Gml.Launcher.exe }
+
+  build-linux:
+    needs: checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { submodules: recursive }
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: '8.0.x' }
+      - run: dotnet publish src/Gml.Launcher -r linux-x64 $PUBLISH_FLAGS -p:AssemblyVersion=${{ needs.checks.outputs.version }} -p:FileVersion=${{ needs.checks.outputs.version }} -o out/linux-x64
+      - uses: actions/upload-artifact@v4
+        with: { name: linux-x64, path: out/linux-x64/Gml.Launcher }
+
+  build-mac:
+    needs: checks
+    runs-on: macos-latest
+    strategy:
+      matrix:
+        rid: [osx-arm64, osx-x64]
+    steps:
+      - uses: actions/checkout@v4
+        with: { submodules: recursive }
+      - uses: actions/setup-dotnet@v4
+        with: { dotnet-version: '8.0.x' }
+      - run: dotnet publish src/Gml.Launcher -r ${{ matrix.rid }} $PUBLISH_FLAGS -p:AssemblyVersion=${{ needs.checks.outputs.version }} -p:FileVersion=${{ needs.checks.outputs.version }} -o out/${{ matrix.rid }}
+      - run: bash tools/macos/make-app.sh out/${{ matrix.rid }} ${{ matrix.rid }} ${{ needs.checks.outputs.version }}
+      - uses: actions/upload-artifact@v4
+        with: { name: '${{ matrix.rid }}', path: 'HedgeFox-macos-*.dmg' }
+
+  smoke-win:
+    needs: build-win
+    runs-on: windows-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { name: win-x64, path: app }
+      - shell: pwsh
+        run: |
+          $p = Start-Process -FilePath app\Gml.Launcher.exe -PassThru
+          Start-Sleep 20
+          if ($p.HasExited) { throw "launcher exited with code $($p.ExitCode)" }
+          Stop-Process -Id $p.Id
+
+  smoke-linux:
+    needs: build-linux
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { name: linux-x64, path: app }
+      - run: sudo apt-get update && sudo apt-get install -y xvfb libice6 libsm6 libfontconfig1
+      - run: |
+          chmod +x app/Gml.Launcher
+          set +e
+          timeout 20 xvfb-run -a ./app/Gml.Launcher
+          test $? -eq 124
+
+  smoke-mac:
+    needs: build-mac
+    runs-on: macos-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { name: osx-arm64, path: app }
+      - run: |
+          hdiutil attach app/HedgeFox-macos-arm64.dmg -mountpoint /Volumes/HedgeFox -nobrowse
+          open -n /Volumes/HedgeFox/HedgeFox.app
+          sleep 20
+          pgrep -f Gml.Launcher
+
+  version:
+    needs: [checks, build-win]
+    runs-on: windows-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { name: win-x64, path: app }
+      - shell: pwsh
+        run: |
+          $v = (Get-Item app\Gml.Launcher.exe).VersionInfo.FileVersion
+          if ($v -ne "${{ needs.checks.outputs.version }}") { throw "FileVersion $v, expected ${{ needs.checks.outputs.version }}" }
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [checks, smoke-win, smoke-linux, smoke-mac, version]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { path: artifacts }
+      - run: python3 tools/package_release.py package artifacts out
+      - run: |
+          {
+            echo "## HedgeFox $GITHUB_REF_NAME"
+            echo
+            echo "Лаунчер сервера HedgeFox. Скачать и как установить: https://www.hedgefox.ru/download"
+            echo
+            echo "Сборка не подписана, поэтому Windows и macOS спросят подтверждение при первом запуске. Инструкция — на сайте."
+            echo
+            echo '```'
+            cat out/SHA256SUMS.txt
+            echo '```'
+          } > notes.md
+      - env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" out/* --title "HedgeFox $GITHUB_REF_NAME" --notes-file notes.md

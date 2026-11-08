@@ -7,6 +7,9 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
     <ApplicationIcon>Assets\Images\logo.ico</ApplicationIcon>
+    <Product>HedgeFox</Product>
+    <Company>HedgeFox</Company>
+    <Description>Лаунчер сервера HedgeFox</Description>
     <AssemblyVersion>2026.1</AssemblyVersion>
     <FileVersion>2026.1</FileVersion>
     <License>Apache-2.0</License>

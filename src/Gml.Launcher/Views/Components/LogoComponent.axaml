@@ -15,7 +15,7 @@
         <!-- Set Defaults -->
         <Setter Property="Template">
             <ControlTemplate>
-                <Svg Path="/Assets/Images/logo.svg"
+                <Image Source="/Assets/Images/logo.png"
                      Width="{TemplateBinding Size}"
                      Height="{TemplateBinding Size}" />
             </ControlTemplate>
@@ -28,10 +28,10 @@
             <ControlTemplate>
                 <StackPanel Orientation="Horizontal"
                             Spacing="15">
-                    <Svg Path="/Assets/Images/logo.svg"
+                    <Image Source="/Assets/Images/logo.png"
                          Width="{TemplateBinding Size}"
                          Height="{TemplateBinding Size}" />
-                    <TextBlock Text="GAMERVII"
+                    <TextBlock Text="HedgeFox"
                                VerticalAlignment="Center"
                                FontSize="26"
                                FontWeight="Bold"
