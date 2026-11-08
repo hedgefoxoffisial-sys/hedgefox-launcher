@@ -103,6 +103,14 @@ class BrandTest(unittest.TestCase):
         for f in (MAIN_WINDOW, SPLASH):
             self.assertIn('Title="HedgeFox"', read(f))
 
+    def test_exe_describes_itself_as_hedgefox(self):
+        # Windows shows FileDescription (from AssemblyTitle, else the assembly name «Gml.Launcher») in Task Manager
+        # and in the file's properties; AssemblyName stays, the avares://Gml.Launcher URIs depend on it
+        csproj = read(APP / "Gml.Launcher.csproj")
+        self.assertIn("<AssemblyTitle>HedgeFox</AssemblyTitle>", csproj)
+        self.assertIn("<Product>HedgeFox</Product>", csproj)
+        self.assertNotIn("<AssemblyName>", csproj)
+
     def test_no_upstream_brand_in_the_app(self):
         self.assertEqual(find_brand_leaks(APP), [])
 

@@ -48,7 +48,7 @@
 | `Views/Components/ProfileUserControl.axaml.cs` | без чужого скина и ника по умолчанию |
 | `Views/Pages/OverviewPageView.axaml`, `ProfilePageView.axaml` | ссылки из `HfLinks` вместо чужих |
 | `Gml.Launcher.parcel` | имя и идентификатор HedgeFox |
-| `Gml.Launcher.csproj` | `Product`, `Company`, `Description`, версии пакетов; `AssemblyName` не меняем |
+| `Gml.Launcher.csproj` | `AssemblyTitle` (описание exe в Windows), `Product`, `Company`, `Description`, версии пакетов; `AssemblyName` не меняем |
 
 В форке выключены upstream-ные `ci.yml` (Build All) и `dependabot-auto-merge.yml`.
 
