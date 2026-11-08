@@ -138,12 +138,31 @@
                                 <TextBlock Text="{x:Static core:HfStrings.Mods}" VerticalAlignment="Center" />
                             </StackPanel>
                         </hf:HfButton>
+                        <!-- deletes the profile's game folder: asks first, off offline (HfConfirmModel) -->
                         <hf:HfButton Classes="ghost sm"
-                                     Command="{Binding Page.ReinstallCommand}"
-                                     IsEnabled="{Binding CanPlay}"
+                                     Command="{Binding Reinstall.AskCommand}"
+                                     IsVisible="{Binding !Reinstall.IsAsking}"
                                      ToolTip.Tip="{x:Static core:HfStrings.ReinstallHint}"
+                                     ToolTip.ShowOnDisabled="True"
                                      Content="{x:Static core:HfStrings.Reinstall}" />
                     </StackPanel>
+
+                    <hf:PixelBorder Classes="hf-plate" Padding="18,14,18,16" Margin="0,0,6,6"
+                                    IsVisible="{Binding Reinstall.IsAsking}">
+                        <StackPanel Spacing="12">
+                            <TextBlock Classes="hf-h3" Text="{x:Static core:HfStrings.ReinstallAskTitle}" />
+                            <TextBlock Classes="hf-small" Foreground="{DynamicResource HfTextBrush}"
+                                       Text="{x:Static core:HfStrings.ReinstallAsk}" />
+                            <WrapPanel ItemSpacing="10" LineSpacing="10">
+                                <hf:HfButton Classes="secondary sm"
+                                             Command="{Binding Reinstall.ConfirmCommand}"
+                                             Content="{x:Static core:HfStrings.ReinstallYes}" />
+                                <hf:HfButton Classes="ghost sm"
+                                             Command="{Binding Reinstall.CancelCommand}"
+                                             Content="{x:Static core:HfStrings.Cancel}" />
+                            </WrapPanel>
+                        </StackPanel>
+                    </hf:PixelBorder>
                 </StackPanel>
 
                 <!-- Status, the Pelena, news -->

@@ -53,6 +53,11 @@ public static class HfStrings
     public const string Mods = "Моды";
     public const string Reinstall = "Переустановить";
     public const string ReinstallHint = "Скачать файлы игры заново, если она не запускается";
+    public const string ReinstallAskTitle = "Переустановить игру?";
+    public const string ReinstallAsk =
+        "Удалим папку этого профиля: настройки игры, скриншоты, ресурспаки и шейдеры — и скачаем всё заново.";
+    public const string ReinstallYes = "Да, переустановить";
+    public const string Cancel = "Отмена";
 
     // ----- news -----
     public const string NewsKicker = "НОВОСТИ";

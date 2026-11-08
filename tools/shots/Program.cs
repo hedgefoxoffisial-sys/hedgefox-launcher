@@ -175,6 +175,13 @@ void Screens(int width, int height, string size)
         Ui.PumpUntil(() => !main.GetVisualDescendants().OfType<NotificationMessage>().Any(), "toasts gone");
     }
 
+    // «Переустановить» asks before it deletes the profile's folder
+    var overviewModel = HfModel<HfOverviewModel>(main)!;
+    overviewModel.Reinstall.AskCommand.Execute().Subscribe();
+    Ui.PumpUntil(() => overviewModel.Reinstall.IsAsking, "reinstall question");
+    Save(main, "overview-reinstall" + size);
+    overviewModel.Reinstall.CancelCommand.Execute().Subscribe();
+
     // downloading: the meter, the step and the speed under «ИГРАТЬ»
     overview.Headline = "Обновление";
     overview.Description = "Осталось: 312 файлов";

@@ -41,6 +41,7 @@ public sealed class HfOverviewModel : ReactiveObject, IHfScreenModel
 
         SelectCommand = ReactiveCommand.Create<HfProfileCard>(card => Page.ListViewModel.SelectedProfile = card.Profile);
         LogoutCommand = ReactiveCommand.CreateFromTask(LogoutAsync);
+        Reinstall = new HfConfirmModel(() => Page.ReinstallCommand.Execute(null), this.WhenAnyValue(x => x.CanReinstall));
     }
 
     public OverviewPageViewModel Page { get; }
@@ -51,10 +52,14 @@ public sealed class HfOverviewModel : ReactiveObject, IHfScreenModel
     public ReactiveCommand<HfProfileCard, Unit> SelectCommand { get; }
     public ReactiveCommand<Unit, Unit> LogoutCommand { get; }
 
+    /// <summary>«Переустановить» asks first: it deletes the profile's game folder.</summary>
+    public HfConfirmModel Reinstall { get; }
+
     [Reactive] public Bitmap? Face { get; private set; }
     [Reactive] public string SelectedTitle { get; private set; } = string.Empty;
     [Reactive] public string SelectedVersion { get; private set; } = string.Empty;
     [Reactive] public bool CanPlay { get; private set; }
+    [Reactive] public bool CanReinstall { get; private set; }
     [Reactive] public bool IsBusy { get; private set; }
     [Reactive] public bool IsIdle { get; private set; } = true;
     [Reactive] public double MeterValue { get; private set; }
@@ -62,6 +67,13 @@ public sealed class HfOverviewModel : ReactiveObject, IHfScreenModel
     [Reactive] public string StepText { get; private set; } = string.Empty;
     [Reactive] public string PercentText { get; private set; } = string.Empty;
     [Reactive] public string SpeedText { get; private set; } = string.Empty;
+
+    /// <summary>
+    ///     «Переустановить» deletes the profile's folder and downloads it again: never mid-download or mid-game, and
+    ///     not offline, where the stock loader deletes the files but cannot download them again.
+    /// </summary>
+    public static bool CanReinstallWith(bool hasProfile, bool busy, bool backendActive) =>
+        hasProfile && !busy && backendActive;
 
     public IDisposable Start()
     {
@@ -82,6 +94,7 @@ public sealed class HfOverviewModel : ReactiveObject, IHfScreenModel
                 IsBusy = busy;
                 IsIdle = !busy;
                 CanPlay = selected is not null && !busy;
+                CanReinstall = CanReinstallWith(selected is not null, busy, Page.BackendIsActive);
                 MeterIndeterminate = percent is null;
                 MeterValue = percent ?? 0;
                 StepText = HfPlayProgress.Step(headline, description);
