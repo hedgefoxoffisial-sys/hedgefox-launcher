@@ -12,6 +12,7 @@ public static class HfViews
     public static IViewFor? Resolve(object? viewModel) => viewModel switch
     {
         LoginPageViewModel page => new HfLoginView { DataContext = page },
+        OverviewPageViewModel page => new HfOverviewView { DataContext = page },
         _ => null
     };
 }

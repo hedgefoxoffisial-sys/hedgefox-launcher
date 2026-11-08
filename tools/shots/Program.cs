@@ -131,6 +131,8 @@ void Screens(int width, int height, string size)
     vm.Router.NavigateAndReset.Execute(overview).Subscribe();
     Ui.PumpUntil(() => overview.ListViewModel.Profiles?.Count == 3 && overview.ListViewModel.SelectedProfile != null,
         "overview profiles");
+    Ui.PumpUntil(() => HfModel<HfOverviewModel>(main) is { Face: not null, Cards.Count: 3 } m && m.Info.News.Count > 0,
+        "overview face, cards and news");
     Save(main, "overview" + size);
 
     // downloading: the meter, the step and the speed under «ИГРАТЬ»

@@ -50,6 +50,9 @@ public static class HfStrings
     public const string RecommendedBadge = "СОВЕТУЕМ";
     public const string ShadersAlsoFit = "Твой ПК потянет и шейдеры";
     public const string MemoryForGame = "Памяти игре";
+    public const string Mods = "Моды";
+    public const string Reinstall = "Переустановить";
+    public const string ReinstallHint = "Скачать файлы игры заново, если она не запускается";
 
     // ----- news -----
     public const string NewsKicker = "НОВОСТИ";
