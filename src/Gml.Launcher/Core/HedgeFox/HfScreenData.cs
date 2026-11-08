@@ -59,21 +59,15 @@ public static class HfProfileCards
         }).ToList();
 }
 
-/// <summary>The line under «ИГРАТЬ» while the game downloads: step, percent and speed, in Russian.</summary>
+/// <summary>The sign while the game downloads, and the one short line under it, in Russian.</summary>
 public static class HfPlayProgress
 {
-    private static readonly Regex SpeedPattern = new(@"^\s*([\d.,]+)\s*(B|KB|MB|GB|TB)/s\s*$", RegexOptions.Compiled);
-
-    private static readonly Dictionary<string, string> Units = new()
-    {
-        ["B"] = "Б", ["KB"] = "КБ", ["MB"] = "МБ", ["GB"] = "ГБ", ["TB"] = "ТБ"
-    };
-
-    private static readonly Regex FilesLeft = new(@"^Осталось: (\d+) файлов$", RegexOptions.Compiled);
+    private static readonly Regex FilesLeft = new(@"^Осталось:? (\d+) файлов$", RegexOptions.Compiled);
 
     /// <summary>
-    ///     The detail («Осталось: 120 файлов») when there is one, else the headline («Обновление»). The stock line
-    ///     says «файлов» for every number; it is made to agree («1 файл», «2 файла»).
+    ///     The line under the sign: the detail («Осталось 120 файлов») when there is one, else the headline
+    ///     («Обновление»). The stock line says «Осталось: N файлов» for every number; it is made to agree («1 файл»,
+    ///     «2 файла») and loses the colon.
     /// </summary>
     public static string Step(string? headline, string? description)
     {
@@ -82,7 +76,7 @@ public static class HfPlayProgress
         var text = description.Trim();
         var m = FilesLeft.Match(text);
         return m.Success && int.TryParse(m.Groups[1].Value, NumberStyles.None, CultureInfo.InvariantCulture, out var n)
-            ? $"Осталось: {n} {HfStrings.Plural(n, "файл", "файла", "файлов")}"
+            ? $"Осталось {n} {HfStrings.Plural(n, "файл", "файла", "файлов")}"
             : text;
     }
 
@@ -91,36 +85,47 @@ public static class HfPlayProgress
 
     /// <summary>The sign's label while it downloads: the percent, or «ЗАГРУЗКА…» while the size is unknown.</summary>
     public static string SignLabel(int? percent) => percent is null ? HfStrings.LoadingCaps : Percent(percent);
-
-    /// <summary>The one line under the sign: the step and, while bytes arrive, the speed.</summary>
-    public static string Line(string? headline, string? description, string? speed)
-    {
-        var step = Step(headline, description);
-        var rate = Speed(speed);
-        return step.Length == 0 ? rate : rate.Length == 0 ? step : step + HfStrings.Dot + rate;
-    }
-
-    /// <summary>The stock counter's «3.5 MB/s» as «3,5 МБ/с».</summary>
-    public static string Speed(string? speed)
-    {
-        if (string.IsNullOrWhiteSpace(speed))
-            return string.Empty;
-        var m = SpeedPattern.Match(speed);
-        return m.Success ? $"{m.Groups[1].Value.Replace('.', ',')} {Units[m.Groups[2].Value]}/с" : speed.Trim();
-    }
 }
 
-/// <summary>The «советуем» mark on the memory slider: the memory of the profile the advice picks.</summary>
+/// <summary>
+///     Which version of the game (GML profile) «Играть» starts. Nobody has to choose: the launcher takes the one
+///     advised for this PC. A pick in Настройки wins and is remembered; picking the advised version again means
+///     «follow this PC» once more.
+/// </summary>
+public static class HfProfilePick
+{
+    /// <summary>Storage key of the player's own pick (a GML name), or null while the launcher picks.</summary>
+    public const string StorageKey = "HfProfileChoice";
+
+    /// <summary>
+    ///     The version to select: the player's pick while it is still offered, else the advised one; null keeps the
+    ///     current selection (no advice, or the advised version is not offered).
+    /// </summary>
+    public static ProfileReadDto? Pick(IEnumerable<ProfileReadDto> profiles, HfAdvice advice, string? choice)
+    {
+        var list = profiles.ToList();
+        return Find(list, choice) ?? Find(list, advice.Recommended);
+    }
+
+    /// <summary>What to remember when the player picks <paramref name="picked" />: null for the advised version.</summary>
+    public static string? Remember(string picked, HfAdvice advice) =>
+        advice.Recommended is { } r && string.Equals(r, picked, StringComparison.OrdinalIgnoreCase) ? null : picked;
+
+    private static ProfileReadDto? Find(List<ProfileReadDto> list, string? name) =>
+        name is null ? null : list.FirstOrDefault(p => string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase));
+}
+
+/// <summary>
+///     The «рекомендуем» mark on the memory slider: the memory the chosen version asks for, which is also what the
+///     game gets while memory is automatic (the stock «по профилю»). The thumb on the mark is automatic memory.
+/// </summary>
 public static class HfRamMark
 {
-    /// <summary>Memory of the advised profile, or null without advice or when this PC has less than that.</summary>
-    public static int? RecommendedMb(HfAdvice advice, ulong maxRamMb)
-    {
-        if (advice.Recommended is not { } name)
-            return null;
-        var mb = ProfileCatalog.For(name, null).RamMb;
-        return mb > 0 && (ulong)mb <= maxRamMb ? mb : null;
-    }
+    /// <summary>The version's memory (what automatic memory gives the game), or null when it does not say.</summary>
+    public static int? ProfileMb(ProfileReadDto? profile) => profile is { RecommendedRam: > 0 and var mb } ? mb : null;
+
+    /// <summary>The slider stands on the mark: the game follows the version's memory.</summary>
+    public static bool IsOnMark(double value, int? markMb) => markMb is { } m && Math.Abs(value - m) < 1;
 
     /// <summary>Where <paramref name="value" /> sits between the slider's ends, 0…1.</summary>
     public static double Fraction(double value, double min, double max) =>

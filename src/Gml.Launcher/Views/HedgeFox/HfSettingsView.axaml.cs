@@ -2,16 +2,20 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reactive.Linq;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform.Storage;
+using Avalonia.Threading;
 using GamerVII.Notification.Avalonia;
 using Gml.Launcher.Assets;
 using Gml.Launcher.Core;
 using Gml.Launcher.Core.HedgeFox;
 using Gml.Launcher.ViewModels.HedgeFox;
 using Gml.Launcher.ViewModels.Pages;
+using ReactiveUI;
 using Sentry;
 
 namespace Gml.Launcher.Views.HedgeFox;
@@ -23,7 +27,27 @@ public partial class HfSettingsView : HfPageView<SettingsPageViewModel, HfSettin
         AvaloniaXamlLoader.Load(this);
     }
 
+    private IDisposable? _more;
+
     protected override HfSettingsModel CreateModel(SettingsPageViewModel page) => new(page);
+
+    // «Дополнительно» opens under the fold on a small window: scroll its rows into view
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnAttachedToVisualTree(e);
+        _more?.Dispose();
+        _more = Model?.WhenAnyValue(m => m.ShowMore)
+            .Where(open => open)
+            .Subscribe(_ => Dispatcher.UIThread.Post(() => this.FindControl<Control>("More")?.BringIntoView(),
+                DispatcherPriority.Loaded));
+    }
+
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
+    {
+        base.OnDetachedFromVisualTree(e);
+        _more?.Dispose();
+        _more = null;
+    }
 
     // the same checks as the stock settings page: one folder, no spaces in the path
     private async void OnPickFolder(object? sender, RoutedEventArgs e)

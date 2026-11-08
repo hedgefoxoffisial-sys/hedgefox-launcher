@@ -6,7 +6,8 @@
       hf:HfButton            orange chamfered button; classes secondary, ghost; lg, sm; block;
                              link (underlined text link), card (clickable .card frame, +selected);
                              the game menu's: sign (+narrow: the wooden sign, the screen's one main action),
-                             text (quiet text button), tab (+selected: a profile tab), strip (the news headline)
+                             text (quiet text button; +icon: a pixel icon alone, +accent: the second action,
+                             +quiet: muted), tab (+selected: one of a few choices, «Версия игры»)
       hf:HfMenuScene         the game menu's night behind every page (MainWindow); hf:HfSprite (pixel sprite with
                              frames, the fog tuft); hf:HfSignMeter (the sign while the game downloads)
       hf:HfCaptionButton     32 px title-bar button; class close
@@ -19,7 +20,6 @@
       TextBlock classes      hf-px16/24/32/48/64 (Tiny5), hf-h1/h2/h3 (Unbounded), hf-body, hf-lead, hf-label,
                              hf-small, hf-muted, hf-kicker, hf-link, hf-error, hf-success, hf-ink, hf-shadow,
                              hf-status (the status line over the night)
-      Border class           hf-tag (the small «советуем» on a profile tab)
       Image class            hf-pixel (nearest-neighbour scaling for pixel art)
       CheckBox, Slider       square night box with a pixel tick; void trough, orange run, chamfered thumb
       Stock mods page        restyled here only (pages|ModsPageView …)
@@ -71,10 +71,11 @@
             <Color x:Key="SystemAccentColorLight2">#FFC48A</Color>
             <Color x:Key="SystemAccentColorLight3">#FFF1DF</Color>
 
-            <SolidColorBrush x:Key="TextControlBackground" Color="{DynamicResource HfWellColor}" />
-            <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="{DynamicResource HfWellColor}" />
-            <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="{DynamicResource HfWellColor}" />
-            <SolidColorBrush x:Key="TextControlBorderBrush" Color="{DynamicResource HfLineColor}" />
+            <!-- solid void fields with a 2 px line: they hold their own over the mountains and the fog -->
+            <SolidColorBrush x:Key="TextControlBackground" Color="{DynamicResource HfVoidColor}" />
+            <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="{DynamicResource HfVoidColor}" />
+            <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="{DynamicResource HfVoidColor}" />
+            <SolidColorBrush x:Key="TextControlBorderBrush" Color="{DynamicResource HfLineStrongColor}" />
             <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="{DynamicResource HfPurpleColor}" />
             <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="{DynamicResource HfOrangeColor}" />
             <SolidColorBrush x:Key="TextControlForeground" Color="{DynamicResource HfTextColor}" />
@@ -84,8 +85,8 @@
             <SolidColorBrush x:Key="TextControlPlaceholderForegroundPointerOver" Color="{DynamicResource HfMutedColor}" Opacity="0.7" />
             <SolidColorBrush x:Key="TextControlPlaceholderForegroundFocused" Color="{DynamicResource HfMutedColor}" Opacity="0.7" />
             <SolidColorBrush x:Key="TextControlSelectionHighlightColor" Color="{DynamicResource HfPurpleDeepColor}" />
-            <Thickness x:Key="TextControlBorderThemeThickness">1</Thickness>
-            <Thickness x:Key="TextControlBorderThemeThicknessFocused">1</Thickness>
+            <Thickness x:Key="TextControlBorderThemeThickness">2</Thickness>
+            <Thickness x:Key="TextControlBorderThemeThicknessFocused">2</Thickness>
             <Thickness x:Key="TextControlThemePadding">14,12</Thickness>
             <x:Double x:Key="TextControlThemeMinHeight">48</x:Double>
 
@@ -304,7 +305,7 @@
                 </Style>
 
                 <!-- a quiet text button: no frame, no underline («Настройки», «Выйти», the footer links) -->
-                <Style Selector="^.text, ^.tab, ^.strip">
+                <Style Selector="^.text, ^.tab">
                     <Setter Property="FontFamily" Value="{StaticResource HfFontBody}" />
                     <Setter Property="FontWeight" Value="Medium" />
                 </Style>
@@ -334,39 +335,31 @@
                     <Setter Property="Background" Value="Transparent" />
                     <Setter Property="RenderTransform" Value="none" />
                 </Style>
-
-                <!-- the one news headline at the bottom of the main screen: a thin night strip -->
-                <Style Selector="^.strip">
-                    <Setter Property="Background" Value="{DynamicResource HfTicketBrush}" />
+                <!-- a pixel icon alone (the gear): a square, easy to hit -->
+                <Style Selector="^.text.icon">
+                    <Setter Property="Padding" Value="8" />
+                </Style>
+                <!-- the second action of a screen («Регистрация»): orange, a bit larger -->
+                <Style Selector="^.text.accent">
+                    <Setter Property="Foreground" Value="{DynamicResource HfOrangeLightBrush}" />
+                    <Setter Property="FontWeight" Value="SemiBold" />
+                    <Setter Property="FontSize" Value="15" />
+                    <Setter Property="Padding" Value="8,6" />
+                </Style>
+                <Style Selector="^.text.accent:pointerover">
+                    <Setter Property="Foreground" Value="{DynamicResource HfOrangeBrush}" />
+                </Style>
+                <!-- next to the accent: muted until pointed at -->
+                <Style Selector="^.text.quiet">
+                    <Setter Property="Foreground" Value="{DynamicResource HfMutedBrush}" />
+                    <Setter Property="Padding" Value="8,6" />
+                </Style>
+                <Style Selector="^.text.quiet:pointerover">
                     <Setter Property="Foreground" Value="{DynamicResource HfTextBrush}" />
-                    <Setter Property="BorderBrush" Value="{DynamicResource HfLineBrush}" />
-                    <Setter Property="Padding" Value="12,6,12,7" />
-                    <Setter Property="MinHeight" Value="0" />
-                    <Setter Property="FontSize" Value="13" />
-                </Style>
-                <Style Selector="^.strip /template/ hf|PixelBorder#PART_Frame">
-                    <Setter Property="Notch" Value="0" />
-                    <Setter Property="BorderThickness" Value="1" />
-                    <Setter Property="ShadowOffset" Value="0" />
-                    <Setter Property="BevelTop" Value="0" />
-                    <Setter Property="BevelBottom" Value="0" />
-                </Style>
-                <Style Selector="^.strip /template/ hf|PixelBorder#PART_FocusRing">
-                    <Setter Property="Margin" Value="-4" />
-                    <Setter Property="Notch" Value="0" />
-                    <Setter Property="BorderThickness" Value="2" />
-                </Style>
-                <Style Selector="^.strip:pointerover">
-                    <Setter Property="Background" Value="{DynamicResource HfSurfaceBrush}" />
-                    <Setter Property="BorderBrush" Value="{DynamicResource HfPurpleBrush}" />
-                </Style>
-                <Style Selector="^.strip:pressed">
-                    <Setter Property="Background" Value="{DynamicResource HfSurfaceBrush}" />
-                    <Setter Property="RenderTransform" Value="none" />
                 </Style>
 
-                <!-- one of the profile tabs under the sign: text on the night strip, the chosen one lit with an
-                     orange top edge -->
+                <!-- one of a few choices side by side («Версия игры»): text on a void strip, the chosen one lit
+                     with an orange top edge -->
                 <Style Selector="^.tab">
                     <Setter Property="Background" Value="Transparent" />
                     <Setter Property="Foreground" Value="{DynamicResource HfMutedBrush}" />
@@ -613,9 +606,12 @@
         <Setter Property="FontFamily" Value="{StaticResource HfFontPixel}" />
         <Setter Property="hf:HfRender.CrispText" Value="True" />
     </Style>
-    <Style Selector="hf|HfButton.text TextBlock, hf|HfButton.tab TextBlock, hf|HfButton.strip TextBlock">
+    <Style Selector="hf|HfButton.text TextBlock, hf|HfButton.tab TextBlock">
         <Setter Property="FontFamily" Value="{StaticResource HfFontBody}" />
         <Setter Property="FontWeight" Value="Medium" />
+    </Style>
+    <Style Selector="hf|HfButton.text.accent TextBlock">
+        <Setter Property="FontWeight" Value="SemiBold" />
     </Style>
     <!-- the sign's label: Tiny5 (the presenter draws a plain string itself, the button sets the font) -->
     <Style Selector="hf|HfButton.sign TextBlock">
@@ -785,19 +781,6 @@
         <Setter Property="ShadowBrush" Value="{DynamicResource HfVoidBrush}" />
         <Setter Property="ShadowOffset" Value="4" />
         <Setter Property="Padding" Value="20,16" />
-    </Style>
-    <!-- a small outlined word next to a name: «советуем» on a profile tab -->
-    <Style Selector="Border.hf-tag">
-        <Setter Property="BorderBrush" Value="{DynamicResource HfBrassBrush}" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="Padding" Value="4,0,4,1" />
-        <Setter Property="VerticalAlignment" Value="Center" />
-    </Style>
-    <Style Selector="Border.hf-tag TextBlock">
-        <Setter Property="FontFamily" Value="{StaticResource HfFontBody}" />
-        <Setter Property="FontSize" Value="11" />
-        <Setter Property="FontWeight" Value="SemiBold" />
-        <Setter Property="Foreground" Value="{DynamicResource HfBrassBrush}" />
     </Style>
     <Style Selector="hf|PixelBorder.hf-chip">
         <Setter Property="Background" Value="{DynamicResource HfNightBrush}" />

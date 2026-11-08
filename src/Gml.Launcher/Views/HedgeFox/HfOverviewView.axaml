@@ -1,8 +1,9 @@
-<!-- Главный экран: the game's main menu. In the middle the title, «Пираты над Пеленой» and the wooden sign «ИГРАТЬ»
-     hanging from the title on two ropes over its tuft of fog (the menu's sprites at ×2); under it the profile tabs
-     and one status line. The player in the top left corner (→ Профиль), «Настройки» and «Выйти» in the top right,
-     the site links and the latest post along the bottom. While the game downloads the sign fills with light wood
-     and shows the percent, the line under it the step.
+<!-- Главный экран: the game's main menu with one action. In the middle the title, «Пираты над Пеленой» and the
+     wooden sign «ИГРАТЬ» hanging from the title on two ropes over its tuft of fog (the menu's sprites at ×2). The
+     player in the top left corner (→ Профиль), the gear (→ Настройки) in the top right, «Сайт» and the status line
+     along the bottom. The version of the game is picked for this PC (Настройки can change it).
+     While the game downloads the sign fills with light wood and shows the percent, the one line under it what is
+     left; the corners are off and the status line steps aside.
      The stock OverviewPageViewModel runs the profiles, the download and the game; HfOverviewModel adds the rest. -->
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -12,9 +13,10 @@
              x:Class="Gml.Launcher.Views.HedgeFox.HfOverviewView">
     <Grid Name="Root" x:DataType="hfvm:HfOverviewModel" RowDefinitions="Auto,*,Auto" Margin="16,4,16,12">
 
-        <!-- The player (→ Профиль); Настройки and Выйти -->
+        <!-- The player (→ Профиль) and the gear (→ Настройки); both off while the game downloads or runs -->
         <Grid ColumnDefinitions="Auto,*,Auto">
             <hf:HfButton Classes="text" Padding="4" Command="{Binding Page.GoProfileCommand}"
+                         IsEnabled="{Binding IsIdle}"
                          ToolTip.Tip="{x:Static core:HfStrings.Profile}">
                 <StackPanel Orientation="Horizontal" Spacing="10">
                     <Border BorderBrush="{DynamicResource HfVoidBrush}" BorderThickness="2">
@@ -24,15 +26,17 @@
                                Foreground="{DynamicResource HfTextBrush}" VerticalAlignment="Center" />
                 </StackPanel>
             </hf:HfButton>
-            <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                <hf:HfButton Classes="text" Command="{Binding Page.GoSettingsCommand}"
-                             Content="{x:Static core:HfStrings.Settings}" />
-                <hf:HfButton Classes="text" Command="{Binding LogoutCommand}" Content="{x:Static core:HfStrings.Logout}" />
-            </StackPanel>
+            <hf:HfButton Grid.Column="2" Classes="text icon" VerticalAlignment="Center"
+                         Command="{Binding Page.GoSettingsCommand}"
+                         IsEnabled="{Binding IsIdle}"
+                         ToolTip.Tip="{x:Static core:HfStrings.Settings}"
+                         AutomationProperties.Name="{x:Static core:HfStrings.Settings}">
+                <hf:PixelIcon Kind="gear" Width="24" Height="24" />
+            </hf:HfButton>
         </Grid>
 
         <!-- The menu -->
-        <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,8">
+        <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center">
             <!-- 576 wide: the title at ×2 of the game's 288×54; the sign 64 px in, 146 px down -->
             <Panel Width="576" Height="230">
                 <!-- the ropes start behind the title's lower edge and end in rings on the plank's rivets -->
@@ -51,7 +55,7 @@
                 <hf:HfSprite Source="cloud.png" Frames="6" Scale="2" FrameMs="450"
                              HorizontalAlignment="Left" VerticalAlignment="Top" Margin="-20,182,0,0" />
 
-                <!-- «ИГРАТЬ» while idle; faded only when no profile is chosen -->
+                <!-- «ИГРАТЬ» while idle; faded only when no version is chosen -->
                 <hf:HfButton Classes="sign"
                              HorizontalAlignment="Left" VerticalAlignment="Top" Margin="64,146,0,0"
                              Command="{Binding Page.PlayCommand}"
@@ -77,72 +81,25 @@
                 </Panel>
             </Panel>
 
-            <!-- the profile tabs; while downloading, the step in their place -->
-            <Panel Height="38" Margin="0,16,0,0">
-                <Border HorizontalAlignment="Center" Background="{DynamicResource HfTicketBrush}"
-                        BorderBrush="{DynamicResource HfLineBrush}" BorderThickness="1" Padding="2"
-                        IsVisible="{Binding IsIdle}">
-                    <ItemsControl ItemsSource="{Binding Cards}">
-                        <ItemsControl.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel Orientation="Horizontal" Spacing="2" />
-                            </ItemsPanelTemplate>
-                        </ItemsControl.ItemsPanel>
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate x:DataType="core:HfProfileCard">
-                                <hf:HfButton Classes="tab"
-                                             Classes.selected="{Binding Selected}"
-                                             Command="{Binding $parent[ItemsControl].((hfvm:HfOverviewModel)DataContext).SelectCommand}"
-                                             CommandParameter="{Binding}"
-                                             ToolTip.Tip="{Binding Hint}">
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <TextBlock Text="{Binding Title}" VerticalAlignment="Center" />
-                                        <Border Classes="hf-tag" IsVisible="{Binding Recommended}"
-                                                ToolTip.Tip="{x:Static core:HfStrings.AdvisedHint}">
-                                            <TextBlock Text="{x:Static core:HfStrings.Advised}" />
-                                        </Border>
-                                    </StackPanel>
-                                </hf:HfButton>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
-                </Border>
-                <TextBlock Classes="hf-status" Text="{Binding StepLine}"
+            <!-- while downloading, what is left: the one line under the sign (its place is kept, so the sign stays put) -->
+            <Panel Height="24" Margin="0,14,0,0">
+                <TextBlock Classes="hf-status" Text="{Binding StepLine}" FontSize="14"
                            HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="NoWrap"
                            IsVisible="{Binding IsBusy}" />
             </Panel>
-
-            <!-- one status line: online and the Pelena, or «Сервер спит»; nothing without data -->
-            <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center" Margin="0,14,0,0"
-                        IsVisible="{Binding Info.HasShortLine}">
-                <hf:HfStatusDot State="{Binding Info.Dot}" VerticalAlignment="Center" />
-                <TextBlock Classes="hf-status" Text="{Binding Info.ShortLine}" VerticalAlignment="Center" />
-            </StackPanel>
         </StackPanel>
 
-        <!-- Site links; the latest post -->
-        <Grid Grid.Row="2" ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Bottom">
-            <StackPanel Orientation="Horizontal" Spacing="2" VerticalAlignment="Center">
-                <hf:HfButton Classes="text" FontSize="13" Command="{Binding Page.OpenLinkCommand}"
-                             CommandParameter="{x:Static core:HfLinks.Site}" Content="{x:Static core:HfStrings.Site}" />
-                <TextBlock Classes="hf-small" Text="·" VerticalAlignment="Center" />
-                <hf:HfButton Classes="text" FontSize="13" Command="{Binding Page.OpenLinkCommand}"
-                             CommandParameter="{x:Static core:HfLinks.Telegram}" Content="{x:Static core:HfStrings.Telegram}" />
-                <TextBlock Classes="hf-small" Text="·" VerticalAlignment="Center" />
-                <hf:HfButton Classes="text" FontSize="13" Command="{Binding Page.OpenLinkCommand}"
-                             CommandParameter="{x:Static core:HfLinks.Install}" Content="{x:Static core:HfStrings.Help}" />
-            </StackPanel>
-            <hf:HfButton Grid.Column="2" Classes="strip" MaxWidth="440"
-                         IsVisible="{Binding Info.HasLatest}"
-                         Command="{Binding Info.OpenNewsCommand}"
-                         CommandParameter="{Binding Info.Latest}">
-                <StackPanel Orientation="Horizontal" Spacing="10">
-                    <TextBlock Classes="hf-small" Text="{Binding Info.Latest.Date, FallbackValue=''}" VerticalAlignment="Center" />
-                    <TextBlock Text="{Binding Info.Latest.Title, FallbackValue=''}" VerticalAlignment="Center"
-                               MaxWidth="320" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
-                    <hf:PixelIcon Kind="arrow" Foreground="{DynamicResource HfOrangeBrush}" VerticalAlignment="Center" />
+        <!-- «Сайт»; the status line in the middle («Онлайн 7 из 45», «Сервер спит», nothing without data) -->
+        <Grid Grid.Row="2" ColumnDefinitions="*,Auto,*" VerticalAlignment="Bottom">
+            <hf:HfButton Classes="text" FontSize="13" HorizontalAlignment="Left" VerticalAlignment="Center"
+                         Command="{Binding Page.OpenLinkCommand}"
+                         CommandParameter="{x:Static core:HfLinks.Site}" Content="{x:Static core:HfStrings.Site}" />
+            <Panel Grid.Column="1" VerticalAlignment="Center" IsVisible="{Binding IsIdle}">
+                <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding Info.HasOnlineLine}">
+                    <hf:HfStatusDot State="{Binding Info.Dot}" VerticalAlignment="Center" />
+                    <TextBlock Classes="hf-status" Text="{Binding Info.OnlineLine}" VerticalAlignment="Center" />
                 </StackPanel>
-            </hf:HfButton>
+            </Panel>
         </Grid>
     </Grid>
 </UserControl>

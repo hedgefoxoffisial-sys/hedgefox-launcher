@@ -18,7 +18,8 @@ public partial class MenuGallery : UserControl
         Set("TabHover", ":pointerover");
         Set("TextHover", ":pointerover");
         Set("TextFocus", ":focus-visible");
-        Set("StripHover", ":pointerover");
+        Set("GearHover", ":pointerover");
+        Set("FieldFocus", ":focus");
     }
 
     private void Set(string name, string pseudoClass)

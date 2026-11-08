@@ -97,20 +97,16 @@ public class StatusWordingTests
     public void Loading() => Assert.Equal("Проверяем…", HfStrings.StatusLine(HfStatusSnapshot.Loading));
 
     [Theory]
-    [InlineData(80, 96, "Онлайн 7 из 45 · Пелена поднимается")]
-    [InlineData(96, 80, "Онлайн 7 из 45 · Пелена опускается")]
-    [InlineData(80, 80, "Онлайн 7 из 45 · Пелена: Y 80")]
-    [InlineData(-64, -64, "Онлайн 7 из 45 · Пелена спит")]
-    [InlineData(-64, 10, "Онлайн 7 из 45 · Пелена просыпается")]
-    public void ShortLineAddsThePelenaInAFewWords(double y, double target, string expected) =>
-        Assert.Equal(expected, HfStrings.StatusShort(new HfStatusSnapshot(HfStatusKind.Online, 7, 45, Pelena: new HfPelena(y, target))));
+    [InlineData(80, 96)]
+    [InlineData(-64, -64)]
+    public void ShortLineIsTheOnlineAloneWhateverThePelenaDoes(double y, double target) =>
+        Assert.Equal("Онлайн 7 из 45", HfStrings.StatusShort(new HfStatusSnapshot(HfStatusKind.Online, 7, 45, Pelena: new HfPelena(y, target))));
 
     [Fact]
-    public void ShortLineWithoutThePelenaOrWithoutAnyIsJustTheOnline()
+    public void ShortLineWithoutAnyPelenaIsJustTheOnline()
     {
-        var online = new HfStatusSnapshot(HfStatusKind.Online, 0, 45, Pelena: new HfPelena(80, 96));
-        Assert.Equal("Онлайн 0 из 45", HfStrings.StatusShort(online, withPelena: false));
-        Assert.Equal("Онлайн 0 из 45", HfStrings.StatusShort(online with { Pelena = null }));
+        var online = new HfStatusSnapshot(HfStatusKind.Online, 0, 45);
+        Assert.Equal("Онлайн 0 из 45", HfStrings.StatusShort(online));
     }
 
     [Fact]

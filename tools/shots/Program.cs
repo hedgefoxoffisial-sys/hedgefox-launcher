@@ -40,7 +40,7 @@ var outDir = Path.GetFullPath(args[0]);
 Directory.CreateDirectory(outDir);
 // what the fakes report as the app folder; nothing is written there
 var scratch = Path.Combine(Path.GetTempPath(), "hedgefox-shots");
-// the stock mods page creates «<install dir>/game data/<profile>/mods»; the fakes' Windows-style install dir is a
+// the stock mods model (under Настройки) creates «<install dir>/game data/<profile>/mods»; the fakes' Windows-style install dir is a
 // relative path on macOS and Linux, so it must land in the scratch folder, never in the working tree
 Directory.CreateDirectory(scratch);
 Environment.CurrentDirectory = scratch;
@@ -79,7 +79,7 @@ gallery.ForceStates();
 Save(galleryWindow, "theme-gallery");
 galleryWindow.Close();
 
-// 1b. The game-menu primitives over the night scene: the sign, the tabs, the text links, the news strip, the status
+// 1b. The game-menu primitives over the night scene: the sign, the text links and the gear, the tabs, the status
 var menuGallery = new MenuGallery();
 var menuWindow = new Window { Width = 1180, Height = 720, Content = menuGallery };
 menuWindow.Show();
@@ -134,7 +134,7 @@ void Screens(int width, int height, string size)
     // login: empty form, then a typed nick, then the 2FA step with an error
     Ui.PumpUntil(() => vm.Router.GetCurrentViewModel() is LoginPageViewModel, "login page");
     var login = (LoginPageViewModel)vm.Router.GetCurrentViewModel()!;
-    Ui.PumpUntil(() => HfModel<HfLoginModel>(main)?.Info.HasShortLine == true, "login status line");
+    Ui.PumpUntil(() => HfModel<HfLoginModel>(main)?.Info.HasOnlineLine == true, "login status line");
     Save(main, "login" + size);
     login.Login = Fakes.User.Name;
     login.Is2FaVisible = true;
@@ -152,13 +152,13 @@ void Screens(int width, int height, string size)
     Fakes.StatusNow = Fakes.Status;
     Fakes.NewsFails = false;
 
-    // main screen
+    // main screen: the version is picked for the fake 8 GB laptop («Слабый ПК»), nobody chooses
     var overview = new OverviewPageViewModel(vm, Fakes.User, vm.OnClosed);
     vm.Router.NavigateAndReset.Execute(overview).Subscribe();
-    Ui.PumpUntil(() => overview.ListViewModel.Profiles?.Count == 3 && overview.ListViewModel.SelectedProfile != null,
-        "overview profiles");
-    Ui.PumpUntil(() => HfModel<HfOverviewModel>(main) is { Face: not null, Cards.Count: 3, Info.HasLatest: true },
-        "overview face, tabs and the latest post");
+    Ui.PumpUntil(() => overview.ListViewModel.Profiles?.Count == 3 &&
+                       overview.ListViewModel.SelectedProfile?.Name == ProfileCatalog.LowPc, "overview, version for this PC");
+    Ui.PumpUntil(() => HfModel<HfOverviewModel>(main) is { Face: not null, Info.HasOnlineLine: true },
+        "overview face and status line");
     Save(main, "overview" + size);
 
     // toasts as the stock view models queue them (their fills only pick the left bar): an error, a success, the VPN
@@ -187,7 +187,7 @@ void Screens(int width, int height, string size)
         Ui.PumpUntil(() => !main.GetVisualDescendants().OfType<NotificationMessage>().Any(), "toasts gone");
     }
 
-    // downloading: the sign fills with light wood and shows the percent, the step and the speed under it
+    // downloading: the sign fills with light wood and shows the percent, what is left under it; the corners are off
     overview.Headline = "Обновление";
     overview.Description = "Осталось: 312 файлов";
     overview.LoadingPercentage = 42;
@@ -201,31 +201,32 @@ void Screens(int width, int height, string size)
     Save(main, "overview-download" + size);
     overview.IsProcessing = false;
 
-    foreach (var (command, name) in new[]
-             {
-                 (overview.GoSettingsCommand, "settings"), (overview.GoProfileCommand, "profile"),
-                 (overview.GoModsCommand, "mods")
-             })
+    foreach (var (command, name) in new[] { (overview.GoSettingsCommand, "settings"), (overview.GoProfileCommand, "profile") })
     {
         command.Execute(null);
         Ui.PumpUntil(() => vm.Router.GetCurrentViewModel() != overview, name + " page");
         if (name == "settings")
         {
-            // the stock page loads the saved settings on the thread pool; then the slider is switched to manual
+            // the stock page loads the saved settings on the thread pool (a fresh install: automatic memory, so the
+            // thumb stands on the mark); the version's mods come from the fake GML
             var settings = (SettingsPageViewModel)vm.Router.GetCurrentViewModel()!;
             Ui.PumpUntil(() => settings.InstallationFolder != null && settings.MaxRamValue > 0, "saved settings");
-            settings.DynamicRamValue = false;
-            settings.RamValue = 6144;
-            Ui.PumpUntil(() => HfModel<HfSettingsModel>(main) is { HasMark: true, IsManualRam: true, CanReinstall: true },
-                "settings and the mark");
+            Ui.PumpUntil(() => HfModel<HfSettingsModel>(main) is
+                    { HasMark: true, HasMods: true, CanReinstall: true, Versions.Count: 3, RamText: "4 ГБ" },
+                "settings, the mark and the mods");
         }
         if (name == "profile")
             Ui.PumpUntil(() => HfModel<HfProfileModel>(main) is { Body: not null }, "skin render");
         Save(main, name + size);
         if (name == "settings")
         {
-            // «Переустановить» asks before it deletes the profile's folder
             var settingsModel = HfModel<HfSettingsModel>(main)!;
+            // «Дополнительно» open: the window size and the game folder
+            settingsModel.ToggleMoreCommand.Execute().Subscribe();
+            Ui.PumpUntil(() => settingsModel.ShowMore, "more settings");
+            Save(main, "settings-more" + size);
+            settingsModel.ToggleMoreCommand.Execute().Subscribe();
+            // «Переустановить» asks before it deletes the version's folder
             settingsModel.Reinstall.AskCommand.Execute().Subscribe();
             Ui.PumpUntil(() => settingsModel.Reinstall.IsAsking, "reinstall question");
             Save(main, "settings-reinstall" + size);

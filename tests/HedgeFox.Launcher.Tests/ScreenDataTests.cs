@@ -1,8 +1,10 @@
 using System.Reactive.Linq;
+using Gml.Dto.Mods;
 using Gml.Dto.Profile;
 using Gml.Launcher.Core.HedgeFox;
 using Gml.Launcher.Core.Services;
 using Gml.Launcher.ViewModels.HedgeFox;
+using Gml.Launcher.ViewModels.Pages;
 using Gml.Launcher.Views.HedgeFox.Controls;
 using ReactiveUI;
 using Xunit;
@@ -36,8 +38,7 @@ public class ScreenDataTests
         Assert.DoesNotContain("0", info.StatusLine);
         Assert.False(info.HasPelena);
         // the screens hide their status line instead
-        Assert.False(info.HasShortLine);
-        Assert.Equal("", info.ShortLine);
+        Assert.False(info.HasOnlineLine);
         Assert.Equal("", info.OnlineLine);
     }
 
@@ -47,9 +48,9 @@ public class ScreenDataTests
         var info = new HfServerInfoModel(null, null, () => Now);
         info.Apply(new HfStatusSnapshot(HfStatusKind.Online, 7, 45, "1.21.1", Now, new HfPelena(80, 96)));
         Assert.Equal("Онлайн 7 из 45", info.StatusLine);
-        Assert.Equal("Онлайн 7 из 45 · Пелена поднимается", info.ShortLine);
+        // the line on the screens is the online alone, the Pelena stays out of it
         Assert.Equal("Онлайн 7 из 45", info.OnlineLine);
-        Assert.True(info.HasShortLine);
+        Assert.True(info.HasOnlineLine);
         Assert.Equal(HfDotState.Online, info.Dot);
         Assert.True(info.HasPelena);
         Assert.Equal("ПЕЛЕНА: Y 80", info.PelenaTitle);
@@ -182,21 +183,21 @@ public class ScreenDataTests
     // ----- play button -----
 
     [Theory]
-    [InlineData("Обновление", "Осталось: 120 файлов", "Осталось: 120 файлов")]
+    [InlineData("Обновление", "Осталось: 120 файлов", "Осталось 120 файлов")]
     [InlineData("Обновление", "", "Обновление")]
     [InlineData(null, null, "")]
     public void StepTextPrefersTheDetail(string? headline, string? description, string expected) =>
         Assert.Equal(expected, HfPlayProgress.Step(headline, description));
 
-    // the stock line is «Осталось: {N} файлов» for every N (copy-lore-6)
+    // the stock line is «Осталось: {N} файлов» for every N (copy-lore-6); under the sign it loses the colon
     [Theory]
-    [InlineData(1, "Осталось: 1 файл")]
-    [InlineData(2, "Осталось: 2 файла")]
-    [InlineData(5, "Осталось: 5 файлов")]
-    [InlineData(11, "Осталось: 11 файлов")]
-    [InlineData(21, "Осталось: 21 файл")]
-    [InlineData(122, "Осталось: 122 файла")]
-    [InlineData(0, "Осталось: 0 файлов")]
+    [InlineData(1, "Осталось 1 файл")]
+    [InlineData(2, "Осталось 2 файла")]
+    [InlineData(5, "Осталось 5 файлов")]
+    [InlineData(11, "Осталось 11 файлов")]
+    [InlineData(21, "Осталось 21 файл")]
+    [InlineData(122, "Осталось 122 файла")]
+    [InlineData(0, "Осталось 0 файлов")]
     public void FilesLeftAgreeWithTheNumber(int n, string expected) =>
         Assert.Equal(expected, HfPlayProgress.Step("Обновление", $"Осталось: {n} файлов"));
 
@@ -208,43 +209,104 @@ public class ScreenDataTests
     public void PercentIsWholeAndCapped(int? value, string expected) => Assert.Equal(expected, HfPlayProgress.Percent(value));
 
     [Theory]
-    [InlineData("3.5 MB/s", "3,5 МБ/с")]
-    [InlineData("812 KB/s", "812 КБ/с")]
-    [InlineData("1.25 GB/s", "1,25 ГБ/с")]
-    [InlineData("900 B/s", "900 Б/с")]
-    [InlineData("", "")]
-    [InlineData(null, "")]
-    public void SpeedIsInRussianUnits(string? speed, string expected) => Assert.Equal(expected, HfPlayProgress.Speed(speed));
-
-    [Theory]
     [InlineData(42, "42 %")]
     [InlineData(null, "ЗАГРУЗКА…")]
     public void SignShowsThePercentOrThatItLoads(int? percent, string expected) =>
         Assert.Equal(expected, HfPlayProgress.SignLabel(percent));
 
+    // ----- the version of the game: picked for this PC, the player's pick wins -----
+
+    [Fact]
+    public void NobodyChoosesTheVersionAdvisedForThisPcIsPicked()
+    {
+        var offered = new[] { Gml("HedgeFox"), Gml("HedgeFox-LowPC"), Gml("HedgeFox-Shaders") };
+        Assert.Equal("HedgeFox-LowPC", HfProfilePick.Pick(offered, new HfAdvice(ProfileCatalog.LowPc, false), null)?.Name);
+        Assert.Equal("HedgeFox", HfProfilePick.Pick(offered, new HfAdvice(ProfileCatalog.Normal, true), null)?.Name);
+    }
+
+    [Fact]
+    public void ThePlayersPickWinsWhileItIsOffered()
+    {
+        var offered = new[] { Gml("HedgeFox"), Gml("HedgeFox-LowPC"), Gml("HedgeFox-Shaders") };
+        var advice = new HfAdvice(ProfileCatalog.LowPc, false);
+        Assert.Equal("HedgeFox-Shaders", HfProfilePick.Pick(offered, advice, "HedgeFox-Shaders")?.Name);
+        // a version GML no longer offers: back to the advice
+        Assert.Equal("HedgeFox-LowPC", HfProfilePick.Pick(offered, advice, "HedgeFox-Old")?.Name);
+    }
+
+    [Fact]
+    public void WithoutAdviceOrAnOfferedAdvisedVersionTheSelectionStays()
+    {
+        Assert.Null(HfProfilePick.Pick([Gml("HedgeFox"), Gml("HedgeFox-LowPC")], new HfAdvice(null, false), null));
+        Assert.Null(HfProfilePick.Pick([Gml("HedgeFox")], new HfAdvice(ProfileCatalog.LowPc, false), null));
+        Assert.Null(HfProfilePick.Pick([], new HfAdvice(ProfileCatalog.LowPc, false), "HedgeFox"));
+    }
+
+    [Fact]
+    public void PickingTheAdvisedVersionFollowsThisPcAgain()
+    {
+        var advice = new HfAdvice(ProfileCatalog.LowPc, false);
+        Assert.Null(HfProfilePick.Remember("HedgeFox-LowPC", advice));
+        Assert.Equal("HedgeFox-Shaders", HfProfilePick.Remember("HedgeFox-Shaders", advice));
+        Assert.Equal("HedgeFox-LowPC", HfProfilePick.Remember("HedgeFox-LowPC", new HfAdvice(null, false)));
+    }
+
+    // ----- settings: the version's mods, one row each -----
+
+    [Fact]
+    public void ModRowsTakeTheTitlesGmlKeepsUnderTheJar()
+    {
+        var mods = new[]
+        {
+            new ExternalModReadDto(new ModReadDto { Name = "minimap" }, isEnabled: true),
+            new ExternalModReadDto(new ModReadDto { Name = "sound-physics" })
+        };
+        var details = new Dictionary<string, ModsDetailsInfoDto>
+        {
+            ["minimap.jar"] = new() { Key = "minimap.jar", Title = "Мини-карта", Description = " Карта в углу экрана. " }
+        };
+        var rows = HfModRow.Build(mods, details);
+        Assert.Equal(new[] { "Мини-карта", "sound-physics" }, rows.Select(r => r.Title));
+        Assert.Equal("Карта в углу экрана.", rows[0].Description);
+        Assert.True(rows[0].Mod.IsSelected);
+        Assert.False(rows[1].HasDescription);
+    }
+
+    [Fact]
+    public async Task ThePickIsStoredAndAtOnceInMemory()
+    {
+        var storage = new TestStorage();
+        await HfVersionChoice.SetAsync(storage, "HedgeFox-Shaders");
+        Assert.Equal("HedgeFox-Shaders", await storage.GetAsync<string>(HfProfilePick.StorageKey));
+        // the main screen reads the memory, not a storage whose write may still be on its way
+        Assert.Equal("HedgeFox-Shaders", await HfVersionChoice.GetAsync(new TestStorage()));
+        await HfVersionChoice.SetAsync(storage, null);
+        Assert.Null(await HfVersionChoice.GetAsync(storage));
+    }
+
+    // ----- settings: the memory slider's «рекомендуем» mark -----
+
+    [Fact]
+    public void MarkSitsAtTheVersionsMemory()
+    {
+        Assert.Equal(4096, HfRamMark.ProfileMb(Gml("HedgeFox-LowPC", ram: 4096)));
+        Assert.Equal(8192, HfRamMark.ProfileMb(Gml("HedgeFox-Shaders", ram: 8192)));
+    }
+
+    [Fact]
+    public void NoMarkWithoutAVersionOrItsMemory()
+    {
+        Assert.Null(HfRamMark.ProfileMb(null));
+        Assert.Null(HfRamMark.ProfileMb(Gml("HedgeFox")));
+    }
+
     [Theory]
-    [InlineData("Обновление", "Осталось: 312 файлов", "3.5 MB/s", "Осталось: 312 файлов · 3,5 МБ/с")]
-    [InlineData("Обновление", "Осталось: 312 файлов", "", "Осталось: 312 файлов")]
-    [InlineData(null, null, "3.5 MB/s", "3,5 МБ/с")]
-    [InlineData(null, null, null, "")]
-    public void LineUnderTheSignIsTheStepAndTheSpeed(string? headline, string? description, string? speed, string expected) =>
-        Assert.Equal(expected, HfPlayProgress.Line(headline, description, speed));
-
-    // ----- settings: the memory slider's «советуем» mark -----
-
-    [Fact]
-    public void MarkSitsAtTheAdvisedProfilesMemory()
-    {
-        Assert.Equal(4096, HfRamMark.RecommendedMb(new HfAdvice(ProfileCatalog.LowPc, false), 8192));
-        Assert.Equal(6144, HfRamMark.RecommendedMb(new HfAdvice(ProfileCatalog.Normal, true), 32768));
-    }
-
-    [Fact]
-    public void NoMarkWithoutAdviceOrWhenThePcHasLessMemory()
-    {
-        Assert.Null(HfRamMark.RecommendedMb(new HfAdvice(null, false), 16384));
-        Assert.Null(HfRamMark.RecommendedMb(new HfAdvice(ProfileCatalog.Normal, false), 4096));
-    }
+    [InlineData(4096, 4096, true)]
+    [InlineData(4096.4, 4096, true)]
+    [InlineData(4608, 4096, false)]
+    [InlineData(4096, null, false)]
+    public void OnTheMarkMemoryIsAutomatic(double value, int? mark, bool on) =>
+        Assert.Equal(on, HfRamMark.IsOnMark(value, mark));
 
     [Theory]
     [InlineData(4096, 512, 8192, 0.466666)]

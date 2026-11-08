@@ -20,7 +20,6 @@ public static class HfStrings
     public const string StatusLoading = "Проверяем…";
     public const string StatusNoData = "Нет данных";
     public const string StatusOffline = "Сервер спит";
-    public const string Dot = " · ";
 
     // ----- Pelena -----
     public const string PelenaKicker = "ПЕЛЕНА";
@@ -41,14 +40,9 @@ public static class HfStrings
     // ----- main screen -----
     public const string Profile = "Профиль";
     public const string Settings = "Настройки";
-    public const string Logout = "Выйти";
     public const string Play = "Играть";
     public const string PlayCaps = "ИГРАТЬ";
     public const string LoadingCaps = "ЗАГРУЗКА…";
-    public const string Advised = "советуем";
-    public const string AdvisedHint = "Советуем для твоего ПК";
-    public const string MemoryForGame = "Памяти игре";
-    public const string Mods = "Моды";
     public const string Reinstall = "Переустановить";
     public const string ReinstallHint = "Если игра не запускается, скачаем её файлы заново.";
     public const string ReinstallAskTitle = "Переустановить игру?";
@@ -68,16 +62,20 @@ public static class HfStrings
 
     // ----- profile page -----
     public const string ChangeSkin = "Сменить скин на сайте";
+    public const string LogoutAccount = "Выйти из аккаунта";
     public const string NoSkin = "Скина пока нет — загрузи его в кабинете на сайте.";
 
     // ----- settings -----
     public const string SettingsCaps = "НАСТРОЙКИ";
-    public const string MemorySetting = "Память для игры";
-    public const string MemoryAuto = "Автоматически по профилю";
-    public const string MemoryAutoShort = "АВТО";
-    public const string MemoryRecommendedMark = "советуем";
+    public const string GameVersion = "Версия игры";
+    public const string MemorySetting = "Память";
+    public const string MemoryRecommendedMark = "рекомендуем";
     public const string WindowSetting = "Окно игры";
     public const string FullScreen = "Полный экран";
+    public const string Mods = "Моды";
+    public const string ModsNote = "Сработает при следующем запуске.";
+    public const string More = "Дополнительно";
+    public const string WindowSize = "Размер окна";
     public const string WindowWidth = "Ширина";
     public const string WindowHeight = "Высота";
     public const string GameFolder = "Папка игры";
@@ -85,7 +83,6 @@ public static class HfStrings
     public const string FolderFailed = "Не получилось сменить папку. Попробуй другую.";
     public const string ChangeFolder = "Выбрать папку";
     public const string OpenFolder = "Открыть";
-    public const string GameSetting = "Игра";
     public const string Back = "Назад";
 
     // ----- window -----
@@ -140,14 +137,11 @@ public static class HfStrings
     };
 
     /// <summary>
-    ///     The one small status line under the menu: «Онлайн 7 из 45 · Пелена поднимается» (the sign-in screen: without
-    ///     the Pelena) or «Сервер спит»; null while there is nothing to say (no answer yet, or no data): the line is then
-    ///     hidden, never a made-up «0».
+    ///     The one small status line at the bottom of the sign-in and main screens: «Онлайн 7 из 45» or «Сервер спит»;
+    ///     null while there is nothing to say (no answer yet, or no data): the line is then hidden, never a made-up «0».
     /// </summary>
-    public static string? StatusShort(HfStatusSnapshot status, bool withPelena = true) => status.Kind switch
+    public static string? StatusShort(HfStatusSnapshot status) => status.Kind switch
     {
-        HfStatusKind.Online when withPelena && HfPelenaView.From(status.Pelena)?.Short is { } pelena =>
-            StatusOnline(status.Players ?? 0, status.Max ?? 0) + Dot + pelena,
         HfStatusKind.Online => StatusOnline(status.Players ?? 0, status.Max ?? 0),
         HfStatusKind.Offline => StatusOffline,
         _ => null

@@ -44,8 +44,9 @@
             </rxui:RoutedViewHost>
         </Grid>
 
-        <!-- MessageBar -->
-        <controls:NotificationMessageContainer Margin="0,32,0,0" Manager="{Binding Manager}" />
+        <!-- MessageBar: under the title bar; on the signed-in pages also under their top row (the gear), see
+             MainWindow.axaml.cs -->
+        <controls:NotificationMessageContainer Name="Toasts" Margin="0,32,0,0" Manager="{Binding Manager}" />
     </Grid>
 
 </Window>

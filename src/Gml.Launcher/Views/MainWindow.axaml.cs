@@ -6,6 +6,7 @@ using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
 using Gml.Launcher.ViewModels;
+using Gml.Launcher.ViewModels.Pages;
 using Gml.Launcher.Views.HedgeFox;
 using Gml.Launcher.Views.HedgeFox.Controls;
 using ReactiveUI;
@@ -52,14 +53,21 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     {
         base.OnDataContextChanged(e);
 
-        if (DataContext is MainWindowViewModel viewModel)
-            viewModel.GameLaunched.Subscribe(isActive =>
-            {
-                if (isActive)
-                    Hide();
-                else
-                    Show();
-            });
+        if (DataContext is not MainWindowViewModel viewModel)
+            return;
+        viewModel.GameLaunched.Subscribe(isActive =>
+        {
+            if (isActive)
+                Hide();
+            else
+                Show();
+        });
+        // the sign-in page has no top row; the others have the player and the gear there, which a toast must not hide
+        viewModel.Router.CurrentViewModel.Subscribe(page =>
+        {
+            if (this.FindControl<Control>("Toasts") is { } toasts)
+                toasts.Margin = new Thickness(0, page is LoginPageViewModel or null ? 32 : 88, 0, 0);
+        });
     }
 
     protected override void OnClosed(EventArgs e)

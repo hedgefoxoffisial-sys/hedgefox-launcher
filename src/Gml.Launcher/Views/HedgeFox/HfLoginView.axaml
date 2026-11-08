@@ -1,5 +1,6 @@
 <!-- «Вход»: one centred column over the game menu's night. The title and «Пираты над Пеленой», the nick and the
-     password, the wooden sign «ВОЙТИ», two small links under it; one tiny status line at the bottom.
+     password (solid fields as wide as the sign), the wooden sign «ВОЙТИ», «Регистрация» and «Забыл пароль?» under it;
+     one tiny status line at the bottom.
      The stock LoginPageViewModel does the sign-in and the 2FA step; HfLoginModel adds the status line and the error. -->
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -36,12 +37,13 @@
                     <!-- the GML sign-in server did not answer at start: offline mode, «Войти» is off -->
                     <TextBlock Classes="hf-small" Foreground="{DynamicResource HfTextBrush}" TextAlignment="Center"
                                Text="{x:Static core:HfStrings.LoginOffline}" IsVisible="{Binding !Page.BackendIsActive}" />
-                    <StackPanel Orientation="Horizontal" Spacing="18" HorizontalAlignment="Center" Margin="0,2,0,0">
-                        <hf:HfButton Classes="text"
+                    <!-- «Регистрация» is the second action; the links stand 24 px apart -->
+                    <StackPanel Orientation="Horizontal" Spacing="24" HorizontalAlignment="Center" Margin="0,4,0,0">
+                        <hf:HfButton Classes="text accent"
                                      Command="{Binding Page.OpenLinkCommand}"
                                      CommandParameter="{x:Static core:HfLinks.Register}"
                                      Content="{x:Static core:HfStrings.Register}" />
-                        <hf:HfButton Classes="text"
+                        <hf:HfButton Classes="text quiet"
                                      Command="{Binding Page.OpenLinkCommand}"
                                      CommandParameter="{x:Static core:HfLinks.Forgot}"
                                      Content="{x:Static core:HfStrings.Forgot}" />
@@ -74,7 +76,7 @@
 
         <!-- one tiny status line: «Онлайн 7 из 45» or «Сервер спит»; nothing without data -->
         <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center"
-                    IsVisible="{Binding Info.HasShortLine}">
+                    IsVisible="{Binding Info.HasOnlineLine}">
             <hf:HfStatusDot State="{Binding Info.Dot}" VerticalAlignment="Center" />
             <TextBlock Classes="hf-status" Text="{Binding Info.OnlineLine}" VerticalAlignment="Center" />
         </StackPanel>

@@ -4,8 +4,8 @@ using ReactiveUI;
 namespace Gml.Launcher.Views.HedgeFox;
 
 /// <summary>
-///     The HedgeFox pages for the stock page view models, hooked into AppViewLocator by one line. Mods keeps the
-///     stock page (restyled by the theme only).
+///     The HedgeFox pages for the stock page view models, hooked into AppViewLocator by one line. The mods are a
+///     section of Настройки now; the stock mods page (restyled by the theme only) stays for whatever still opens it.
 /// </summary>
 public static class HfViews
 {
