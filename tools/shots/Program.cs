@@ -35,6 +35,10 @@ var outDir = Path.GetFullPath(args[0]);
 Directory.CreateDirectory(outDir);
 // what the fakes report as the app folder; nothing is written there
 var scratch = Path.Combine(Path.GetTempPath(), "hedgefox-shots");
+// the stock mods page creates «<install dir>/game data/<profile>/mods»; the fakes' Windows-style install dir is a
+// relative path on macOS and Linux, so it must land in the scratch folder, never in the working tree
+Directory.CreateDirectory(scratch);
+Environment.CurrentDirectory = scratch;
 var clock = System.Diagnostics.Stopwatch.StartNew();
 
 AppBuilder.Configure<App>()
@@ -152,6 +156,17 @@ void Screens(int width, int height, string size)
     {
         command.Execute(null);
         Ui.PumpUntil(() => vm.Router.GetCurrentViewModel() != overview, name + " page");
+        if (name == "settings")
+        {
+            // the stock page loads the saved settings on the thread pool; then the slider is switched to manual
+            var settings = (SettingsPageViewModel)vm.Router.GetCurrentViewModel()!;
+            Ui.PumpUntil(() => settings.InstallationFolder != null && settings.MaxRamValue > 0, "saved settings");
+            settings.DynamicRamValue = false;
+            settings.RamValue = 6144;
+            Ui.PumpUntil(() => HfModel<HfSettingsModel>(main) is { HasMark: true, IsManualRam: true }, "settings and the mark");
+        }
+        if (name == "profile")
+            Ui.PumpUntil(() => HfModel<HfProfileModel>(main) is { Body: not null }, "skin render");
         Save(main, name + size);
         vm.Router.NavigateBack.Execute().Subscribe();
         Ui.PumpUntil(() => vm.Router.GetCurrentViewModel() == overview, "back to overview");

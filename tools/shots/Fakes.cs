@@ -6,6 +6,7 @@ using Gml.Client;
 using Gml.Client.Interfaces;
 using Gml.Client.Models;
 using Gml.Dto.Messages;
+using Gml.Dto.Mods;
 using Gml.Dto.News;
 using Gml.Dto.Profile;
 using Gml.Launcher.Core.HedgeFox;
@@ -157,6 +158,22 @@ public static class Fakes
             "get_Gameloader" => gameLoader,
             "GetProfiles" or "GetOfflineProfiles" => Task.FromResult(new ResponseMessage<List<ProfileReadDto>> { Data = Profiles() }),
             "GetNews" => Task.FromResult(new ResponseMessage<List<NewsReadDto>> { Data = GmlNews() }),
+            "GetOptionalMods" => Task.FromResult(new ResponseMessage<List<ModReadDto>>
+            {
+                Data = [new ModReadDto { Name = "minimap" }, new ModReadDto { Name = "sound-physics" }]
+            }),
+            "GetOptionalModsInfo" => Task.FromResult(new ResponseMessage<List<ModsDetailsInfoDto>>
+            {
+                Data =
+                [
+                    new ModsDetailsInfoDto { Key = "minimap.jar", Title = "Мини-карта", Description = "Карта в углу экрана." },
+                    new ModsDetailsInfoDto
+                    {
+                        Key = "sound-physics.jar", Title = "Объёмный звук",
+                        Description = "Эхо в пещерах и трюмах. Нагружает процессор."
+                    }
+                ]
+            }),
             _ => FakeProxy.Default
         };
     }

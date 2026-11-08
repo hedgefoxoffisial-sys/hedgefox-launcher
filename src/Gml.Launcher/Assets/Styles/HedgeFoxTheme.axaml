@@ -20,6 +20,8 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:hf="using:Gml.Launcher.Views.HedgeFox.Controls"
         xmlns:components="using:Gml.Launcher.Views.Components"
+        xmlns:pages="using:Gml.Launcher.Views.Pages"
+        xmlns:core="using:Gml.Launcher.Core.HedgeFox"
         xmlns:notifications="clr-namespace:GamerVII.Notification.Avalonia.Controls;assembly=GamerVII.Notification.Avalonia">
 
     <Design.PreviewWith>
@@ -785,6 +787,60 @@
     </Style>
     <Style Selector="Thumb.hf-thumb:pressed">
         <Setter Property="Background" Value="{DynamicResource HfPurpleLightBrush}" />
+    </Style>
+
+    <!-- ===== The stock mods page (spec: restyled by the theme only) ===== -->
+
+    <!-- the shell already draws the scene: no second background, the left scrim of the HedgeFox pages instead -->
+    <Style Selector="pages|ModsPageView components|BackgroundComponent">
+        <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <!-- its overlay (a local Fill) only hides; it still catches the clicks that drag the window -->
+    <Style Selector="pages|ModsPageView Rectangle">
+        <Setter Property="Opacity" Value="0" />
+    </Style>
+    <!-- the stock grey icons have no pixel twin here; the text indented for them moves back under the heading -->
+    <Style Selector="pages|ModsPageView Svg">
+        <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="pages|ModsPageView TextBlock.FormText[LineHeight=25]">
+        <Setter Property="RenderTransform" Value="translate(-38px, 0px)" />
+    </Style>
+    <!-- «Назад» as the HedgeFox back button -->
+    <Style Selector="pages|ModsPageView components|GmlButton.TextIcon">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <hf:HfButton Classes="secondary sm"
+                             Command="{TemplateBinding Command}"
+                             CommandParameter="{TemplateBinding CommandParameter}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <hf:PixelIcon Kind="back" />
+                        <TextBlock Text="{x:Static core:HfStrings.Back}" VerticalAlignment="Center" />
+                    </StackPanel>
+                </hf:HfButton>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <!-- frames as the site's cards -->
+    <Style Selector="pages|ModsPageView components|StackFrameBorder:not(.hf-stock)">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <hf:PixelBorder Classes="hf-card" Padding="22,18,22,20" Margin="0,0,4,4">
+                    <ItemsPresenter />
+                </hf:PixelBorder>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="pages|ModsPageView TextBlock.HeadlineText">
+        <Setter Property="FontFamily" Value="{StaticResource HfFontHeading}" />
+        <Setter Property="FontWeight" Value="ExtraBold" />
+        <Setter Property="FontSize" Value="{StaticResource HfFontSizeH2}" />
+        <Setter Property="Foreground" Value="{DynamicResource HfTextBrush}" />
+    </Style>
+    <Style Selector="pages|ModsPageView TextBlock.FormText">
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Normal" />
+        <Setter Property="Foreground" Value="{DynamicResource HfMutedBrush}" />
     </Style>
 
     <!-- ===== Stock GML parts until the HedgeFox screens replace them: square corners, site colours ===== -->
