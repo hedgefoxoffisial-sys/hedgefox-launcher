@@ -1,0 +1,132 @@
+<!-- «Вход» (spec «Экраны» 2): the title and the form on the left, the status card and the latest news on the right.
+     The stock LoginPageViewModel does the sign-in and the 2FA step; HfLoginModel adds the server column. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:hf="using:Gml.Launcher.Views.HedgeFox.Controls"
+             xmlns:hfv="using:Gml.Launcher.Views.HedgeFox"
+             xmlns:core="using:Gml.Launcher.Core.HedgeFox"
+             xmlns:hfvm="using:Gml.Launcher.ViewModels.HedgeFox"
+             x:Class="Gml.Launcher.Views.HedgeFox.HfLoginView">
+    <Grid Name="Root" x:DataType="hfvm:HfLoginModel">
+        <!-- darkens the scene under the form; empty background drags the window -->
+        <Rectangle Fill="{DynamicResource HfScrimLeftBrush}" />
+
+        <!-- both columns start at the same height; the pair is centred in the window -->
+        <Grid ColumnDefinitions="Auto,*,Auto" Margin="64,24,44,28" VerticalAlignment="Center">
+
+            <!-- Title and form -->
+            <StackPanel Width="400" VerticalAlignment="Top">
+                <Image Classes="hf-pixel"
+                       Source="/Assets/HedgeFox/Images/hedgefox-title-orange.png"
+                       Width="384"
+                       Height="72"
+                       HorizontalAlignment="Left">
+                    <Image.Effect>
+                        <DropShadowEffect OffsetX="0" OffsetY="6" BlurRadius="0" Opacity="0.6" Color="#080511" />
+                    </Image.Effect>
+                </Image>
+                <TextBlock Classes="hf-px24 hf-shadow"
+                           Foreground="{DynamicResource HfBrassBrush}"
+                           Text="{x:Static core:HfStrings.TaglinePixel}"
+                           Margin="2,14,0,22" />
+
+                <hf:PixelBorder Classes="hf-plate orange" Margin="0,0,6,6" Padding="24,22,24,24">
+                    <Panel>
+                        <!-- nick and password -->
+                        <StackPanel Spacing="14" IsVisible="{Binding !Page.Is2FaVisible}">
+                            <StackPanel Spacing="6">
+                                <TextBlock Classes="hf-label" Text="{x:Static core:HfStrings.LoginField}" />
+                                <TextBox Name="LoginBox" Text="{Binding Page.Login}" />
+                            </StackPanel>
+                            <StackPanel Spacing="6">
+                                <TextBlock Classes="hf-label" Text="{x:Static core:HfStrings.PasswordField}" />
+                                <TextBox PasswordChar="•" Text="{Binding Page.Password}" />
+                            </StackPanel>
+                            <TextBlock Classes="hf-small hf-error" Text="{Binding Error}" IsVisible="{Binding HasError}" />
+                            <hf:HfButton Classes="lg block"
+                                         Margin="0,4,0,0"
+                                         Command="{Binding Page.LoginCommand}"
+                                         IsDefault="{Binding !Page.Is2FaVisible}"
+                                         IsEnabled="{Binding Page.BackendIsActive}"
+                                         Content="{x:Static core:HfStrings.SignIn}" />
+                            <hf:HfMeter IsIndeterminate="True" Height="14" IsVisible="{Binding Page.IsProcessing}" />
+                        </StackPanel>
+
+                        <!-- the second step for accounts with 2FA -->
+                        <StackPanel Spacing="14" IsVisible="{Binding Page.Is2FaVisible}">
+                            <TextBlock Classes="hf-h3" Text="{x:Static core:HfStrings.TwoFactorField}" />
+                            <TextBlock Classes="hf-small" Text="{x:Static core:HfStrings.TwoFactorHint}" />
+                            <TextBox Name="CodeBox"
+                                     Text="{Binding Page.TwoFactorCode}"
+                                     MaxLength="6"
+                                     FontSize="24"
+                                     FontWeight="SemiBold"
+                                     HorizontalContentAlignment="Center" />
+                            <TextBlock Classes="hf-small hf-error" Text="{Binding Error}" IsVisible="{Binding HasError}" />
+                            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12" Margin="0,4,0,0">
+                                <hf:HfButton Classes="lg block"
+                                             Command="{Binding Page.Verify2FaCommand}"
+                                             IsDefault="{Binding Page.Is2FaVisible}"
+                                             Content="{x:Static core:HfStrings.TwoFactorConfirm}" />
+                                <hf:HfButton Grid.Column="1"
+                                             Classes="secondary lg"
+                                             Command="{Binding CancelTwoFactorCommand}"
+                                             ToolTip.Tip="{x:Static core:HfStrings.Back}">
+                                    <hf:PixelIcon Kind="back" Width="24" Height="24" />
+                                </hf:HfButton>
+                            </Grid>
+                            <hf:HfMeter IsIndeterminate="True" Height="14" IsVisible="{Binding Page.IsProcessing}" />
+                        </StackPanel>
+                    </Panel>
+                </hf:PixelBorder>
+
+                <StackPanel Orientation="Horizontal" Spacing="24" Margin="2,18,0,0">
+                    <hf:HfButton Classes="link"
+                                 Command="{Binding Page.OpenLinkCommand}"
+                                 CommandParameter="{x:Static core:HfLinks.Register}"
+                                 Content="{x:Static core:HfStrings.Register}" />
+                    <hf:HfButton Classes="link"
+                                 Command="{Binding Page.OpenLinkCommand}"
+                                 CommandParameter="{x:Static core:HfLinks.Forgot}"
+                                 Content="{x:Static core:HfStrings.Forgot}" />
+                </StackPanel>
+                <TextBlock Classes="hf-small" Text="{x:Static core:HfStrings.LoginHint}" Margin="2,10,0,0" />
+            </StackPanel>
+
+            <!-- Status, the Pelena and the latest news -->
+            <StackPanel Grid.Column="2" Width="344" VerticalAlignment="Top" Spacing="18">
+                <hfv:HfStatusPanel DataContext="{Binding Info}" />
+                <StackPanel Spacing="10">
+                    <TextBlock Classes="hf-kicker" Text="{x:Static core:HfStrings.NewsKicker}" />
+                    <hf:PixelBorder Classes="hf-well" Padding="14,12" IsVisible="{Binding Info.HasNewsMessage}">
+                        <TextBlock Classes="hf-small" Text="{Binding Info.NewsMessage}" />
+                    </hf:PixelBorder>
+                    <ItemsControl ItemsSource="{Binding Info.News}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Spacing="12" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="core:HfNewsCard">
+                                <hf:HfButton Classes="card"
+                                             Margin="0,0,4,4"
+                                             Padding="14,10,14,12"
+                                             Command="{Binding $parent[ItemsControl].((hfvm:HfLoginModel)DataContext).Info.OpenNewsCommand}"
+                                             CommandParameter="{Binding}">
+                                    <StackPanel Spacing="6">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <hf:HfBadge Classes="purple" Content="{Binding Source}" />
+                                            <TextBlock Classes="hf-small" Text="{Binding Date}" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                        <TextBlock Classes="hf-h3" Text="{Binding Title}" MaxLines="2" TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+                                </hf:HfButton>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</UserControl>

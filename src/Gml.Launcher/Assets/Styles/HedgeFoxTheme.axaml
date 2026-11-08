@@ -201,6 +201,77 @@
                 <Style Selector="^.block">
                     <Setter Property="HorizontalAlignment" Value="Stretch" />
                 </Style>
+                <!-- a clickable card (news, profile cards): the site's .card frame with a button's focus and command -->
+                <Style Selector="^.card">
+                    <Setter Property="Background" Value="{DynamicResource HfSurfaceBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource HfTextBrush}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource HfLineBrush}" />
+                    <Setter Property="FontFamily" Value="{StaticResource HfFontBody}" />
+                    <Setter Property="FontWeight" Value="Normal" />
+                    <Setter Property="Padding" Value="16,14" />
+                    <Setter Property="MinHeight" Value="0" />
+                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                    <Setter Property="VerticalContentAlignment" Value="Top" />
+                </Style>
+                <Style Selector="^.card /template/ hf|PixelBorder#PART_Frame">
+                    <Setter Property="Notch" Value="0" />
+                    <Setter Property="BorderThickness" Value="2" />
+                    <Setter Property="AccentBrush" Value="{DynamicResource HfPurpleBrush}" />
+                    <Setter Property="AccentTop" Value="2" />
+                    <Setter Property="ShadowOffset" Value="4" />
+                    <Setter Property="BevelTop" Value="0" />
+                    <Setter Property="BevelBottom" Value="0" />
+                </Style>
+                <Style Selector="^.card /template/ hf|PixelBorder#PART_FocusRing">
+                    <Setter Property="Margin" Value="-5" />
+                    <Setter Property="Notch" Value="0" />
+                </Style>
+                <Style Selector="^.card:pointerover">
+                    <Setter Property="Background" Value="{DynamicResource HfRaisedBrush}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource HfPurpleBrush}" />
+                </Style>
+                <Style Selector="^.card:pressed">
+                    <Setter Property="Background" Value="{DynamicResource HfRaisedBrush}" />
+                </Style>
+                <Style Selector="^.card.selected">
+                    <Setter Property="Background" Value="{DynamicResource HfRaisedBrush}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource HfOrangeBrush}" />
+                </Style>
+                <Style Selector="^.card.selected /template/ hf|PixelBorder#PART_Frame">
+                    <Setter Property="AccentBrush" Value="{DynamicResource HfOrangeBrush}" />
+                    <Setter Property="AccentTop" Value="4" />
+                    <Setter Property="ShadowOffset" Value="6" />
+                </Style>
+
+                <!-- a text link with a button's keyboard and command behaviour («Регистрация», «Забыли пароль?») -->
+                <Style Selector="^.link">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Foreground" Value="{DynamicResource HfPurpleLightBrush}" />
+                    <Setter Property="Padding" Value="0,2" />
+                    <Setter Property="MinHeight" Value="0" />
+                    <Setter Property="FontSize" Value="14" />
+                </Style>
+                <Style Selector="^.link /template/ hf|PixelBorder#PART_Frame">
+                    <Setter Property="Notch" Value="0" />
+                    <Setter Property="ShadowOffset" Value="0" />
+                    <Setter Property="BevelTop" Value="0" />
+                    <Setter Property="BevelBottom" Value="0" />
+                </Style>
+                <Style Selector="^.link /template/ hf|PixelBorder#PART_FocusRing">
+                    <Setter Property="Margin" Value="-4,-2" />
+                    <Setter Property="Notch" Value="0" />
+                    <Setter Property="BorderThickness" Value="2" />
+                </Style>
+                <Style Selector="^.link:pointerover">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Foreground" Value="{DynamicResource HfOrangeLightBrush}" />
+                </Style>
+                <Style Selector="^.link:pressed">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="RenderTransform" Value="none" />
+                </Style>
+
                 <Style Selector="^:disabled">
                     <Setter Property="Opacity" Value="0.55" />
                     <Setter Property="Cursor" Value="Arrow" />
@@ -279,6 +350,48 @@
                     <Setter Property="Foreground" Value="{DynamicResource HfTextBrush}" />
                 </Style>
             </ControlTheme>
+
+            <!-- Slider parts: the orange filled run, the empty run and the chamfered thumb -->
+            <ControlTheme x:Key="HfSliderFill" TargetType="RepeatButton">
+                <Setter Property="Focusable" Value="False" />
+                <Setter Property="Template">
+                    <ControlTemplate>
+                        <Border Height="8" Margin="5,0,0,0" VerticalAlignment="Center" Background="{DynamicResource HfOrangeBrush}" />
+                    </ControlTemplate>
+                </Setter>
+            </ControlTheme>
+            <ControlTheme x:Key="HfSliderRest" TargetType="RepeatButton">
+                <Setter Property="Focusable" Value="False" />
+                <Setter Property="Template">
+                    <ControlTemplate>
+                        <Border Background="Transparent" />
+                    </ControlTemplate>
+                </Setter>
+            </ControlTheme>
+            <ControlTheme x:Key="HfSliderThumb" TargetType="Thumb">
+                <Setter Property="Background" Value="{DynamicResource HfOrangeBrush}" />
+                <Setter Property="Width" Value="18" />
+                <Setter Property="Height" Value="30" />
+                <Setter Property="Cursor" Value="Hand" />
+                <Setter Property="Template">
+                    <ControlTemplate>
+                        <hf:PixelBorder Background="{TemplateBinding Background}"
+                                        Notch="3"
+                                        ShadowBrush="{DynamicResource HfVoidBrush}"
+                                        ShadowOffset="3"
+                                        BevelTopBrush="{DynamicResource HfBevelLightBrush}"
+                                        BevelTop="2"
+                                        BevelBottomBrush="{DynamicResource HfBevelDarkBrush}"
+                                        BevelBottom="3" />
+                    </ControlTemplate>
+                </Setter>
+                <Style Selector="^:pointerover">
+                    <Setter Property="Background" Value="{DynamicResource HfOrangeLightBrush}" />
+                </Style>
+                <Style Selector="^:pressed">
+                    <Setter Property="Background" Value="{DynamicResource HfLipOrangeBrush}" />
+                </Style>
+            </ControlTheme>
         </ResourceDictionary>
     </Styles.Resources>
 
@@ -296,6 +409,11 @@
     </Style>
     <Style Selector="hf|HfButton TextBlock">
         <Setter Property="FontFamily" Value="{StaticResource HfFontHeading}" />
+    </Style>
+    <Style Selector="hf|HfButton.link TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource HfFontBody}" />
+        <Setter Property="FontWeight" Value="Medium" />
+        <Setter Property="TextDecorations" Value="Underline" />
     </Style>
     <Style Selector="hf|HfBadge TextBlock">
         <Setter Property="FontFamily" Value="{StaticResource HfFontPixel}" />
@@ -512,6 +630,98 @@
     </Style>
     <Style Selector="TextBox:error /template/ Border#PART_BorderElement">
         <Setter Property="BorderBrush" Value="{DynamicResource HfErrorBrush}" />
+    </Style>
+
+    <!-- ===== Check boxes: a square night well, orange with a pixel tick when on ===== -->
+
+    <Style Selector="CheckBox">
+        <Setter Property="Foreground" Value="{DynamicResource HfTextBrush}" />
+        <Setter Property="FontSize" Value="15" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusAdorner" Value="{x:Null}" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid ColumnDefinitions="Auto,*" Background="Transparent">
+                    <hf:PixelBorder Name="PART_Box" Width="24" Height="24" VerticalAlignment="Center">
+                        <hf:PixelIcon Name="PART_Check" Kind="check" Width="16" Height="16"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </hf:PixelBorder>
+                    <ContentPresenter Name="PART_ContentPresenter"
+                                      Grid.Column="1"
+                                      Margin="12,0,0,0"
+                                      VerticalAlignment="Center"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      Foreground="{TemplateBinding Foreground}"
+                                      IsVisible="{TemplateBinding Content, Converter={x:Static ObjectConverters.IsNotNull}}" />
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="CheckBox /template/ hf|PixelBorder#PART_Box">
+        <Setter Property="Background" Value="{DynamicResource HfNightBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource HfLineStrongBrush}" />
+        <Setter Property="BorderThickness" Value="2" />
+    </Style>
+    <Style Selector="CheckBox /template/ hf|PixelIcon#PART_Check">
+        <Setter Property="Foreground" Value="{DynamicResource HfInkBrush}" />
+        <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="CheckBox:pointerover /template/ hf|PixelBorder#PART_Box">
+        <Setter Property="BorderBrush" Value="{DynamicResource HfPurpleBrush}" />
+    </Style>
+    <Style Selector="CheckBox:checked /template/ hf|PixelBorder#PART_Box">
+        <Setter Property="Background" Value="{DynamicResource HfOrangeBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource HfOrangeBrush}" />
+    </Style>
+    <Style Selector="CheckBox:checked /template/ hf|PixelIcon#PART_Check">
+        <Setter Property="IsVisible" Value="True" />
+    </Style>
+    <Style Selector="CheckBox:focus-visible /template/ hf|PixelBorder#PART_Box">
+        <Setter Property="BorderBrush" Value="{DynamicResource HfOrangeLightBrush}" />
+    </Style>
+    <Style Selector="CheckBox:disabled">
+        <Setter Property="Opacity" Value="0.5" />
+    </Style>
+
+    <!-- ===== Slider: a void trough with a line ring, the orange run and a chamfered orange thumb ===== -->
+
+    <Style Selector="Slider:horizontal">
+        <Setter Property="MinHeight" Value="34" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="FocusAdorner" Value="{x:Null}" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid MinHeight="34" Background="Transparent">
+                    <hf:PixelBorder Name="PART_Trough" Height="16" VerticalAlignment="Center" />
+                    <Track Name="PART_Track"
+                           Orientation="Horizontal"
+                           Minimum="{TemplateBinding Minimum}"
+                           Maximum="{TemplateBinding Maximum}"
+                           Value="{TemplateBinding Value, Mode=TwoWay}"
+                           IsDirectionReversed="{TemplateBinding IsDirectionReversed}">
+                        <Track.DecreaseButton>
+                            <RepeatButton Name="PART_DecreaseButton" Theme="{StaticResource HfSliderFill}" />
+                        </Track.DecreaseButton>
+                        <Track.IncreaseButton>
+                            <RepeatButton Name="PART_IncreaseButton" Theme="{StaticResource HfSliderRest}" />
+                        </Track.IncreaseButton>
+                        <Thumb Name="thumb" Theme="{StaticResource HfSliderThumb}" />
+                    </Track>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="Slider:horizontal /template/ hf|PixelBorder#PART_Trough">
+        <Setter Property="Background" Value="{DynamicResource HfVoidBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource HfLineBrush}" />
+        <Setter Property="BorderThickness" Value="2" />
+        <Setter Property="ShadowBrush" Value="{DynamicResource HfVoidBrush}" />
+        <Setter Property="ShadowOffset" Value="3" />
+    </Style>
+    <Style Selector="Slider:disabled">
+        <Setter Property="Opacity" Value="0.45" />
+        <Setter Property="Cursor" Value="Arrow" />
     </Style>
 
     <!-- ===== Scrollbars: square 8 px, line-strong thumb ===== -->

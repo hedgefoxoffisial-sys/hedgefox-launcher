@@ -114,17 +114,23 @@ public static class Fakes
         m.RegisterConstant<IHardwareProbe>(new FixedHardware());
     }
 
+    /// <summary>What the fake status service answers now (a shot can switch to «Нет данных» or «Сервер спит»).</summary>
+    public static HfStatusSnapshot StatusNow { get; set; } = Status;
+
+    /// <summary>The fake feed fails, as our API does until it ships the endpoint.</summary>
+    public static bool NewsFails { get; set; }
+
     private sealed class FixedStatus : IStatusService
     {
-        public HfStatusSnapshot Current => Status;
-        public IObservable<HfStatusSnapshot> Updates => Observable.Return(Status);
-        public Task<HfStatusSnapshot> RefreshAsync(CancellationToken cancellationToken = default) => Task.FromResult(Status);
+        public HfStatusSnapshot Current => StatusNow;
+        public IObservable<HfStatusSnapshot> Updates => Observable.Defer(() => Observable.Return(StatusNow));
+        public Task<HfStatusSnapshot> RefreshAsync(CancellationToken cancellationToken = default) => Task.FromResult(StatusNow);
     }
 
     private sealed class FixedNews : INewsService
     {
         public Task<HfNewsResult> LoadAsync(int limit = 10, CancellationToken cancellationToken = default) =>
-            Task.FromResult(new HfNewsResult(News().Take(limit).ToList(), false));
+            Task.FromResult(NewsFails ? HfNewsResult.Error : new HfNewsResult(News().Take(limit).ToList(), false));
     }
 
     private sealed class FixedSkin(byte[] png) : ISkinService

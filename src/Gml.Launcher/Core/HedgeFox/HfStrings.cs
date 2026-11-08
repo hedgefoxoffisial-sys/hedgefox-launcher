@@ -14,6 +14,7 @@ public static class HfStrings
     // ----- brand -----
     public const string Name = "HedgeFox";
     public const string Tagline = "Пираты над Пеленой";
+    public const string TaglinePixel = "ПИРАТЫ НАД ПЕЛЕНОЙ";
 
     // ----- status ticket -----
     public const string StatusLoading = "Проверяем…";
@@ -36,6 +37,7 @@ public static class HfStrings
     public const string LoginHint = "Не пускает? Подтверди почту — письмо пришло при регистрации.";
     public const string TwoFactorField = "Код из приложения";
     public const string TwoFactorConfirm = "Подтвердить";
+    public const string TwoFactorHint = "Вход защищён: введи код из приложения-аутентификатора.";
 
     // ----- main screen -----
     public const string Profile = "Профиль";

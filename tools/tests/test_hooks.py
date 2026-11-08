@@ -24,6 +24,12 @@ class HookTest(unittest.TestCase):
         self.assertIn("HedgeFoxServices.Register(storageService);", body)
         self.assertLess(body.index("CheckAndChangeLanguage("), body.index("HedgeFoxServices.Register("))
 
+    def test_hedgefox_pages_are_resolved_first(self):
+        src = read(APP / "Core" / "Helpers" / "AppViewLocator.cs")
+        body = src[src.index("viewModel switch"):]
+        first_arm = body.split("{", 1)[1].strip().splitlines()[0]
+        self.assertIn("HfViews.Resolve(viewModel)", first_arm)
+
     def test_theme_has_no_corner_radius(self):
         theme = read(APP / "Assets" / "Styles" / "HedgeFoxTheme.axaml")
         for value in re.findall(r'(?:CornerRadius="([^"]*)")|(?:Property="CornerRadius" Value="([^"]*)")', theme):

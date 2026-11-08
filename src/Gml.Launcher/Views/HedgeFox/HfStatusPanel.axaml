@@ -1,0 +1,35 @@
+<!-- The status card (site hero ticket): online or «Сервер спит» / «Нет данных», and the Pelena's level.
+     DataContext: HfServerInfoModel. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:hf="using:Gml.Launcher.Views.HedgeFox.Controls"
+             xmlns:core="using:Gml.Launcher.Core.HedgeFox"
+             xmlns:hfvm="using:Gml.Launcher.ViewModels.HedgeFox"
+             x:Class="Gml.Launcher.Views.HedgeFox.HfStatusPanel"
+             x:DataType="hfvm:HfServerInfoModel">
+    <hf:PixelBorder Classes="hf-ticket" Margin="0,0,4,4" Padding="20,16,20,18">
+        <StackPanel Spacing="10">
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                <hf:HfStatusDot State="{Binding Dot}" VerticalAlignment="Center" />
+                <TextBlock Grid.Column="1" Classes="hf-h3" Text="{Binding StatusLine}" VerticalAlignment="Center" />
+            </Grid>
+            <TextBlock Classes="hf-small" Text="{x:Static core:HfStrings.ServerAddress}" />
+            <StackPanel Spacing="10" IsVisible="{Binding HasPelena}" Margin="0,2,0,0">
+                <Border Height="1" Background="{DynamicResource HfLineBrush}" />
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                    <TextBlock Classes="hf-px16" Foreground="{DynamicResource HfToxicBrush}"
+                               Text="{Binding PelenaTitle}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Classes="hf-small" Text="{Binding PelenaTrend}"
+                               IsVisible="{Binding HasPelenaTrend}" VerticalAlignment="Center" />
+                </Grid>
+                <hf:HfMeter Height="14"
+                            Value="{Binding PelenaPercent}"
+                            IsVisible="{Binding PelenaShowBar}"
+                            StripeBrush="{DynamicResource HfToxicBrush}"
+                            StripeLightBrush="{DynamicResource HfTextBrush}"
+                            GlowColor="Transparent"
+                            ShadowOffset="3" />
+            </StackPanel>
+        </StackPanel>
+    </hf:PixelBorder>
+</UserControl>
