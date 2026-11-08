@@ -19,5 +19,11 @@ sed "s/{{VERSION}}/$ver/g" "$root/tools/macos/Info.plist.tmpl" > "$app/Contents/
 codesign --force --deep -s - "$app"
 dmg="$root/HedgeFox-macos-$arch.dmg"
 rm -f "$dmg"
-hdiutil create -volname HedgeFox -srcfolder "$app" -ov -format UDZO "$dmg" >/dev/null
+# An explicit size: hdiutil's own estimate sometimes fails on CI runners with "No space left on device".
+size_mb=$(( $(du -sm "$app" | cut -f1) * 13 / 10 + 32 ))
+for attempt in 1 2 3; do
+  hdiutil create -volname HedgeFox -srcfolder "$app" -ov -format UDZO -size "${size_mb}m" "$dmg" >/dev/null && break
+  [ "$attempt" = 3 ] && exit 1
+  sleep 5
+done
 echo "$dmg"
