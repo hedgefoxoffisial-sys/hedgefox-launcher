@@ -39,8 +39,10 @@ public sealed class HfOverviewModel : ReactiveObject, IHfScreenModel
         _storage = Locator.Current.GetService<IStorageService>();
         Nick = page.User.Name;
 
-        SelectCommand = ReactiveCommand.Create<HfProfileCard>(card => Page.ListViewModel.SelectedProfile = card.Profile);
-        LogoutCommand = ReactiveCommand.CreateFromTask(LogoutAsync);
+        // no switching profiles or accounts while a download or the game runs on the old page (code-8)
+        var idle = this.WhenAnyValue(x => x.IsIdle);
+        SelectCommand = ReactiveCommand.Create<HfProfileCard>(card => Page.ListViewModel.SelectedProfile = card.Profile, idle);
+        LogoutCommand = ReactiveCommand.CreateFromTask(LogoutAsync, idle);
         Reinstall = new HfConfirmModel(() => Page.ReinstallCommand.Execute(null), this.WhenAnyValue(x => x.CanReinstall));
     }
 
@@ -96,7 +98,8 @@ public sealed class HfOverviewModel : ReactiveObject, IHfScreenModel
                 IsIdle = !busy;
                 CanPlay = selected is not null && !busy;
                 CanReinstall = CanReinstallWith(selected is not null, busy, Page.BackendIsActive);
-                MeterIndeterminate = percent is null;
+                // the stripes march (a 10 Hz timer) only while the meter is on screen (code-6)
+                MeterIndeterminate = busy && percent is null;
                 MeterValue = percent ?? 0;
                 // «Обновление» over the meter, «Осталось: 312 файлов» under it (or the headline alone)
                 StepTitle = string.IsNullOrWhiteSpace(description) ? string.Empty : headline?.Trim() ?? string.Empty;

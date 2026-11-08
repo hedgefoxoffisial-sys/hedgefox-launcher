@@ -74,17 +74,19 @@
                                         <StackPanel Spacing="5">
                                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                                                 <TextBlock Classes="hf-h3" Text="{Binding Title}" VerticalAlignment="Center" />
+                                                <!-- brass, the site's default badge: orange marks only the chosen card and «ИГРАТЬ» -->
                                                 <hf:HfBadge Grid.Column="1"
-                                                            Classes="orange"
                                                             Content="{x:Static core:HfStrings.RecommendedBadge}"
-                                                            ToolTip.Tip="{x:Static core:HfStrings.Recommended}"
                                                             IsVisible="{Binding Recommended}"
                                                             VerticalAlignment="Center" />
                                             </Grid>
+                                            <TextBlock Classes="hf-small" Foreground="{DynamicResource HfBrassBrush}"
+                                                       Text="{x:Static core:HfStrings.Recommended}" IsVisible="{Binding Recommended}" />
                                             <TextBlock Classes="hf-small" Text="{Binding Hint}" IsVisible="{Binding HasHint}" />
+                                            <!-- the profile's advice; the game gets what Настройки say -->
                                             <TextBlock Classes="hf-small" IsVisible="{Binding HasRam}">
-                                                <Run Text="{x:Static core:HfStrings.MemoryForGame}" /><Run Text=": " /><Run
-                                                    Text="{Binding Ram}" FontWeight="SemiBold" Foreground="{DynamicResource HfOrangeLightBrush}" />
+                                                <Run Text="{x:Static core:HfStrings.MemoryNeeded}" /><Run Text=": " /><Run
+                                                    Text="{Binding Ram}" FontWeight="SemiBold" Foreground="{DynamicResource HfTextBrush}" />
                                             </TextBlock>
                                             <StackPanel Orientation="Horizontal" Spacing="6" IsVisible="{Binding ShadersAlsoFit}">
                                                 <hf:PixelIcon Kind="check" Foreground="{DynamicResource HfSuccessBrush}" />

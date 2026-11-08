@@ -108,7 +108,7 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     }
 
     /// <summary>On Linux the window has no system frame, so its edges resize it.</summary>
-    private WindowEdge? ResizeEdgeAt(Point p)
+    internal WindowEdge? ResizeEdgeAt(Point p)
     {
         if (HfWindowChrome.Current != HfChromeKind.Linux || WindowState != WindowState.Normal)
             return null;

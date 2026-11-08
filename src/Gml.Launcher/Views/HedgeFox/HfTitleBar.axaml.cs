@@ -37,6 +37,9 @@ public partial class HfTitleBar : UserControl
     {
         if (e.Source is Button || Window is not { } w || !e.GetCurrentPoint(this).Properties.IsLeftButtonPressed)
             return;
+        // Linux: the window's top edge and corners resize it (MainWindow); a move started here would win (code-7)
+        if (w is MainWindow main && main.ResizeEdgeAt(e.GetPosition(main)) is not null)
+            return;
         if (e.ClickCount == 1)
             w.BeginMoveDrag(e);
     }
