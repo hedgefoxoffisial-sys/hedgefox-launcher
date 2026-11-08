@@ -142,13 +142,13 @@
     <value>Ошибка</value>
   </data>
   <data name="InvalidAuthData" xml:space="preserve">
-    <value>Ошибка авторизации</value>
+    <value>Не получилось войти</value>
   </data>
   <data name="LostConnection" xml:space="preserve">
-    <value>Потеряно соединение с сервером</value>
+    <value>Связь пропала</value>
   </data>
   <data name="Reconnecting" xml:space="preserve">
-    <value>Переподключение...</value>
+    <value>Пробуем снова…</value>
   </data>
   <data name="Back" xml:space="preserve">
     <value>НАЗАД</value>
@@ -157,7 +157,7 @@
     <value>Личный кабинет</value>
   </data>
   <data name="ProfileNotConfigured" xml:space="preserve">
-    <value>Профиль не настроен, или не настроен сервис текстур, запуск текущего клиента не доступен</value>
+    <value>Этот профиль пока не готов к запуску. Выбери другой или загляни позже.</value>
   </data>
   <data name="SettingsRamTitle" xml:space="preserve">
     <value>Настройки ОЗУ</value>
@@ -220,7 +220,7 @@
     <value>чел.</value>
   </data>
   <data name="JavaNotFound" xml:space="preserve">
-    <value>Не удалось обнаружить загруженную Java для Вашей операционной системы, обратитесь в поддержку или к администратору проекта</value>
+    <value>Не нашли Java для твоей системы. Переустанови игру, а если не поможет — напиши нам.</value>
   </data>
   <data name="InstallationDirectory" xml:space="preserve">
     <value>Папка установки</value>
@@ -244,7 +244,7 @@
     <value>Ошибка инициализации игрового профиля.</value>
   </data>
   <data name="InvalidSession" xml:space="preserve">
-    <value>Ваша игровая сессия в лаунчере истекла, авторизуйтесь заново</value>
+    <value>Сессия закончилась — войди заново.</value>
   </data>
   <data name="VpnUse" xml:space="preserve">
     <value>Включён VPN. Если игра не подключается или долго качается, попробуй выключить его.</value>
@@ -253,25 +253,25 @@
     <value>Информация</value>
   </data>
   <data name="ModsListDescription" xml:space="preserve">
-    <value>На данной странице вы можете просмотреть список модификаций, и выбрать интересующие вас, можете динамично включать и выключать в любое время</value>
+    <value>Включай и выключай дополнительные моды. Изменения применятся при следующем запуске.</value>
   </data>
   <data name="Success" xml:space="preserve">
     <value>Успешно</value>
   </data>
   <data name="ModEnabled" xml:space="preserve">
-    <value>Мод успешно включен</value>
+    <value>Мод включён</value>
   </data>
   <data name="ModDisabled" xml:space="preserve">
-    <value>Мод успешно выключен</value>
+    <value>Мод выключен</value>
   </data>
   <data name="ModsEmpty" xml:space="preserve">
-    <value>Для данного профиля нет опциональных модов, если у вас есть предложения, оповестите об этом администрацию</value>
+    <value>Для этого профиля дополнительных модов нет.</value>
   </data>
   <data name="Empty" xml:space="preserve">
     <value>Пусто</value>
   </data>
   <data name="MinecraftExceptionStartException" xml:space="preserve">
-    <value>Произошла ошибка во время работы игры. Администрация уже получила детали вашей ошибки.</value>
+    <value>Игра завершилась с ошибкой. Отчёт уже у нас.</value>
   </data>
   <data name="News" xml:space="preserve">
     <value>Новости</value>
@@ -286,23 +286,22 @@
     <value>Всё еще проверка сервера</value>
   </data>
   <data name="OfflineDescription" xml:space="preserve">
-    <value>Нет доступа к серверу. Лаунчер работает в оффлайн режиме.
-Чтобы выйти из этого режима - убедитесь, что сервер работает и перезапустите лаунчер</value>
+    <value>Не достучались до сервера входа, поэтому лаунчер работает без него. Проверь интернет и перезапусти лаунчер.</value>
   </data>
   <data name="OfflineMode" xml:space="preserve">
-    <value>Оффлайн режим</value>
+    <value>Нет связи с сервером входа</value>
   </data>
   <data name="CheckBackendButton" xml:space="preserve">
     <value>Проверить сервер</value>
   </data>
   <data name="CheckBackendMessage" xml:space="preserve">
-    <value>Проверка доступности сервера, пожалуйста подождите</value>
+    <value>Проверяем сервер входа…</value>
   </data>
   <data name="CheckBackendResultFailed" xml:space="preserve">
-    <value>Сервер сейчас недоступен. Повторите попытку позже</value>
+    <value>Сервер входа пока не отвечает. Попробуй позже.</value>
   </data>
   <data name="CheckBackendResultSuccessful" xml:space="preserve">
-    <value>Сервер доступен. Перезапустите лаунчер чтобы выключить оффлайн режим</value>
+    <value>Сервер входа на связи. Перезапусти лаунчер, чтобы войти.</value>
   </data>
   <data name="CheckBackendTitle" xml:space="preserve">
     <value>Проверка сервера</value>

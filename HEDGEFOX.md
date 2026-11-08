@@ -42,7 +42,7 @@
 | `Core/Helpers/AppViewLocator.cs` | одна строка первой веткой: `HfViews.Resolve(viewModel)` (наши страницы; «Моды» остаётся стоковой) |
 | `Assets/Styles/Colors.axaml` | генерируется `tools/brand.py`, руками не правим |
 | `Assets/Resources/ResourceKeysDictionary.cs` | адрес API `https://api.hedgefox.ru` и папка данных `.hedgefox` |
-| `Assets/Resources/Resources.ru.resx` | строка про VPN |
+| `Assets/Resources/Resources.ru.resx` | только значения: VPN, нет связи со входом, моды, ошибки запуска — коротко и на «ты» |
 | `Assets/Images/` | логотип, иконка, фон |
 | `Views/Components/LogoComponent.axaml` | логотип и подпись HedgeFox |
 | `Views/Components/ProfileUserControl.axaml.cs` | без чужого скина и ника по умолчанию |

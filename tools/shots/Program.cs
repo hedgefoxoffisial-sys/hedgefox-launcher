@@ -14,10 +14,12 @@ using Avalonia.Headless;
 using Avalonia.ReactiveUI;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using GamerVII.Notification.Avalonia;
 using GamerVII.Notification.Avalonia.Controls;
 using Gml.Launcher;
 using Gml.Launcher.Core;
 using Gml.Launcher.Core.HedgeFox;
+using Gml.Launcher.Core.Services;
 using Gml.Launcher.ViewModels;
 using Gml.Launcher.ViewModels.HedgeFox;
 using Gml.Launcher.ViewModels.Pages;
@@ -146,6 +148,32 @@ void Screens(int width, int height, string size)
     Ui.PumpUntil(() => HfModel<HfOverviewModel>(main) is { Face: not null, Cards.Count: 3 } m && m.Info.News.Count > 0,
         "overview face, cards and news");
     Save(main, "overview" + size);
+
+    // toasts as the stock view models queue them (their fills only pick the left bar): an error, a success, the VPN
+    // note and «reconnecting» with its overlay bar
+    if (width == 1180)
+    {
+        var text = new ResourceLocalizationService();
+        var toasts = new[]
+        {
+            vm.Manager.CreateMessage(true, "#D03E3E", text.GetString(SystemConstants.InvalidAuthData), HfStrings.NoConnection),
+            vm.Manager.CreateMessage(true, "#008C45", text.GetString(SystemConstants.Success), text.GetString(SystemConstants.ModEnabled)),
+            vm.Manager.CreateMessage(true, "#3684EA", text.GetString(SystemConstants.Information), text.GetString(SystemConstants.VpnUse)),
+            vm.Manager.CreateMessage().Background("#111111")
+                .HasHeader(text.GetString(SystemConstants.LostConnection))
+                .HasMessage(text.GetString(SystemConstants.Reconnecting))
+                .WithOverlay(new ProgressBar
+                {
+                    VerticalAlignment = Avalonia.Layout.VerticalAlignment.Bottom, Height = 2, IsIndeterminate = true,
+                    IsHitTestVisible = false
+                })
+        }.Select(b => b.Queue()).ToList();
+        Ui.PumpUntil(() => main.GetVisualDescendants().OfType<NotificationMessage>().Count() == toasts.Count, "toasts");
+        Save(main, "overview-toasts" + size);
+        foreach (var t in toasts)
+            vm.Manager.Dismiss(t);
+        Ui.PumpUntil(() => !main.GetVisualDescendants().OfType<NotificationMessage>().Any(), "toasts gone");
+    }
 
     // downloading: the meter, the step and the speed under «ИГРАТЬ»
     overview.Headline = "Обновление";

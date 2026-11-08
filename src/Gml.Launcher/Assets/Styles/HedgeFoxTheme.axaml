@@ -869,7 +869,109 @@
     <Style Selector="ComboBox.ComboBoxStyle">
         <Setter Property="CornerRadius" Value="0" />
     </Style>
+
+    <!-- ===== Toasts (the notifications submodule): the site's night plate instead of the stock solid fills ===== -->
+
+    <!-- The stock view models pass a hex fill (#D03E3E errors, #008C45 success, #3684EA VPN …); it only picks the
+         colour of the plate's left bar (HfToastAccent). The stock badge («WARNING», English) is not drawn. -->
     <Style Selector="notifications|NotificationMessage">
         <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="HorizontalAlignment" Value="Right" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Name="notificationMessageBorder"
+                        Classes.start="{TemplateBinding StartAnimation}"
+                        Classes.dismiss="{TemplateBinding DismissAnimation}"
+                        Width="400"
+                        Margin="0,0,6,6"
+                        VerticalAlignment="Top">
+                    <hf:PixelBorder Background="{DynamicResource HfSurfaceBrush}"
+                                    BorderBrush="{DynamicResource HfLineStrongBrush}"
+                                    BorderThickness="2"
+                                    AccentBrush="{TemplateBinding Background, Converter={x:Static hf:HfToastAccent.Instance}}"
+                                    AccentLeft="4"
+                                    ShadowBrush="{DynamicResource HfVoidBrush}"
+                                    ShadowOffset="6">
+                        <Panel>
+                            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" Margin="20,14,4,16">
+                                <ContentControl Grid.ColumnSpan="2" Content="{TemplateBinding AdditionalContentTop}" />
+                                <StackPanel Grid.Row="1" Spacing="6" Margin="0,2,8,0">
+                                    <TextBlock Classes="hf-h3"
+                                               Text="{TemplateBinding Header}"
+                                               IsVisible="{TemplateBinding HeaderVisibility}" />
+                                    <TextBlock Classes="hf-small"
+                                               FontSize="14"
+                                               LineHeight="20"
+                                               Foreground="{DynamicResource HfTextBrush}"
+                                               Text="{TemplateBinding Message}"
+                                               IsVisible="{TemplateBinding MessageVisibility}" />
+                                    <ContentControl Content="{TemplateBinding AdditionalContentMain}" />
+                                    <ItemsControl Margin="0,8,0,0"
+                                                  IsVisible="{TemplateBinding ButtonsVisibility}"
+                                                  ItemsSource="{TemplateBinding Buttons}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <WrapPanel Orientation="Horizontal" ItemSpacing="10" LineSpacing="10" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                    </ItemsControl>
+                                </StackPanel>
+                                <hf:HfCaptionButton Grid.Row="1"
+                                                    Grid.Column="1"
+                                                    Width="36"
+                                                    Height="32"
+                                                    VerticalAlignment="Top"
+                                                    ToolTip.Tip="{x:Static core:HfStrings.Close}"
+                                                    Command="{TemplateBinding CloseCommand}"
+                                                    CommandParameter="{Binding RelativeSource={RelativeSource TemplatedParent}}"
+                                                    IsVisible="{TemplateBinding CloseButtonVisible}">
+                                    <hf:PixelIcon Kind="cross" />
+                                </hf:HfCaptionButton>
+                                <ContentControl Grid.Row="2" Grid.ColumnSpan="2" Margin="0,10,12,0"
+                                                Content="{TemplateBinding AdditionalContentBottom}" />
+                            </Grid>
+                            <ContentControl Content="{TemplateBinding OverlayContent}" IsHitTestVisible="False" />
+                        </Panel>
+                    </hf:PixelBorder>
+                </Border>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <!-- toast buttons («Перезапустить», «Проверить сервер») as the site's secondary small buttons -->
+    <Style Selector="notifications|NotificationMessageButton">
+        <Setter Property="Background" Value="{DynamicResource HfRaisedBrush}" />
+        <Setter Property="Foreground" Value="{DynamicResource HfTextBrush}" />
+        <Setter Property="FontFamily" Value="{StaticResource HfFontHeading}" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="13" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <hf:PixelBorder Name="PART_Frame"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{DynamicResource HfLineBrush}"
+                                BorderThickness="2"
+                                Notch="4"
+                                ShadowBrush="{DynamicResource HfVoidBrush}"
+                                ShadowOffset="3"
+                                MinHeight="40"
+                                Padding="16,8"
+                                Margin="0,0,3,3">
+                    <ContentPresenter Content="{TemplateBinding Content}"
+                                      Foreground="{TemplateBinding Foreground}"
+                                      HorizontalContentAlignment="Center"
+                                      VerticalContentAlignment="Center" />
+                </hf:PixelBorder>
+            </ControlTemplate>
+        </Setter>
+    </Style>
+    <Style Selector="notifications|NotificationMessageButton:pointerover">
+        <Setter Property="Background" Value="{DynamicResource HfRaisedHoverBrush}" />
+    </Style>
+    <Style Selector="notifications|NotificationMessageButton:pressed">
+        <Setter Property="Background" Value="{DynamicResource HfNightBrush}" />
+    </Style>
+    <Style Selector="notifications|NotificationMessageButton:disabled">
+        <Setter Property="Opacity" Value="0.55" />
     </Style>
 </Styles>
