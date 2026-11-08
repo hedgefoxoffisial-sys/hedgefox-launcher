@@ -457,3 +457,8 @@ $RECYCLE.BIN/
 !.vscode/launch.json
 !.vscode/extensions.json
 /src/Gml.Launcher/FodyWeavers.xml
+
+# HedgeFox: local build and packaging output (tools/macos/make-app.sh, dotnet build -o out)
+/out/
+/dist/
+__pycache__/
