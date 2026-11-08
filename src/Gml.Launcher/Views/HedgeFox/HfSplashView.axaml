@@ -1,0 +1,43 @@
+<!-- The loader (site intro): the orange HEDGEFOX title, three meshing pixel cogs, the striped meter and rotating
+     Tiny5 hints, over the night scene. DataContext: the stock SplashScreenViewModel (its checks run unchanged). -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:hf="using:Gml.Launcher.Views.HedgeFox.Controls"
+             xmlns:vm="using:Gml.Launcher.ViewModels"
+             x:Class="Gml.Launcher.Views.HedgeFox.HfSplashView"
+             x:DataType="vm:SplashScreenViewModel">
+    <Grid>
+        <Image Name="Scene"
+               Source="/Assets/Images/background.jpg"
+               Stretch="UniformToFill"
+               HorizontalAlignment="Center"
+               VerticalAlignment="Bottom" />
+        <Rectangle Fill="{DynamicResource HfBgBrush}" Opacity="0.8" />
+        <hf:HfFogLayer VerticalAlignment="Bottom" Height="192" Opacity="0.3" />
+
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="22">
+            <Image Classes="hf-pixel"
+                   Source="/Assets/HedgeFox/Images/hedgefox-title-orange.png"
+                   Width="512"
+                   Height="96">
+                <Image.Effect>
+                    <DropShadowEffect OffsetX="0" OffsetY="8" BlurRadius="0" Opacity="0.6" Color="#080511" />
+                </Image.Effect>
+            </Image>
+            <hf:HfGears Name="Gears" Cell="3" HorizontalAlignment="Center" />
+            <StackPanel Spacing="14" HorizontalAlignment="Center">
+                <hf:HfMeter Width="280"
+                            Height="20"
+                            IsIndeterminate="{Binding InfinityLoading}"
+                            Value="{Binding Progress}" />
+                <TextBlock Name="Hint"
+                           Classes="hf-px16"
+                           Foreground="{DynamicResource HfMutedBrush}"
+                           HorizontalAlignment="Center" />
+            </StackPanel>
+        </StackPanel>
+
+        <!-- the frameless window's edge -->
+        <Border BorderBrush="{DynamicResource HfLineBrush}" BorderThickness="2" IsHitTestVisible="False" />
+    </Grid>
+</UserControl>

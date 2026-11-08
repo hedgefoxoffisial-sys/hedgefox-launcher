@@ -87,6 +87,12 @@ public static class HfStrings
     public static readonly IReadOnlyList<string> SplashHints =
         ["ЗАВОДИМ ШЕСТЕРЁНКИ…", "ПОДНИМАЕМ ДИРИЖАБЛЬ…", "ПОЧТИ ГОТОВО…"];
 
+    public static readonly TimeSpan SplashHintEvery = TimeSpan.FromSeconds(1.6);
+
+    /// <summary>The hint shown <paramref name="elapsed" /> after the splash appeared.</summary>
+    public static string SplashHintAt(TimeSpan elapsed) =>
+        SplashHints[(int)(Math.Max(0, elapsed.Ticks) / SplashHintEvery.Ticks % SplashHints.Count)];
+
     private static readonly string[] MonthsGenitive =
     [
         "января", "февраля", "марта", "апреля", "мая", "июня",

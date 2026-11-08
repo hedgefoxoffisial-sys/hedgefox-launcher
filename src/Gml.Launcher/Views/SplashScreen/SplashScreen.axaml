@@ -1,39 +1,26 @@
-<!-- Splash (fork-owned): the stock checks with the HedgeFox look. Square plate, orange top, striped meter.
-     The full loader (orange title, pixel cogs, Tiny5 hints) comes with the HedgeFox screens. -->
+<!-- Splash (fork-owned): the stock checks run in SplashScreenViewModel; the look is the site's loader
+     (Views/HedgeFox/HfSplashView: orange title, pixel cogs, striped meter, Tiny5 hints). -->
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:components="clr-namespace:Gml.Launcher.Views.Components"
         xmlns:viewModels="clr-namespace:Gml.Launcher.ViewModels"
-        xmlns:hf="using:Gml.Launcher.Views.HedgeFox.Controls"
+        xmlns:hfv="using:Gml.Launcher.Views.HedgeFox"
         mc:Ignorable="d"
-        d:DesignWidth="380"
-        d:DesignHeight="210"
-        Width="380"
-        Height="210"
+        d:DesignWidth="640"
+        d:DesignHeight="440"
+        Width="640"
+        Height="440"
+        CanResize="False"
         WindowStartupLocation="CenterScreen"
         SystemDecorations="None"
         Background="{DynamicResource HfBgBrush}"
         TransparencyLevelHint="None"
+        Icon="/Assets/Images/logo.ico"
         x:Class="Gml.Launcher.Views.SplashScreen.SplashScreen"
         x:DataType="viewModels:SplashScreenViewModel"
         Title="HedgeFox">
 
-    <hf:PixelBorder Classes="hf-plate orange" ShadowOffset="0" Padding="28,20">
-        <StackPanel VerticalAlignment="Center" Spacing="16">
-            <components:LogoComponent Classes="TextLogo" HorizontalAlignment="Center" />
-
-            <hf:HfMeter IsIndeterminate="{Binding InfinityLoading}"
-                        Value="{Binding Progress}"
-                        Width="280"
-                        HorizontalAlignment="Center" />
-
-            <TextBlock Classes="hf-small"
-                       Text="{Binding StatusText}"
-                       HorizontalAlignment="Center"
-                       TextAlignment="Center" />
-        </StackPanel>
-    </hf:PixelBorder>
+    <hfv:HfSplashView />
 
 </Window>
