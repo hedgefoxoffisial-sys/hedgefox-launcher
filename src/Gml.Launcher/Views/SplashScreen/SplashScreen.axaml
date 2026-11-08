@@ -1,9 +1,12 @@
+<!-- Splash (fork-owned): the stock checks with the HedgeFox look. Square plate, orange top, striped meter.
+     The full loader (orange title, pixel cogs, Tiny5 hints) comes with the HedgeFox screens. -->
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:components="clr-namespace:Gml.Launcher.Views.Components"
         xmlns:viewModels="clr-namespace:Gml.Launcher.ViewModels"
+        xmlns:hf="using:Gml.Launcher.Views.HedgeFox.Controls"
         mc:Ignorable="d"
         d:DesignWidth="380"
         d:DesignHeight="210"
@@ -11,38 +14,26 @@
         Height="210"
         WindowStartupLocation="CenterScreen"
         SystemDecorations="None"
-        Background="Transparent"
-        TransparencyLevelHint="Transparent"
-        TransparencyBackgroundFallback="Transparent"
+        Background="{DynamicResource HfBgBrush}"
+        TransparencyLevelHint="None"
         x:Class="Gml.Launcher.Views.SplashScreen.SplashScreen"
         x:DataType="viewModels:SplashScreenViewModel"
         Title="HedgeFox">
 
-    <Border Background="{DynamicResource FrameBackgroundColor}"
-            BorderBrush="{DynamicResource FrameBackgroundBorderColor}"
-            BorderThickness="1"
-            ClipToBounds="True"
-            CornerRadius="15">
+    <hf:PixelBorder Classes="hf-plate orange" ShadowOffset="0" Padding="28,20">
+        <StackPanel VerticalAlignment="Center" Spacing="16">
+            <components:LogoComponent Classes="TextLogo" HorizontalAlignment="Center" />
 
-        <Grid>
-            <StackPanel VerticalAlignment="Center">
-                <components:LogoComponent Classes="TextLogo"
-                                          HorizontalAlignment="Center" />
+            <hf:HfMeter IsIndeterminate="{Binding InfinityLoading}"
+                        Value="{Binding Progress}"
+                        Width="280"
+                        HorizontalAlignment="Center" />
 
-                <ProgressBar IsIndeterminate="{Binding InfinityLoading}"
-                             Value="{Binding Progress}"
-                             Maximum="100"
-                             Classes="ProgressBar"
-                             Margin="60, 20"
-                             Height="1"
-                             VerticalAlignment="Bottom" />
-
-                <TextBlock Text="{Binding StatusText}"
-                           HorizontalAlignment="Center"
-                           Foreground="{DynamicResource ContentColor}" />
-            </StackPanel>
-        </Grid>
-
-    </Border>
+            <TextBlock Classes="hf-small"
+                       Text="{Binding StatusText}"
+                       HorizontalAlignment="Center"
+                       TextAlignment="Center" />
+        </StackPanel>
+    </hf:PixelBorder>
 
 </Window>

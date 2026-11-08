@@ -1,0 +1,32 @@
+<!-- The 32 px title bar: drag area, the pixel wordmark, and on Windows and Linux our own «свернуть» / «закрыть».
+     On macOS the native traffic lights sit in the left inset. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:hf="using:Gml.Launcher.Views.HedgeFox.Controls"
+             xmlns:core="using:Gml.Launcher.Core.HedgeFox"
+             x:Class="Gml.Launcher.Views.HedgeFox.HfTitleBar"
+             Height="32">
+    <Border Name="Bar"
+            Background="{DynamicResource HfTitleBarBrush}"
+            BorderBrush="{DynamicResource HfLineBrush}"
+            BorderThickness="0,0,0,1">
+        <Grid ColumnDefinitions="Auto,Auto,*,Auto">
+            <Border Name="MacInset" Grid.Column="0" Width="78" IsVisible="False" />
+            <TextBlock Grid.Column="1"
+                       Classes="hf-px16"
+                       Margin="14,0,0,0"
+                       VerticalAlignment="Center"
+                       IsHitTestVisible="False">
+                <Run Text="HEDGE" /><Run Text="FOX" Foreground="{DynamicResource HfOrangeBrush}" />
+            </TextBlock>
+            <StackPanel Name="CaptionButtons" Grid.Column="3" Orientation="Horizontal">
+                <hf:HfCaptionButton Name="MinimizeButton" ToolTip.Tip="{x:Static core:HfStrings.Minimize}">
+                    <hf:PixelIcon Kind="minimize" />
+                </hf:HfCaptionButton>
+                <hf:HfCaptionButton Name="CloseButton" Classes="close" ToolTip.Tip="{x:Static core:HfStrings.Close}">
+                    <hf:PixelIcon Kind="cross" />
+                </hf:HfCaptionButton>
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>
