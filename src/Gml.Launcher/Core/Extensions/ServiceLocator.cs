@@ -32,7 +32,7 @@ public static class ServiceLocator
 
         CheckAndChangeInstallationFolder(storageService, manager);
         CheckAndChangeLanguage(storageService, systemService);
-        Gml.Launcher.Core.HedgeFox.HedgeFoxServices.Register(storageService);
+        Gml.Launcher.Core.HedgeFox.HedgeFoxServices.Register(storageService, builder);
         Locator.CurrentMutable.RegisterConstant(new VpnChecker(), typeof(IVpnChecker));
         Locator.CurrentMutable.RegisterConstant(new BackendChecker(), typeof(IBackendChecker));
         Locator.CurrentMutable.RegisterConstant(new SettingsService(

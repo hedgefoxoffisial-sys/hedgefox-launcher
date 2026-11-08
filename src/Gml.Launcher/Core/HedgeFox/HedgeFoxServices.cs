@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
+using Avalonia;
 using Gml.Client.Interfaces;
 using Gml.Launcher.Core.Services;
 using Gml.Launcher.Models;
@@ -12,7 +13,8 @@ namespace Gml.Launcher.Core.HedgeFox;
 
 /// <summary>
 ///     The HedgeFox services, registered by one line in ServiceLocator.RegisterServices (after the stock language
-///     check). Screens get them from Splat: <c>Locator.Current.GetService&lt;IStatusService&gt;()</c>.
+///     check; it passes the app builder for the macOS app menu). Screens get them from Splat:
+///     <c>Locator.Current.GetService&lt;IStatusService&gt;()</c>.
 /// </summary>
 public static class HedgeFoxServices
 {
@@ -35,9 +37,16 @@ public static class HedgeFoxServices
         CultureInfo.DefaultThreadCurrentUICulture = Russian;
     }
 
-    public static void Register(IStorageService storage)
+    public static void Register(IStorageService storage, AppBuilder? builder = null)
     {
         UseRussian(storage);
+        if (builder is not null && OperatingSystem.IsMacOS())
+        {
+            // our Russian app menu instead of Avalonia's English one («About Avalonia», «Hide Application», «Quit»);
+            // this callback runs before the platform's own, which builds the native menu from the app's NativeMenu
+            builder.With(new MacOSPlatformOptions { DisableDefaultApplicationMenuItems = true })
+                .AfterSetup(b => HfAppMenu.Apply(b.Instance!));
+        }
 
         var http = CreateHttpClient();
         var m = Locator.CurrentMutable;

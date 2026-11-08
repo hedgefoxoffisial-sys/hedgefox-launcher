@@ -21,7 +21,7 @@
 | `tools/brand.py` | `tokens.json` + `site-derived.json` → `Colors.axaml`; проверка контраста и следов чужого бренда |
 | `tools/fonts.py` | статические TTF из WOFF2 сайта (fontTools), см. «Шрифты» |
 | `tools/package_release.py` | упаковка сборок в ассеты релиза и `SHA256SUMS.txt`, версия из тега |
-| `tools/macos/` | `.app` и `.dmg` для macOS; в `Info.plist` есть доступ к микрофону для голосового чата |
+| `tools/macos/` | `.app` и `.dmg` для macOS; в `Info.plist` доступ к микрофону для голосового чата и русский регион пакета |
 | `tools/tests/` | тесты инструментов (`unittest`): цвета, следы бренда, шрифты, хуки форка |
 | `tools/shots/` | снимки экранов без окна (Avalonia.Headless), см. «Снимки экранов» |
 | `tests/HedgeFox.Launcher.Tests/` | юнит-тесты логики `Core/HedgeFox` (xunit) |
@@ -38,7 +38,7 @@
 | Файл | Правка |
 |---|---|
 | `App.axaml` | `RequestedThemeVariant="Dark"` и последней строкой `HedgeFoxTheme.axaml` |
-| `Core/Extensions/ServiceLocator.cs` | одна строка: `HedgeFoxServices.Register(storageService)` (наши сервисы; язык всегда русский, сохранённый v0.9 английский или китайский переписывается) |
+| `Core/Extensions/ServiceLocator.cs` | одна строка: `HedgeFoxServices.Register(storageService, builder)` (наши сервисы; язык всегда русский, сохранённый v0.9 английский или китайский переписывается; на macOS своё меню приложения по-русски вместо «About Avalonia»; вход через `HfAuthGuard`) |
 | `Core/Helpers/AppViewLocator.cs` | одна строка первой веткой: `HfViews.Resolve(viewModel)` (наши страницы; «Моды» остаётся стоковой) |
 | `Assets/Styles/Colors.axaml` | генерируется `tools/brand.py`, руками не правим |
 | `Assets/Resources/ResourceKeysDictionary.cs` | адрес API `https://api.hedgefox.ru` и папка данных `.hedgefox` |

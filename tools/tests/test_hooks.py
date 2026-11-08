@@ -21,7 +21,8 @@ class HookTest(unittest.TestCase):
     def test_services_are_registered_after_the_language_check(self):
         src = read(APP / "Core" / "Extensions" / "ServiceLocator.cs")
         body = src[src.index("RegisterServices("):]
-        self.assertIn("HedgeFoxServices.Register(storageService);", body)
+        # the builder lets HedgeFoxServices set the macOS app menu (Russian, no «About Avalonia»)
+        self.assertIn("HedgeFoxServices.Register(storageService, builder);", body)
         self.assertLess(body.index("CheckAndChangeLanguage("), body.index("HedgeFoxServices.Register("))
 
     def test_hedgefox_pages_are_resolved_first(self):
@@ -46,6 +47,11 @@ class HookTest(unittest.TestCase):
     def test_window_is_fitted_into_the_work_area(self):
         code = read(APP / "Views" / "MainWindow.axaml.cs")
         self.assertIn("HfWindowFit.Fit(", code)
+
+    def test_macos_bundle_speaks_russian(self):
+        # system-supplied parts of the app (the file picker, the window menu) follow the bundle's region
+        plist = read(ROOT / "tools" / "macos" / "Info.plist.tmpl")
+        self.assertRegex(plist, r"<key>CFBundleDevelopmentRegion</key>\s*<string>ru</string>")
 
     def test_macos_asks_for_the_microphone(self):
         plist = read(ROOT / "tools" / "macos" / "Info.plist.tmpl")
