@@ -27,7 +27,8 @@
         Icon="/Assets/Images/logo.ico"
         Title="HedgeFox">
 
-    <Grid>
+    <!-- a maximised window on Windows has its frame off-screen (OffScreenMargin): everything steps in by it -->
+    <Grid Margin="{Binding $parent[Window].OffScreenMargin}">
         <!-- The night scene: the site's Pelena composite (branding/background.jpg), scaled down smoothly -->
         <Image Name="Scene"
                Source="/Assets/Images/background.jpg"

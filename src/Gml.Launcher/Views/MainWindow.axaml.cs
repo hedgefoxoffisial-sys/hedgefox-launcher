@@ -23,12 +23,32 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
         this.WhenActivated(_ => { });
         AvaloniaXamlLoader.Load(this);
         HfWindowChrome.Apply(this);
+        Opened += (_, _) => FitIntoWorkArea();
         // the 1920×1080 scene is scaled down: smooth here (pixel art elsewhere stays nearest-neighbour)
         RenderOptions.SetBitmapInterpolationMode(this.Get<Image>("Scene"), BitmapInterpolationMode.HighQuality);
 
 #if DEBUG
         this.AttachDevTools();
 #endif
+    }
+
+    /// <summary>
+    ///     1180×720 is taller than the work area of a 1080p laptop at 150 %: shrink and centre the window so its title
+    ///     bar and footer stay on screen (<see cref="HfWindowFit" />).
+    /// </summary>
+    private void FitIntoWorkArea()
+    {
+        if ((Screens.ScreenFromWindow(this) ?? Screens.Primary) is not { } screen)
+            return;
+        var fit = HfWindowFit.Fit(ClientSize, FrameSize ?? ClientSize, new Size(MinWidth, MinHeight), Position,
+            screen.WorkingArea, screen.Scaling);
+        if (fit is not { } f)
+            return;
+        MinWidth = f.MinWidth;
+        MinHeight = f.MinHeight;
+        Width = f.Width;
+        Height = f.Height;
+        Position = f.Position;
     }
 
     protected override void OnDataContextChanged(EventArgs e)

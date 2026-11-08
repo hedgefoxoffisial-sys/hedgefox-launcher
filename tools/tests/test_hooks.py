@@ -37,6 +37,16 @@ class HookTest(unittest.TestCase):
         for value in re.findall(r'<CornerRadius x:Key="\w+">([^<]*)</CornerRadius>', theme):
             self.assertEqual(value.strip(), "0")
 
+    def test_maximised_window_keeps_its_content_on_screen(self):
+        # Windows puts a maximised extended-client window's frame off-screen; Avalonia reports it as OffScreenMargin
+        # and the content must step in by it (Avalonia's own ControlCatalog does the same)
+        window = read(APP / "Views" / "MainWindow.axaml")
+        self.assertRegex(window, r'<Grid[^>]*Margin="\{Binding \$parent\[Window\]\.OffScreenMargin\}"')
+
+    def test_window_is_fitted_into_the_work_area(self):
+        code = read(APP / "Views" / "MainWindow.axaml.cs")
+        self.assertIn("HfWindowFit.Fit(", code)
+
     def test_macos_asks_for_the_microphone(self):
         plist = read(ROOT / "tools" / "macos" / "Info.plist.tmpl")
         self.assertRegex(plist, r"<key>NSMicrophoneUsageDescription</key>\s*<string>Голосовой чат в игре</string>")
