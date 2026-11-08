@@ -86,6 +86,29 @@
             <Thickness x:Key="TextControlThemePadding">14,12</Thickness>
             <x:Double x:Key="TextControlThemeMinHeight">48</x:Double>
 
+            <!-- Fluent overlays: the text-box menu in Russian, tooltips and menus on the night palette -->
+            <x:String x:Key="StringTextFlyoutCutText">Вырезать</x:String>
+            <x:String x:Key="StringTextFlyoutCopyText">Копировать</x:String>
+            <x:String x:Key="StringTextFlyoutPasteText">Вставить</x:String>
+            <SolidColorBrush x:Key="ToolTipBackground" Color="{DynamicResource HfNightColor}" />
+            <SolidColorBrush x:Key="ToolTipForeground" Color="{DynamicResource HfTextColor}" />
+            <SolidColorBrush x:Key="ToolTipBorderBrush" Color="{DynamicResource HfLineStrongColor}" />
+            <Thickness x:Key="ToolTipBorderThemeThickness">2</Thickness>
+            <Thickness x:Key="ToolTipBorderThemePadding">10,6,10,7</Thickness>
+            <x:Double x:Key="ToolTipContentThemeFontSize">13</x:Double>
+            <SolidColorBrush x:Key="MenuFlyoutPresenterBackground" Color="{DynamicResource HfNightColor}" />
+            <SolidColorBrush x:Key="MenuFlyoutPresenterBorderBrush" Color="{DynamicResource HfLineStrongColor}" />
+            <Thickness x:Key="MenuFlyoutPresenterBorderThemeThickness">2</Thickness>
+            <SolidColorBrush x:Key="MenuFlyoutItemBackgroundPointerOver" Color="{DynamicResource HfRaisedColor}" />
+            <SolidColorBrush x:Key="MenuFlyoutItemBackgroundPressed" Color="{DynamicResource HfRaisedHoverColor}" />
+            <SolidColorBrush x:Key="MenuFlyoutItemForeground" Color="{DynamicResource HfTextColor}" />
+            <SolidColorBrush x:Key="MenuFlyoutItemForegroundPointerOver" Color="{DynamicResource HfTextColor}" />
+            <SolidColorBrush x:Key="MenuFlyoutItemForegroundPressed" Color="{DynamicResource HfTextColor}" />
+            <SolidColorBrush x:Key="MenuFlyoutItemForegroundDisabled" Color="{DynamicResource HfMutedColor}" Opacity="0.6" />
+            <SolidColorBrush x:Key="MenuFlyoutItemKeyboardAcceleratorTextForeground" Color="{DynamicResource HfMutedColor}" />
+            <SolidColorBrush x:Key="MenuFlyoutItemKeyboardAcceleratorTextForegroundPointerOver" Color="{DynamicResource HfMutedColor}" />
+            <SolidColorBrush x:Key="MenuFlyoutItemKeyboardAcceleratorTextForegroundDisabled" Color="{DynamicResource HfMutedColor}" Opacity="0.6" />
+
             <!-- Chamfered pixel button (global.css: btn, its secondary and quiet variants) -->
             <ControlTheme x:Key="{x:Type hf:HfButton}" TargetType="hf:HfButton">
                 <Setter Property="Background" Value="{DynamicResource HfOrangeBrush}" />
@@ -412,6 +435,10 @@
     <Style Selector="TextBlock">
         <Setter Property="FontFamily" Value="{StaticResource HfFontBody}" />
     </Style>
+    <!-- overlays live in their own popups, outside the window's font -->
+    <Style Selector="MenuFlyoutPresenter, ContextMenu, ToolTip">
+        <Setter Property="FontFamily" Value="{StaticResource HfFontBody}" />
+    </Style>
     <Style Selector="hf|HfButton TextBlock">
         <Setter Property="FontFamily" Value="{StaticResource HfFontHeading}" />
     </Style>
@@ -422,6 +449,7 @@
     </Style>
     <Style Selector="hf|HfBadge TextBlock">
         <Setter Property="FontFamily" Value="{StaticResource HfFontPixel}" />
+        <Setter Property="hf:HfRender.CrispText" Value="True" />
     </Style>
 
     <!-- ===== Text ===== -->

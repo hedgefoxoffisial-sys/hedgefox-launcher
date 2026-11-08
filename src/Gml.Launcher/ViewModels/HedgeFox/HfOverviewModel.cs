@@ -119,7 +119,8 @@ public sealed class HfOverviewModel : ReactiveObject, IHfScreenModel
             Cards.Add(card);
         var selected = cards.FirstOrDefault(c => c.Selected);
         SelectedTitle = selected?.Title ?? string.Empty;
-        SelectedVersion = selected?.Profile.GameVersion is { Length: > 0 } v ? "Minecraft " + v : string.Empty;
+        // Tiny5 reads well only in capitals
+        SelectedVersion = selected?.Profile.GameVersion is { Length: > 0 } v ? "MINECRAFT " + v : string.Empty;
     }
 
     private async Task LoadAdviceAsync()
