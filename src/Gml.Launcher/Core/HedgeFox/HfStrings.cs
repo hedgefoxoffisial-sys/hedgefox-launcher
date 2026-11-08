@@ -25,6 +25,7 @@ public static class HfStrings
     // ----- Pelena -----
     public const string PelenaKicker = "ПЕЛЕНА";
     public const string PelenaSleeps = "Пелена спит";
+    public const string PelenaWaking = "Пелена просыпается";
     public const string PelenaRising = "поднимается";
     public const string PelenaFalling = "опускается";
 
@@ -33,7 +34,7 @@ public static class HfStrings
     public const string PasswordField = "Пароль";
     public const string SignIn = "Войти";
     public const string Register = "Регистрация";
-    public const string Forgot = "Забыли пароль?";
+    public const string Forgot = "Забыл пароль?";
     public const string LoginHint = "Не пускает? Подтверди почту — письмо пришло при регистрации.";
     public const string TwoFactorField = "Код из приложения";
     public const string TwoFactorConfirm = "Подтвердить";
@@ -50,6 +51,7 @@ public static class HfStrings
     public const string RecommendedBadge = "СОВЕТУЕМ";
     public const string ShadersAlsoFit = "Твой ПК потянет и шейдеры";
     public const string MemoryForGame = "Памяти игре";
+    public const string MemoryNeeded = "Памяти нужно";
     public const string Mods = "Моды";
     public const string Reinstall = "Переустановить";
     public const string ReinstallHint = "Скачать файлы игры заново, если она не запускается";
@@ -61,7 +63,7 @@ public static class HfStrings
 
     // ----- news -----
     public const string NewsKicker = "НОВОСТИ";
-    public const string NewsEmpty = "Новостей пока нет. Загляни в Telegram.";
+    public const string NewsEmpty = "Новостей пока нет. Летопись — на сайте.";
     public const string NewsFailed = "Новости не загрузились. Попробуем позже.";
     public const string NewsOpen = "Открыть";
 
@@ -90,6 +92,8 @@ public static class HfStrings
     public const string WindowHeight = "Высота";
     public const string GameFolder = "Папка игры";
     public const string GameFolderHint = "Сюда скачиваются игра и моды. Путь без пробелов.";
+    public const string FolderHasSpaces = "В пути есть пробелы. Выбери папку без них.";
+    public const string FolderFailed = "Не получилось сменить папку. Попробуй другую.";
     public const string ChangeFolder = "Выбрать папку";
     public const string OpenFolder = "Открыть";
     public const string Back = "Назад";

@@ -124,10 +124,26 @@ public class PelenaWordingTests
     [Theory]
     [InlineData(80, 96, "поднимается")]
     [InlineData(96, 80, "опускается")]
-    [InlineData(-64, 72, "поднимается")]
     [InlineData(80.02, 80, null)]
     public void TargetGivesTheTrend(double y, double target, string? trend) =>
         Assert.Equal(trend, HfPelenaView.From(new HfPelena(y, target))!.Trend);
+
+    // never «Пелена спит» next to «поднимается» (copy-lore-11): at the bottom with a higher target it wakes up
+    [Fact]
+    public void AtTheBottomWithAHigherTargetItWakesUp()
+    {
+        var v = HfPelenaView.From(new HfPelena(-64, 72))!;
+        Assert.True(v.Sleeping);
+        Assert.Equal("Пелена просыпается", v.Title);
+        Assert.Null(v.Trend);
+        Assert.False(v.ShowBar);
+    }
+
+    [Theory]
+    [InlineData(-64, -64)]
+    [InlineData(-64, -80)]
+    public void ASleepingPelenaHasNoTrend(double y, double target) =>
+        Assert.Null(HfPelenaView.From(new HfPelena(y, target))!.Trend);
 
     [Theory]
     [InlineData(80.4, "Пелена: Y 80")]

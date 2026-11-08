@@ -97,8 +97,9 @@ public static class HfStatusParser
 }
 
 /// <summary>
-///     The Pelena widget's wording (spec «Пелена на виджете»): y ≤ −64 → «Пелена спит»; otherwise «Пелена: Y {y}» and
-///     a bar from −64 to 200; target ≠ y → «поднимается» or «опускается». Never a date.
+///     The Pelena widget's wording (spec «Пелена на виджете»): y ≤ −64 → «Пелена спит» («Пелена просыпается» when its
+///     target is higher); otherwise «Пелена: Y {y}» and a bar from −64 to 200; target ≠ y → «поднимается» or
+///     «опускается». Never a date.
 /// </summary>
 public sealed record HfPelenaView(bool Sleeping, string Title, bool ShowBar, double Fraction, string? Trend)
 {
@@ -116,8 +117,10 @@ public sealed record HfPelenaView(bool Sleeping, string Title, bool ShowBar, dou
         var trend = pelena.Target > pelena.Y + Still ? HfStrings.PelenaRising
             : pelena.Target < pelena.Y - Still ? HfStrings.PelenaFalling
             : null;
+        // asleep it has no trend: with a target above the bottom it «просыпается» (never «спит» next to «поднимается»)
         return sleeping
-            ? new HfPelenaView(true, HfStrings.PelenaSleeps, false, 0, trend)
+            ? new HfPelenaView(true, pelena.Target > Bottom + Still ? HfStrings.PelenaWaking : HfStrings.PelenaSleeps,
+                false, 0, null)
             : new HfPelenaView(false, HfStrings.PelenaLevel(pelena.Y), true,
                 Math.Clamp((pelena.Y - Bottom) / (Top - Bottom), 0, 1), trend);
     }

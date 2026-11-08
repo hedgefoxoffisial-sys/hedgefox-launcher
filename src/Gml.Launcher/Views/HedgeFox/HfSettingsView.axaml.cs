@@ -41,14 +41,17 @@ public partial class HfSettingsView : HfPageView<SettingsPageViewModel, HfSettin
                 return;
             var path = folders[0].Path.LocalPath;
             if (path.Any(char.IsWhiteSpace))
-                throw new ArgumentException("The game folder path has spaces");
+            {
+                ShowFolderError(page, HfStrings.FolderHasSpaces);
+                return;
+            }
             page.InstallationFolder = Path.GetFullPath(path);
             page.ChangeFolder();
         }
         catch (Exception exception)
         {
             SentrySdk.CaptureException(exception);
-            ShowFolderError(page);
+            ShowFolderError(page, HfStrings.FolderFailed);
         }
     }
 
@@ -65,15 +68,13 @@ public partial class HfSettingsView : HfPageView<SettingsPageViewModel, HfSettin
         catch (Exception exception)
         {
             SentrySdk.CaptureException(exception);
-            ShowFolderError(page);
+            ShowFolderError(page, HfStrings.FolderFailed);
         }
     }
 
-    private static void ShowFolderError(SettingsPageViewModel page) =>
+    private static void ShowFolderError(SettingsPageViewModel page, string message) =>
         page.MainViewModel.Manager
-            .CreateMessage(true, "#FF6B7A",
-                page.LocalizationService.GetString(SystemConstants.Error),
-                page.LocalizationService.GetString(SystemConstants.InvalidFolder))
+            .CreateMessage(true, "#FF6B7A", page.LocalizationService.GetString(SystemConstants.Error), message)
             .Dismiss()
             .WithDelay(TimeSpan.FromSeconds(3))
             .Queue();

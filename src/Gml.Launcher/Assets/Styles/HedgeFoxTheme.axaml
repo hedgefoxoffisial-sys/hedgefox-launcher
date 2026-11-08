@@ -272,7 +272,7 @@
                     <Setter Property="ShadowOffset" Value="6" />
                 </Style>
 
-                <!-- a text link with a button's keyboard and command behaviour («Регистрация», «Забыли пароль?») -->
+                <!-- a text link with a button's keyboard and command behaviour («Регистрация», «Забыл пароль?») -->
                 <Style Selector="^.link">
                     <Setter Property="Background" Value="Transparent" />
                     <Setter Property="Foreground" Value="{DynamicResource HfPurpleLightBrush}" />

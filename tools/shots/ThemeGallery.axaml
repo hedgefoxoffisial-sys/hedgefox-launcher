@@ -23,7 +23,7 @@
             <TextBlock Classes="hf-label" Text="Ник или почта" />
             <TextBlock Classes="hf-small" Text="Не пускает? Подтверди почту — письмо пришло при регистрации." />
             <StackPanel Orientation="Horizontal" Spacing="16">
-                <TextBlock Classes="hf-link" Text="Забыли пароль?" />
+                <TextBlock Classes="hf-link" Text="Забыл пароль?" />
                 <TextBlock Classes="hf-link" Name="LinkHover" Text="Регистрация" />
             </StackPanel>
             <StackPanel Orientation="Horizontal" Spacing="16">
