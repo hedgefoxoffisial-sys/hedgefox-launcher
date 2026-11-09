@@ -135,9 +135,11 @@ public class HfMenuScene : Control, ICustomHitTest
             }
         }
 
-        // the moon, ×2 (cells of 4 px), left of the title
+        // the moon, ×2 (cells of 4 px), left of the title; on a short window it climbs towards the top (17 % of the
+        // height at 720 px, 8 px at the minimum 620) so the panels of Настройки and Профиль leave it clear
         var moon = HfMenuArt.Get("moon.png");
-        context.DrawImage(moon, new Rect(Math.Round(Math.Max(16, w * 0.035)), Math.Round(h * 0.17), 144, 144));
+        var moonY = h >= 720 ? h * 0.17 : Math.Max(8, h * 0.17 - (720 - h) * 0.97);
+        context.DrawImage(moon, new Rect(Math.Round(Math.Max(16, w * 0.035)), Math.Round(moonY), 144, 144));
 
         // the peaks at a whole scale that covers the width, the hub on the right; never higher than 38 % of the
         // window, so on short windows the snow stays under the menu column
@@ -167,13 +169,16 @@ public class HfMenuScene : Control, ICustomHitTest
         DrawFog(context, HfMenuArt.Get("fog-back.png"), w, h - 88, 0.9, (long)(ms / 1000 * FogBackSpeed / 2) * 2);
 
         // the airship in the top right corner, above the hub and beside the title (the site's first screen): never
-        // over the title or the hub; bobbing 2 px (smooth: a minified illustration, not a 1:1 sprite)
+        // over the title or the hub; bobbing 2 px (smooth: a minified illustration, not a 1:1 sprite). Like the moon it
+        // climbs on a short window (13 % of the height at 720 px, just under the title bar at 620) so it clears the
+        // top of the Настройки and Профиль panels
         var ship = HfMenuArt.Get("ship.png");
-        var sw = Math.Round(Math.Clamp(w / 2 - 288 - 40, 150, 260));
+        var sw = Math.Round(Math.Clamp(w / 2 - 288 - 40, 140, 260));
         var sh = Math.Round(sw * ship.PixelSize.Height / ship.PixelSize.Width);
         var bob = (long)(ms / BobHalfMs) % 2 == 1 ? -2 : 0;
+        var shipY = h >= 720 ? h * 0.13 : Math.Max(36, h * 0.13 - (720 - h) * 0.45);
         using (context.PushRenderOptions(new RenderOptions { BitmapInterpolationMode = BitmapInterpolationMode.HighQuality }))
-            context.DrawImage(ship, new Rect(Math.Round(w - sw - 12), Math.Round(h * 0.13) + bob, sw, sh));
+            context.DrawImage(ship, new Rect(Math.Round(w - sw - 12), Math.Round(shipY) + bob, sw, sh));
 
         // the near fog on the ground
         DrawFog(context, HfMenuArt.Get("fog-front.png"), w, h - 44, 0.85, (long)(ms / 1000 * FogFrontSpeed / 2) * 2);

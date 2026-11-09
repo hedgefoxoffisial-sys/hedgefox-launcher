@@ -11,6 +11,7 @@ using System.Reactive.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless;
+using Avalonia.Input;
 using Avalonia.ReactiveUI;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
@@ -169,8 +170,9 @@ void Screens(int width, int height, string size)
     picker.ToggleCommand.Execute().Subscribe();
     Ui.PumpUntil(() => picker.IsOpen, "versions list");
     Save(main, "overview-versions" + size);
-    picker.CloseCommand.Execute().Subscribe();
-    Ui.PumpUntil(() => !picker.IsOpen, "versions list closed");
+    // Escape closes it (the window's key, wherever the focus is)
+    main.KeyPressQwerty(PhysicalKey.Escape, RawInputModifiers.None);
+    Ui.PumpUntil(() => !picker.IsOpen, "versions list closed by Escape", 3000);
 
     // toasts as the stock view models queue them (their fills only pick the left bar): an error, a success, the VPN
     // note and «reconnecting» with its overlay bar

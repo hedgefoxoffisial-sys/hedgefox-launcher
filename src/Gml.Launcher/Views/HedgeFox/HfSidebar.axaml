@@ -1,4 +1,4 @@
-<!-- The sidebar once signed in, like a game launcher's: the logo on top, the sections «Играть», «Новости»,
+<!-- The sidebar once signed in, like a game launcher's: the logo on top (the HedgeFox cube as 16×16 pixel art at ×2), the sections «Играть», «Новости»,
      «Настройки» (the one shown now lit, with an orange edge), at the bottom «Сайт · Telegram · Помощь» and the player:
      face and nick (→ Профиль). A dark plank down the left edge; the night scene fills the rest of the window.
      DataContext: HfShellModel (MainWindow creates it); hidden on the sign-in page. -->
@@ -18,8 +18,8 @@
 
             <!-- the logo, under the title bar (the traffic lights on macOS) -->
             <StackPanel Orientation="Horizontal" Spacing="10" Margin="18,46,12,0" IsHitTestVisible="False">
-                <Image Source="/Assets/Images/logo.png" Width="36" Height="36"
-                       RenderOptions.BitmapInterpolationMode="HighQuality" />
+                <Image Classes="hf-pixel" Source="/Assets/HedgeFox/Images/cube.png" Width="32" Height="32"
+                       VerticalAlignment="Center" />
                 <TextBlock Classes="hf-px24" Text="HEDGEFOX" Foreground="{DynamicResource HfTextBrush}"
                            VerticalAlignment="Center" Margin="0,0,0,2">
                     <TextBlock.Effect>

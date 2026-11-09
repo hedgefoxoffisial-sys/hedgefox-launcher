@@ -12,7 +12,24 @@
              x:Class="Gml.Launcher.Views.HedgeFox.HfOverviewView">
     <UserControl.Resources>
         <SolidColorBrush x:Key="HfBarBrush" Color="{DynamicResource HfVoidColor}" Opacity="0.94" />
+        <SolidColorBrush x:Key="HfGlassBrush" Color="{DynamicResource HfVoidColor}" Opacity="0.72" />
+        <SolidColorBrush x:Key="HfGlassHoverBrush" Color="{DynamicResource HfNightColor}" Opacity="0.86" />
     </UserControl.Resources>
+
+    <!-- the news cards over the night: flat (no hard shadow, no purple top edge) and see-through, so the mountains
+         behind them still read -->
+    <UserControl.Styles>
+        <Style Selector="hf|HfButton.card.glass">
+            <Setter Property="Background" Value="{StaticResource HfGlassBrush}" />
+        </Style>
+        <Style Selector="hf|HfButton.card.glass:pointerover">
+            <Setter Property="Background" Value="{StaticResource HfGlassHoverBrush}" />
+        </Style>
+        <Style Selector="hf|HfButton.card.glass /template/ hf|PixelBorder#PART_Frame">
+            <Setter Property="ShadowOffset" Value="0" />
+            <Setter Property="AccentTop" Value="0" />
+        </Style>
+    </UserControl.Styles>
 
     <Grid Name="Root" x:DataType="hfvm:HfOverviewModel" RowDefinitions="*,Auto,Auto">
 
@@ -31,7 +48,7 @@
         </StackPanel>
 
         <!-- The three latest posts; the feed's own words when there are none -->
-        <Grid Grid.Row="1" RowDefinitions="Auto,Auto" MaxWidth="944" Margin="32,0,32,44">
+        <Grid Grid.Row="1" RowDefinitions="Auto,Auto" MaxWidth="944" Margin="32,0,32,62">
             <Grid ColumnDefinitions="*,Auto" Margin="0,0,0,8">
                 <TextBlock Classes="hf-kicker" Text="{x:Static core:HfStrings.NewsCaps}" VerticalAlignment="Center">
                     <TextBlock.Effect>
@@ -58,7 +75,7 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate x:DataType="core:HfNewsCard">
-                            <hf:HfButton Classes="card" Margin="8,0" Height="112" Padding="16,12,16,12"
+                            <hf:HfButton Classes="card glass" Margin="8,0" Height="112" Padding="16,12,16,12"
                                          Command="{Binding $parent[ItemsControl].((hfvm:HfOverviewModel)DataContext).Info.OpenNewsCommand}"
                                          CommandParameter="{Binding}">
                                 <StackPanel Spacing="6">
@@ -102,11 +119,12 @@
 
         <!-- The bottom bar -->
         <Panel Grid.Row="2" Height="80">
-            <!-- the fog tuft the sign rests on: its top shows above the bar's edge on both sides of the sign -->
-            <hf:HfSprite Source="cloud.png" Frames="6" Scale="2" FrameMs="450" IsHitTestVisible="False"
-                         HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,-30,0,0" />
             <Border Background="{StaticResource HfBarBrush}" BorderBrush="{DynamicResource HfNightBrush}"
                     BorderThickness="0,2,0,0" />
+            <!-- the fog tuft the sign stands on, as in the game's menu: it lies on the bar's edge, over it, and its
+                 wisps hang down into the bar on both sides of the sign -->
+            <hf:HfSprite Source="cloud.png" Frames="6" Scale="2" FrameMs="450" IsHitTestVisible="False"
+                         HorizontalAlignment="Center" VerticalAlignment="Top" Margin="0,-16,0,0" />
 
             <Grid ColumnDefinitions="*,Auto,*" Margin="24,0,24,0">
                 <!-- the version of the game: «Подобрано для твоего ПК» over the advised one -->
@@ -133,8 +151,8 @@
                     </Grid>
                 </hf:HfButton>
 
-                <!-- «ИГРАТЬ», standing out of the bar; while downloading the sign is the meter -->
-                <StackPanel Grid.Column="1" VerticalAlignment="Top" Margin="0,-26,0,0" Spacing="3">
+                <!-- «ИГРАТЬ», standing on the fog above the bar's edge; while downloading the sign is the meter -->
+                <StackPanel Grid.Column="1" VerticalAlignment="Top" Margin="0,-40,0,0" Spacing="10">
                     <Panel Width="320" Height="64">
                         <hf:HfButton Name="PlayButton" Classes="sign narrow"
                                      Command="{Binding Page.PlayCommand}"
