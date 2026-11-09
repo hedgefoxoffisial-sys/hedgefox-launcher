@@ -31,6 +31,13 @@ public static class HfVersionChoice
         }
     }
 
+    /// <summary>The pick as known in memory now (after <see cref="GetAsync" /> or <see cref="SetAsync" />).</summary>
+    public static string? Peek()
+    {
+        lock (Gate)
+            return _value;
+    }
+
     /// <summary>Remembers <paramref name="value" /> (a GML name, or null: the launcher picks for this PC).</summary>
     public static Task SetAsync(IStorageService? storage, string? value)
     {

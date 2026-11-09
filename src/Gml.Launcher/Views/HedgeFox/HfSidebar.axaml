@@ -1,0 +1,89 @@
+<!-- The sidebar once signed in, like a game launcher's: the logo on top, the sections «Играть», «Новости»,
+     «Настройки» (the one shown now lit, with an orange edge), at the bottom «Сайт · Telegram · Помощь» and the player:
+     face and nick (→ Профиль). A dark plank down the left edge; the night scene fills the rest of the window.
+     DataContext: HfShellModel (MainWindow creates it); hidden on the sign-in page. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:hf="using:Gml.Launcher.Views.HedgeFox.Controls"
+             xmlns:core="using:Gml.Launcher.Core.HedgeFox"
+             xmlns:hfvm="using:Gml.Launcher.ViewModels.HedgeFox"
+             x:Class="Gml.Launcher.Views.HedgeFox.HfSidebar"
+             x:DataType="hfvm:HfShellModel"
+             Width="208"
+             IsVisible="{Binding IsShown, FallbackValue=False}">
+    <!-- the plank (also the window's drag area, MainWindow) -->
+    <Border Classes="hf-drag" Background="{DynamicResource HfVoidBrush}"
+            BorderBrush="{DynamicResource HfNightBrush}" BorderThickness="0,0,2,0">
+        <Grid Classes="hf-drag" Background="Transparent" RowDefinitions="Auto,Auto,*,Auto,Auto">
+
+            <!-- the logo, under the title bar (the traffic lights on macOS) -->
+            <StackPanel Orientation="Horizontal" Spacing="10" Margin="18,46,12,0" IsHitTestVisible="False">
+                <Image Source="/Assets/Images/logo.png" Width="36" Height="36"
+                       RenderOptions.BitmapInterpolationMode="HighQuality" />
+                <TextBlock Classes="hf-px24" Text="HEDGEFOX" Foreground="{DynamicResource HfTextBrush}"
+                           VerticalAlignment="Center" Margin="0,0,0,2">
+                    <TextBlock.Effect>
+                        <DropShadowEffect OffsetX="2" OffsetY="2" BlurRadius="0" Opacity="1" Color="#000000" />
+                    </TextBlock.Effect>
+                </TextBlock>
+            </StackPanel>
+
+            <!-- the sections -->
+            <StackPanel Grid.Row="1" Spacing="4" Margin="0,34,0,0">
+                <hf:HfButton Name="NavPlay" Classes="nav" Classes.selected="{Binding IsPlay}"
+                             Command="{Binding GoPlayCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="14">
+                        <hf:PixelIcon Kind="play" VerticalAlignment="Center" />
+                        <TextBlock Text="{x:Static core:HfStrings.Play}" VerticalAlignment="Center" />
+                    </StackPanel>
+                </hf:HfButton>
+                <hf:HfButton Name="NavNews" Classes="nav" Classes.selected="{Binding IsNews}"
+                             Command="{Binding GoNewsCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="14">
+                        <hf:PixelIcon Kind="news" VerticalAlignment="Center" />
+                        <TextBlock Text="{x:Static core:HfStrings.News}" VerticalAlignment="Center" />
+                    </StackPanel>
+                </hf:HfButton>
+                <hf:HfButton Name="NavSettings" Classes="nav" Classes.selected="{Binding IsSettings}"
+                             Command="{Binding GoSettingsCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="14">
+                        <hf:PixelIcon Kind="gear" VerticalAlignment="Center" />
+                        <TextBlock Text="{x:Static core:HfStrings.Settings}" VerticalAlignment="Center" />
+                    </StackPanel>
+                </hf:HfButton>
+            </StackPanel>
+
+            <!-- the site, the channel and the install guide -->
+            <StackPanel Grid.Row="3" Orientation="Horizontal" Spacing="0" Margin="12,0,8,10">
+                <hf:HfButton Classes="text quiet" FontSize="12" Padding="6,4" Command="{Binding OpenLinkCommand}"
+                             CommandParameter="{x:Static core:HfLinks.Site}" Content="{x:Static core:HfStrings.Site}" />
+                <TextBlock Classes="hf-small" FontSize="12" Text="·" VerticalAlignment="Center" />
+                <hf:HfButton Classes="text quiet" FontSize="12" Padding="6,4" Command="{Binding OpenLinkCommand}"
+                             CommandParameter="{x:Static core:HfLinks.Telegram}" Content="{x:Static core:HfStrings.Telegram}" />
+                <TextBlock Classes="hf-small" FontSize="12" Text="·" VerticalAlignment="Center" />
+                <hf:HfButton Classes="text quiet" FontSize="12" Padding="6,4" Command="{Binding OpenLinkCommand}"
+                             CommandParameter="{x:Static core:HfLinks.Install}" Content="{x:Static core:HfStrings.Help}" />
+            </StackPanel>
+
+            <!-- the player (→ Профиль) -->
+            <Border Grid.Row="4" BorderBrush="{DynamicResource HfNightBrush}" BorderThickness="0,2,0,0">
+                <hf:HfButton Name="NavProfile" Classes="nav" Classes.selected="{Binding IsProfile}" MinHeight="64"
+                             Padding="16,0,12,0" Command="{Binding GoProfileCommand}"
+                             ToolTip.Tip="{x:Static core:HfStrings.Profile}">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <Border BorderBrush="{DynamicResource HfLineBrush}" BorderThickness="2"
+                                Background="{DynamicResource HfNightBrush}" VerticalAlignment="Center">
+                            <Image Name="Face" Classes="hf-pixel" Source="{Binding Face}" Width="32" Height="32" />
+                        </Border>
+                        <StackPanel VerticalAlignment="Center" Spacing="1">
+                            <TextBlock Text="{Binding Nick}" FontSize="14" Foreground="{DynamicResource HfTextBrush}"
+                                       TextTrimming="CharacterEllipsis" MaxWidth="120" />
+                            <TextBlock Text="{x:Static core:HfStrings.Profile}" FontSize="12" FontWeight="Normal"
+                                       Foreground="{DynamicResource HfMutedBrush}" />
+                        </StackPanel>
+                    </StackPanel>
+                </hf:HfButton>
+            </Border>
+        </Grid>
+    </Border>
+</UserControl>

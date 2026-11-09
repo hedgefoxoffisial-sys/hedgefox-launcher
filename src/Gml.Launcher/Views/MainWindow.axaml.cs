@@ -6,7 +6,7 @@ using Avalonia.Input;
 using Avalonia.Markup.Xaml;
 using Avalonia.ReactiveUI;
 using Gml.Launcher.ViewModels;
-using Gml.Launcher.ViewModels.Pages;
+using Gml.Launcher.ViewModels.HedgeFox;
 using Gml.Launcher.Views.HedgeFox;
 using Gml.Launcher.Views.HedgeFox.Controls;
 using ReactiveUI;
@@ -17,6 +17,8 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
 {
     /// <summary>Edge width that resizes the frameless window on Linux.</summary>
     private const double ResizeEdge = 6;
+
+    private IDisposable? _shell;
 
     public MainWindow()
     {
@@ -62,17 +64,18 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             else
                 Show();
         });
-        // the sign-in page has no top row; the others have the player and the gear there, which a toast must not hide
-        viewModel.Router.CurrentViewModel.Subscribe(page =>
-        {
-            if (this.FindControl<Control>("Toasts") is { } toasts)
-                toasts.Margin = new Thickness(0, page is LoginPageViewModel or null ? 32 : 88, 0, 0);
-        });
+        // the sidebar follows the router while the window lives
+        _shell?.Dispose();
+        var shell = new HfShellModel(viewModel);
+        this.Get<HfSidebar>("Sidebar").DataContext = shell;
+        _shell = shell.Start();
     }
 
     protected override void OnClosed(EventArgs e)
     {
         SendCloseEvent();
+        _shell?.Dispose();
+        _shell = null;
 
         base.OnClosed(e);
     }
@@ -92,8 +95,8 @@ public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
             return;
         }
 
-        // empty background (the night scene) drags the window, as in the stock launcher
-        if (e.Source is Rectangle or HfMenuScene)
+        // empty background (the night scene, the sidebar's plank) drags the window, as in the stock launcher
+        if (e.Source is Rectangle or HfMenuScene || e.Source is Control c && c.Classes.Contains("hf-drag"))
             BeginMoveDrag(e);
     }
 

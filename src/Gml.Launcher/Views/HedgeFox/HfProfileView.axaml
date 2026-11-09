@@ -1,21 +1,15 @@
-<!-- Профиль: the skin full-length in the middle of the night (the stock front render, nearest-neighbour), the nick
-     under it, the way to change the skin on the site and, quietly under it, «Выйти из аккаунта». DataContext: the
-     stock ProfilePageViewModel; HfProfileModel loads the skin and signs out. -->
+<!-- Профиль, from the player at the bottom of the sidebar: the skin full-length in the middle of the night (the
+     stock front render, nearest-neighbour), the nick under it, the way to change the skin on the site and, quietly
+     under it, «Выйти из аккаунта» (off while the game downloads or runs). DataContext: the stock
+     ProfilePageViewModel; HfProfileModel loads the skin and signs out. -->
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:hf="using:Gml.Launcher.Views.HedgeFox.Controls"
              xmlns:core="using:Gml.Launcher.Core.HedgeFox"
              xmlns:hfvm="using:Gml.Launcher.ViewModels.HedgeFox"
              x:Class="Gml.Launcher.Views.HedgeFox.HfProfileView">
-    <Grid Name="Root" x:DataType="hfvm:HfProfileModel" RowDefinitions="Auto,*" Margin="16,4,16,16">
-        <hf:HfButton Classes="text" HorizontalAlignment="Left" Command="{Binding Page.GoBackCommand}">
-            <StackPanel Orientation="Horizontal" Spacing="8">
-                <hf:PixelIcon Kind="back" />
-                <TextBlock Text="{x:Static core:HfStrings.Back}" VerticalAlignment="Center" />
-            </StackPanel>
-        </hf:HfButton>
-
-        <StackPanel Grid.Row="1" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="18" Margin="0,0,0,24">
+    <Grid Name="Root" x:DataType="hfvm:HfProfileModel" Margin="16,0,16,16">
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="18" Margin="0,0,0,24">
             <Image Name="Body"
                    Classes="hf-pixel"
                    Source="{Binding Body}"

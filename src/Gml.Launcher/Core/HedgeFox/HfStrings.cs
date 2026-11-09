@@ -43,6 +43,9 @@ public static class HfStrings
     public const string Play = "Играть";
     public const string PlayCaps = "ИГРАТЬ";
     public const string LoadingCaps = "ЗАГРУЗКА…";
+    public const string StraightToServer = "Сразу на сервер";
+    public const string PickedForPc = "Подобрано для твоего ПК";
+    public const string ForYourPcCaps = "ДЛЯ ТВОЕГО ПК";
     public const string Reinstall = "Переустановить";
     public const string ReinstallHint = "Если игра не запускается, скачаем её файлы заново.";
     public const string ReinstallAskTitle = "Переустановить игру?";
@@ -52,6 +55,10 @@ public static class HfStrings
     public const string Cancel = "Отмена";
 
     // ----- news -----
+    public const string News = "Новости";
+    public const string NewsCaps = "НОВОСТИ";
+    public const string AllNews = "Все новости";
+    public const string NewsOnSite = "Открыть на сайте";
     public const string NewsEmpty = "Новостей пока нет. Летопись — на сайте.";
     public const string NewsFailed = "Новости не загрузились. Попробуем позже.";
 
@@ -68,6 +75,7 @@ public static class HfStrings
     // ----- settings -----
     public const string SettingsCaps = "НАСТРОЙКИ";
     public const string GameVersion = "Версия игры";
+    public const string GameVersionCaps = "ВЕРСИЯ ИГРЫ";
     public const string MemorySetting = "Память";
     public const string MemoryRecommendedMark = "рекомендуем";
     public const string WindowSetting = "Окно игры";

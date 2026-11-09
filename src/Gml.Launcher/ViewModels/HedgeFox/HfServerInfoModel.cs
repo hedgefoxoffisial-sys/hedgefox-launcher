@@ -56,12 +56,18 @@ public sealed class HfServerInfoModel : ReactiveObject
     [Reactive] public string PelenaTitle { get; private set; } = string.Empty;
     [Reactive] public string? PelenaTrend { get; private set; }
     [Reactive] public bool HasPelenaTrend { get; private set; }
+
+    /// <summary>One line under the status: «Пелена поднимается», «Пелена: Y 80», «Пелена спит».</summary>
+    [Reactive] public string PelenaShort { get; private set; } = string.Empty;
     [Reactive] public bool PelenaShowBar { get; private set; }
     [Reactive] public double PelenaPercent { get; private set; }
 
     public ObservableCollection<HfNewsCard> News { get; } = [];
     [Reactive] public string? NewsMessage { get; private set; }
     [Reactive] public bool HasNewsMessage { get; private set; }
+
+    /// <summary>The feed answered with posts.</summary>
+    [Reactive] public bool HasNews { get; private set; }
 
     /// <summary>The newest post (the one strip on the main screen), or null.</summary>
     [Reactive] public HfNewsCard? Latest { get; private set; }
@@ -90,6 +96,7 @@ public sealed class HfServerInfoModel : ReactiveObject
         PelenaTitle = pelena?.Title.ToUpper(Ru) ?? string.Empty;
         PelenaTrend = pelena?.Trend;
         HasPelenaTrend = PelenaTrend is not null;
+        PelenaShort = pelena?.Short ?? string.Empty;
         PelenaShowBar = pelena?.ShowBar == true;
         PelenaPercent = (pelena?.Fraction ?? 0) * 100;
     }
@@ -105,6 +112,7 @@ public sealed class HfServerInfoModel : ReactiveObject
             News.Add(HfNewsCard.From(item, now));
         NewsMessage = HfNewsCard.Message(result);
         HasNewsMessage = NewsMessage is not null;
+        HasNews = News.Count > 0;
         Latest = News.Count > 0 ? News[0] : null;
         HasLatest = Latest is not null;
     }

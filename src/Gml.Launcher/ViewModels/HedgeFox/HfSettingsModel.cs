@@ -48,12 +48,9 @@ public sealed record HfModRow(ExternalModReadDto Mod, string Title, string Descr
 /// </summary>
 public sealed class HfSettingsModel : ReactiveObject, IHfScreenModel
 {
-    private readonly IHardwareProbe? _hardware;
-    private readonly IStorageService? _storage;
     private readonly IGmlClientManager? _gml;
     private readonly ISystemService? _system;
     private readonly SerialDisposable _modsWatch = new();
-    private HfAdvice _advice = new(null, false);
     private ProfileReadDto? _modsFor;
     private int? _markMb;
     private double _ram;
@@ -63,13 +60,14 @@ public sealed class HfSettingsModel : ReactiveObject, IHfScreenModel
     public HfSettingsModel(SettingsPageViewModel page, IHardwareProbe? hardware = null)
     {
         Page = page;
-        _hardware = hardware ?? Locator.Current.GetService<IHardwareProbe>();
-        _storage = Locator.Current.GetService<IStorageService>();
         _gml = Locator.Current.GetService<IGmlClientManager>();
         _system = Locator.Current.GetService<ISystemService>();
         Game = page.MainViewModel.Router.NavigationStack.OfType<OverviewPageViewModel>().LastOrDefault();
         HasGame = Game is not null;
-        SelectCommand = ReactiveCommand.CreateFromTask<HfProfileCard>(SelectAsync, this.WhenAnyValue(x => x.CanSwitch));
+        Picker = Game is { } g
+            ? new HfVersionPicker(g, hardware ?? Locator.Current.GetService<IHardwareProbe>(),
+                Locator.Current.GetService<IStorageService>())
+            : null;
         ToggleModCommand = ReactiveCommand.Create<HfModRow>(row => Mods?.ChangeOptionalModState.Execute(row.Mod),
             this.WhenAnyValue(x => x.CanMods));
         ToggleMoreCommand = ReactiveCommand.Create(() => { ShowMore = !ShowMore; });
@@ -92,16 +90,8 @@ public sealed class HfSettingsModel : ReactiveObject, IHfScreenModel
 
     // ----- version of the game -----
 
-    public ObservableCollection<HfProfileCard> Versions { get; } = [];
-    public ReactiveCommand<HfProfileCard, Unit> SelectCommand { get; }
-    [Reactive] public bool HasVersions { get; private set; }
-
-    /// <summary>One line about the chosen version, «Короче дальность, легче графика…».</summary>
-    [Reactive] public string VersionHint { get; private set; } = string.Empty;
-    [Reactive] public bool HasVersionHint { get; private set; }
-
-    /// <summary>No switching while a download or the game runs (code-8).</summary>
-    [Reactive] public bool CanSwitch { get; private set; }
+    /// <summary>«Версия игры» of the main screen (the same as in its bottom bar); null without the main screen.</summary>
+    public HfVersionPicker? Picker { get; }
 
     // ----- memory -----
 
@@ -178,11 +168,11 @@ public sealed class HfSettingsModel : ReactiveObject, IHfScreenModel
             .Subscribe(full => IsWindowed = !full));
         if (Game is { } game)
         {
+            d.Add(Picker!.Start());
             d.Add(game.ListViewModel.WhenAnyValue(l => l.Profiles, l => l.SelectedProfile)
                 .ObserveOn(RxApp.MainThreadScheduler)
                 .Subscribe(_ =>
                 {
-                    RebuildVersions();
                     _markMb = HfRamMark.ProfileMb(game.ListViewModel.SelectedProfile);
                     ShowRam();
                     RebuildMods();
@@ -193,13 +183,11 @@ public sealed class HfSettingsModel : ReactiveObject, IHfScreenModel
                 .Subscribe(x =>
                 {
                     var ((_, busy), selected) = x;
-                    CanSwitch = !busy;
                     CanMods = !busy && game.BackendIsActive;
                     CanReinstall = HfOverviewModel.CanReinstallWith(selected is not null, busy, game.BackendIsActive);
                     RebuildMods();
                 }));
         }
-        _ = LoadAdviceAsync();
         return d;
     }
 
@@ -218,35 +206,6 @@ public sealed class HfSettingsModel : ReactiveObject, IHfScreenModel
         RamText = ProfileCatalog.RamLabel((int)Math.Round(auto ? _markMb!.Value : Page.RamValue));
         HasMark = mark is not null && Page.MaxRamValue > Page.MinRamValue;
         MarkFraction = mark is { } m ? HfRamMark.Fraction(m, Page.MinRamValue, Page.MaxRamValue) : 0;
-    }
-
-    private void RebuildVersions()
-    {
-        if (Game is not { } game)
-            return;
-        var list = game.ListViewModel;
-        var cards = HfProfileCards.Build(list.Profiles ?? [], _advice, list.SelectedProfile?.Name);
-        Versions.Clear();
-        foreach (var card in cards)
-            Versions.Add(card);
-        HasVersions = Versions.Count > 1;
-        VersionHint = cards.FirstOrDefault(c => c.Selected)?.Hint ?? string.Empty;
-        HasVersionHint = VersionHint.Length > 0;
-    }
-
-    private async Task SelectAsync(HfProfileCard card)
-    {
-        if (Game is not { IsProcessing: false } game)
-            return;
-        game.ListViewModel.SelectedProfile = card.Profile;
-        try
-        {
-            await HfVersionChoice.SetAsync(_storage, HfProfilePick.Remember(card.GmlName, _advice));
-        }
-        catch (Exception exception)
-        {
-            SentrySdk.CaptureException(exception);
-        }
     }
 
     /// <summary>The optional mods of the chosen version: the stock model loads them from GML (online only).</summary>
@@ -270,20 +229,5 @@ public sealed class HfSettingsModel : ReactiveObject, IHfScreenModel
                     ModRows.Add(row);
                 HasMods = ModRows.Count > 0;
             });
-    }
-
-    private async Task LoadAdviceAsync()
-    {
-        if (_hardware is null)
-            return;
-        try
-        {
-            _advice = HardwareAdvisor.Advise(await _hardware.ReadAsync());
-            RxApp.MainThreadScheduler.Schedule(RebuildVersions);
-        }
-        catch (Exception exception)
-        {
-            SentrySdk.CaptureException(exception);
-        }
     }
 }

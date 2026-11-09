@@ -1,6 +1,7 @@
-<!-- Настройки: one quiet night plate in the middle, one column of rows: «Версия игры» (the version «Играть» starts),
-     «Память» (a slider with one «рекомендуем» mark), «Окно игры» (full screen), the version's optional mods, then
-     «Дополнительно» (window size, game folder) and «Переустановить» (asks first). Telegram and Помощь at the bottom.
+<!-- Настройки, a section of the sidebar: one quiet night plate in the middle, one column of rows: «Версия игры»
+     (the version «Играть» starts, the same as the bottom bar's picker), «Память» (a slider with one «рекомендуем»
+     mark), «Окно игры» (full screen), the version's optional mods, then «Дополнительно» (window size, game folder)
+     and «Переустановить» (asks first).
      The stock SettingsPageViewModel loads and saves (0.4 s after a change); HfSettingsModel adds the rest. -->
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -8,16 +9,10 @@
              xmlns:core="using:Gml.Launcher.Core.HedgeFox"
              xmlns:hfvm="using:Gml.Launcher.ViewModels.HedgeFox"
              x:Class="Gml.Launcher.Views.HedgeFox.HfSettingsView">
-    <Grid Name="Root" x:DataType="hfvm:HfSettingsModel" RowDefinitions="Auto,*,Auto" Margin="16,4,16,12">
-        <hf:HfButton Classes="text" HorizontalAlignment="Left" Command="{Binding Page.GoBackCommand}">
-            <StackPanel Orientation="Horizontal" Spacing="8">
-                <hf:PixelIcon Kind="back" />
-                <TextBlock Text="{x:Static core:HfStrings.Back}" VerticalAlignment="Center" />
-            </StackPanel>
-        </hf:HfButton>
-
-        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="0,0,8,0" Margin="0,4,0,4">
-            <StackPanel Width="640" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16">
+    <Grid Name="Root" x:DataType="hfvm:HfSettingsModel">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
+            <StackPanel Width="640" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16"
+                        Margin="0,16,0,28">
                 <TextBlock Classes="hf-px32" Text="{x:Static core:HfStrings.SettingsCaps}" HorizontalAlignment="Center">
                     <TextBlock.Effect>
                         <DropShadowEffect OffsetX="3" OffsetY="3" BlurRadius="0" Opacity="1" Color="#080511" />
@@ -28,13 +23,13 @@
                         BorderThickness="1" Padding="28,22,28,20">
                     <StackPanel Spacing="20">
                         <!-- Version of the game: picked for this PC until the player picks one -->
-                        <Grid ColumnDefinitions="132,*" IsVisible="{Binding HasVersions}">
+                        <Grid ColumnDefinitions="132,*" IsVisible="{Binding Picker.HasVersions, FallbackValue=False}">
                             <TextBlock Classes="hf-label" Text="{x:Static core:HfStrings.GameVersion}" Margin="0,8,0,0"
                                        VerticalAlignment="Top" />
                             <StackPanel Grid.Column="1" Spacing="8">
                                 <Border HorizontalAlignment="Left" Background="{DynamicResource HfVoidBrush}"
                                         BorderBrush="{DynamicResource HfLineBrush}" BorderThickness="1" Padding="2">
-                                    <ItemsControl ItemsSource="{Binding Versions}">
+                                    <ItemsControl ItemsSource="{Binding Picker.Versions}">
                                         <ItemsControl.ItemsPanel>
                                             <ItemsPanelTemplate>
                                                 <StackPanel Orientation="Horizontal" Spacing="2" />
@@ -44,15 +39,23 @@
                                             <DataTemplate x:DataType="core:HfProfileCard">
                                                 <hf:HfButton Classes="tab"
                                                              Classes.selected="{Binding Selected}"
-                                                             Command="{Binding $parent[ItemsControl].((hfvm:HfSettingsModel)DataContext).SelectCommand}"
-                                                             CommandParameter="{Binding}"
-                                                             Content="{Binding Title}" />
+                                                             Command="{Binding $parent[ItemsControl].((hfvm:HfSettingsModel)DataContext).Picker.SelectCommand}"
+                                                             CommandParameter="{Binding}">
+                                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                                        <TextBlock Text="{Binding Title}" VerticalAlignment="Center" />
+                                                        <hf:PixelIcon Kind="check" Width="8" Height="8"
+                                                                      VerticalAlignment="Center"
+                                                                      Foreground="{DynamicResource HfBrassBrush}"
+                                                                      IsVisible="{Binding Recommended}"
+                                                                      ToolTip.Tip="{x:Static core:HfStrings.PickedForPc}" />
+                                                    </StackPanel>
+                                                </hf:HfButton>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>
                                     </ItemsControl>
                                 </Border>
-                                <TextBlock Classes="hf-small" Text="{Binding VersionHint}" TextWrapping="Wrap"
-                                           IsVisible="{Binding HasVersionHint}" />
+                                <TextBlock Classes="hf-small" Text="{Binding Picker.Hint}" TextWrapping="Wrap"
+                                           IsVisible="{Binding Picker.HasHint, FallbackValue=False}" />
                             </StackPanel>
                         </Grid>
 
@@ -180,13 +183,5 @@
             </StackPanel>
         </ScrollViewer>
 
-        <!-- Telegram and help: here, not on the main screen -->
-        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="2" HorizontalAlignment="Center">
-            <hf:HfButton Classes="text" FontSize="13" Command="{Binding Page.OpenLinkCommand}"
-                         CommandParameter="{x:Static core:HfLinks.Telegram}" Content="{x:Static core:HfStrings.Telegram}" />
-            <TextBlock Classes="hf-small" Text="·" VerticalAlignment="Center" />
-            <hf:HfButton Classes="text" FontSize="13" Command="{Binding Page.OpenLinkCommand}"
-                         CommandParameter="{x:Static core:HfLinks.Install}" Content="{x:Static core:HfStrings.Help}" />
-        </StackPanel>
     </Grid>
 </UserControl>

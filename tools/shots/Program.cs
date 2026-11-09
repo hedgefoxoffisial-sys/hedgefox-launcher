@@ -152,14 +152,25 @@ void Screens(int width, int height, string size)
     Fakes.StatusNow = Fakes.Status;
     Fakes.NewsFails = false;
 
-    // main screen: the version is picked for the fake 8 GB laptop («Слабый ПК»), nobody chooses
+    // «Играть»: the version is picked for the fake 8 GB laptop («Слабый ПК»), nobody chooses; the three latest posts
     var overview = new OverviewPageViewModel(vm, Fakes.User, vm.OnClosed);
     vm.Router.NavigateAndReset.Execute(overview).Subscribe();
+    var shell = (HfShellModel)main.Get<HfSidebar>("Sidebar").DataContext!;
     Ui.PumpUntil(() => overview.ListViewModel.Profiles?.Count == 3 &&
                        overview.ListViewModel.SelectedProfile?.Name == ProfileCatalog.LowPc, "overview, version for this PC");
-    Ui.PumpUntil(() => HfModel<HfOverviewModel>(main) is { Face: not null, Info.HasOnlineLine: true },
-        "overview face and status line");
+    Ui.PumpUntil(() => shell is { Face: not null, IsPlay: true } &&
+                       HfModel<HfOverviewModel>(main) is
+                           { Info: { HasOnlineLine: true, HasNews: true }, Picker: { CurrentIsAdvised: true, Versions.Count: 3 } },
+        "overview: face, status, news and the version");
     Save(main, "overview" + size);
+
+    // the list of versions open over the bottom bar, the advised one marked
+    var picker = HfModel<HfOverviewModel>(main)!.Picker;
+    picker.ToggleCommand.Execute().Subscribe();
+    Ui.PumpUntil(() => picker.IsOpen, "versions list");
+    Save(main, "overview-versions" + size);
+    picker.CloseCommand.Execute().Subscribe();
+    Ui.PumpUntil(() => !picker.IsOpen, "versions list closed");
 
     // toasts as the stock view models queue them (their fills only pick the left bar): an error, a success, the VPN
     // note and «reconnecting» with its overlay bar
@@ -187,7 +198,7 @@ void Screens(int width, int height, string size)
         Ui.PumpUntil(() => !main.GetVisualDescendants().OfType<NotificationMessage>().Any(), "toasts gone");
     }
 
-    // downloading: the sign fills with light wood and shows the percent, what is left under it; the corners are off
+    // downloading: the sign fills with light wood and shows the percent, what is left under it; no switching versions
     overview.Headline = "Обновление";
     overview.Description = "Осталось: 312 файлов";
     overview.LoadingPercentage = 42;
@@ -201,10 +212,13 @@ void Screens(int width, int height, string size)
     Save(main, "overview-download" + size);
     overview.IsProcessing = false;
 
-    foreach (var (command, name) in new[] { (overview.GoSettingsCommand, "settings"), (overview.GoProfileCommand, "profile") })
+    // the sidebar's sections, each in place of the one before (the main screen stays under them in the stack)
+    foreach (var (section, name) in new[] { (HfSection.News, "news"), (HfSection.Settings, "settings"), (HfSection.Profile, "profile") })
     {
-        command.Execute(null);
-        Ui.PumpUntil(() => vm.Router.GetCurrentViewModel() != overview, name + " page");
+        shell.Go(section);
+        Ui.PumpUntil(() => shell.Section == section, name + " page");
+        if (name == "news")
+            Ui.PumpUntil(() => HfModel<HfNewsModel>(main) is { Info.News.Count: 4 }, "news list");
         if (name == "settings")
         {
             // the stock page loads the saved settings on the thread pool (a fresh install: automatic memory, so the
@@ -212,7 +226,7 @@ void Screens(int width, int height, string size)
             var settings = (SettingsPageViewModel)vm.Router.GetCurrentViewModel()!;
             Ui.PumpUntil(() => settings.InstallationFolder != null && settings.MaxRamValue > 0, "saved settings");
             Ui.PumpUntil(() => HfModel<HfSettingsModel>(main) is
-                    { HasMark: true, HasMods: true, CanReinstall: true, Versions.Count: 3, RamText: "4 ГБ" },
+                    { HasMark: true, HasMods: true, CanReinstall: true, Picker.Versions.Count: 3, RamText: "4 ГБ" },
                 "settings, the mark and the mods");
         }
         if (name == "profile")
@@ -232,9 +246,10 @@ void Screens(int width, int height, string size)
             Save(main, "settings-reinstall" + size);
             settingsModel.Reinstall.CancelCommand.Execute().Subscribe();
         }
-        vm.Router.NavigateBack.Execute().Subscribe();
-        Ui.PumpUntil(() => vm.Router.GetCurrentViewModel() == overview, "back to overview");
     }
+    shell.Go(HfSection.Play);
+    Ui.PumpUntil(() => vm.Router.GetCurrentViewModel() == overview && vm.Router.NavigationStack.Count == 1,
+        "back to overview");
 
     // the server asleep, then no data at all
     Fakes.StatusNow = new HfStatusSnapshot(HfStatusKind.Offline, CheckedAt: Fakes.Status.CheckedAt);

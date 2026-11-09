@@ -3,6 +3,7 @@ using System.IO;
 using System.Reactive;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using Avalonia.Media.Imaging;
 using Gml.Launcher.Core.HedgeFox;
@@ -31,7 +32,10 @@ public sealed class HfProfileModel : ReactiveObject, IHfScreenModel
         _skins = skins ?? Locator.Current.GetService<ISkinService>();
         _storage = Locator.Current.GetService<IStorageService>();
         Nick = page.LauncherUser.Name;
-        LogoutCommand = ReactiveCommand.CreateFromTask(LogoutAsync);
+        // no switch of accounts while the game downloads or runs (code-8)
+        var home = page.HostScreen is MainWindowViewModel main ? HfNav.Home(main.Router) : null;
+        var idle = home?.WhenAnyValue(h => h.IsProcessing).Select(busy => !busy) ?? Observable.Return(true);
+        LogoutCommand = ReactiveCommand.CreateFromTask(LogoutAsync, idle.ObserveOn(RxApp.MainThreadScheduler));
     }
 
     public ProfilePageViewModel Page { get; }
@@ -47,7 +51,6 @@ public sealed class HfProfileModel : ReactiveObject, IHfScreenModel
         return Disposable.Empty;
     }
 
-    // the main screen locks this page while the game downloads or runs, so no switch of accounts mid-game (code-8)
     private Task LogoutAsync()
     {
         if (_storage is null || Page.HostScreen is not MainWindowViewModel main)

@@ -7,7 +7,9 @@
                              link (underlined text link), card (clickable .card frame, +selected);
                              the game menu's: sign (+narrow: the wooden sign, the screen's one main action),
                              text (quiet text button; +icon: a pixel icon alone, +accent: the second action,
-                             +quiet: muted), tab (+selected: one of a few choices, «Версия игры»)
+                             +quiet: muted), tab (+selected: one of a few choices, «Версия игры»), nav (+selected:
+                             a section of the sidebar), picker (+open: the version picker of the bottom bar), option
+                             (+selected: a line of its list)
       hf:HfMenuScene         the game menu's night behind every page (MainWindow); hf:HfSprite (pixel sprite with
                              frames, the fog tuft); hf:HfSignMeter (the sign while the game downloads)
       hf:HfCaptionButton     32 px title-bar button; class close
@@ -395,6 +397,114 @@
                     <Setter Property="AccentTop" Value="2" />
                 </Style>
 
+                <!-- a section of the sidebar («Играть», «Новости», «Настройки»): a full-width row, a pixel icon and a
+                     word; the section shown now is lit, with an orange left edge -->
+                <Style Selector="^.nav">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Foreground" Value="{DynamicResource HfMutedBrush}" />
+                    <Setter Property="FontFamily" Value="{StaticResource HfFontBody}" />
+                    <Setter Property="FontWeight" Value="SemiBold" />
+                    <Setter Property="FontSize" Value="15" />
+                    <Setter Property="Padding" Value="18,0,12,0" />
+                    <Setter Property="MinHeight" Value="44" />
+                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                    <Setter Property="HorizontalContentAlignment" Value="Left" />
+                </Style>
+                <Style Selector="^.nav /template/ hf|PixelBorder#PART_Frame">
+                    <Setter Property="Notch" Value="0" />
+                    <Setter Property="ShadowOffset" Value="0" />
+                    <Setter Property="BevelTop" Value="0" />
+                    <Setter Property="BevelBottom" Value="0" />
+                </Style>
+                <Style Selector="^.nav /template/ hf|PixelBorder#PART_FocusRing">
+                    <Setter Property="Margin" Value="0" />
+                    <Setter Property="Notch" Value="0" />
+                    <Setter Property="BorderThickness" Value="2" />
+                </Style>
+                <Style Selector="^.nav:pointerover">
+                    <Setter Property="Background" Value="{DynamicResource HfNightBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource HfTextBrush}" />
+                </Style>
+                <Style Selector="^.nav:pressed">
+                    <Setter Property="Background" Value="{DynamicResource HfNightBrush}" />
+                    <Setter Property="RenderTransform" Value="none" />
+                </Style>
+                <Style Selector="^.nav.selected">
+                    <Setter Property="Background" Value="{DynamicResource HfRaisedBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource HfTextBrush}" />
+                </Style>
+                <Style Selector="^.nav.selected /template/ hf|PixelBorder#PART_Frame">
+                    <Setter Property="AccentBrush" Value="{DynamicResource HfOrangeBrush}" />
+                    <Setter Property="AccentLeft" Value="4" />
+                </Style>
+
+                <!-- the version picker of the bottom bar: a dark well with a 2 px line; lit while its list is open -->
+                <Style Selector="^.picker">
+                    <Setter Property="Background" Value="{DynamicResource HfNightBrush}" />
+                    <Setter Property="Foreground" Value="{DynamicResource HfTextBrush}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource HfLineBrush}" />
+                    <Setter Property="FontFamily" Value="{StaticResource HfFontBody}" />
+                    <Setter Property="FontWeight" Value="Normal" />
+                    <Setter Property="Padding" Value="12,6,10,7" />
+                    <Setter Property="MinHeight" Value="0" />
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+                <Style Selector="^.picker /template/ hf|PixelBorder#PART_Frame">
+                    <Setter Property="Notch" Value="0" />
+                    <Setter Property="BorderThickness" Value="2" />
+                    <Setter Property="ShadowOffset" Value="0" />
+                    <Setter Property="BevelTop" Value="0" />
+                    <Setter Property="BevelBottom" Value="0" />
+                </Style>
+                <Style Selector="^.picker /template/ hf|PixelBorder#PART_FocusRing">
+                    <Setter Property="Margin" Value="-4" />
+                    <Setter Property="Notch" Value="0" />
+                    <Setter Property="BorderThickness" Value="2" />
+                </Style>
+                <Style Selector="^.picker:pointerover, ^.picker.open">
+                    <Setter Property="Background" Value="{DynamicResource HfRaisedBrush}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource HfLineStrongBrush}" />
+                </Style>
+                <Style Selector="^.picker:pressed">
+                    <Setter Property="RenderTransform" Value="none" />
+                </Style>
+
+                <!-- one line of the picker's list: the chosen one with an orange left edge -->
+                <Style Selector="^.option">
+                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Foreground" Value="{DynamicResource HfTextBrush}" />
+                    <Setter Property="FontFamily" Value="{StaticResource HfFontBody}" />
+                    <Setter Property="FontWeight" Value="Normal" />
+                    <Setter Property="Padding" Value="14,9,12,10" />
+                    <Setter Property="MinHeight" Value="0" />
+                    <Setter Property="HorizontalAlignment" Value="Stretch" />
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                </Style>
+                <Style Selector="^.option /template/ hf|PixelBorder#PART_Frame">
+                    <Setter Property="Notch" Value="0" />
+                    <Setter Property="ShadowOffset" Value="0" />
+                    <Setter Property="BevelTop" Value="0" />
+                    <Setter Property="BevelBottom" Value="0" />
+                </Style>
+                <Style Selector="^.option /template/ hf|PixelBorder#PART_FocusRing">
+                    <Setter Property="Margin" Value="0" />
+                    <Setter Property="Notch" Value="0" />
+                    <Setter Property="BorderThickness" Value="2" />
+                </Style>
+                <Style Selector="^.option:pointerover">
+                    <Setter Property="Background" Value="{DynamicResource HfRaisedBrush}" />
+                </Style>
+                <Style Selector="^.option:pressed">
+                    <Setter Property="RenderTransform" Value="none" />
+                </Style>
+                <Style Selector="^.option.selected">
+                    <Setter Property="Background" Value="{DynamicResource HfSurfaceBrush}" />
+                </Style>
+                <Style Selector="^.option.selected /template/ hf|PixelBorder#PART_Frame">
+                    <Setter Property="AccentBrush" Value="{DynamicResource HfOrangeBrush}" />
+                    <Setter Property="AccentLeft" Value="4" />
+                </Style>
+
                 <!-- the wooden sign of the game menu (Images/Menu/sign*.png, 224×32 at exactly ×2): one per screen,
                      the main action. Hover lights the wood and lifts it 2 px, a press pushes it 2 px down; the keyboard
                      focus is the orange ring. Class narrow: the 160×32 plank (320×64) -->
@@ -609,6 +719,15 @@
     <Style Selector="hf|HfButton.text TextBlock, hf|HfButton.tab TextBlock">
         <Setter Property="FontFamily" Value="{StaticResource HfFontBody}" />
         <Setter Property="FontWeight" Value="Medium" />
+    </Style>
+    <Style Selector="hf|HfButton.nav TextBlock, hf|HfButton.picker TextBlock, hf|HfButton.option TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource HfFontBody}" />
+    </Style>
+    <Style Selector="hf|HfButton.nav TextBlock">
+        <Setter Property="FontWeight" Value="SemiBold" />
+    </Style>
+    <Style Selector="hf|HfButton.nav.selected hf|PixelIcon">
+        <Setter Property="Foreground" Value="{DynamicResource HfOrangeBrush}" />
     </Style>
     <Style Selector="hf|HfButton.text.accent TextBlock">
         <Setter Property="FontWeight" Value="SemiBold" />

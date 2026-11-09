@@ -343,6 +343,7 @@ public class HfSprite : Control
 /// <summary>
 ///     The wooden sign while the game downloads: the plank (sign.png at ×2) lights up from the left as the light
 ///     plank (sign-hover.png) is revealed up to <see cref="Value" /> per cent. Indeterminate: the plain plank.
+///     <see cref="IsNarrow" />: the 160×32 plank (320×64), as the sign of the bottom bar.
 /// </summary>
 public class HfSignMeter : Control
 {
@@ -352,12 +353,16 @@ public class HfSignMeter : Control
     public static readonly StyledProperty<bool> IsIndeterminateProperty =
         AvaloniaProperty.Register<HfSignMeter, bool>(nameof(IsIndeterminate));
 
+    public static readonly StyledProperty<bool> IsNarrowProperty =
+        AvaloniaProperty.Register<HfSignMeter, bool>(nameof(IsNarrow));
+
     /// <summary>The plank inside the sprite's 2-texel glow margin, at ×2.</summary>
     private const double Glow = 4;
 
     static HfSignMeter()
     {
-        AffectsRender<HfSignMeter>(ValueProperty, IsIndeterminateProperty);
+        AffectsRender<HfSignMeter>(ValueProperty, IsIndeterminateProperty, IsNarrowProperty);
+        AffectsMeasure<HfSignMeter>(IsNarrowProperty);
     }
 
     public HfSignMeter()
@@ -378,21 +383,30 @@ public class HfSignMeter : Control
         set => SetValue(IsIndeterminateProperty, value);
     }
 
-    protected override Size MeasureOverride(Size availableSize) => new(448, 64);
+    public bool IsNarrow
+    {
+        get => GetValue(IsNarrowProperty);
+        set => SetValue(IsNarrowProperty, value);
+    }
+
+    private double PlankWidth => IsNarrow ? 320 : 448;
+
+    protected override Size MeasureOverride(Size availableSize) => new(PlankWidth, 64);
 
     public override void Render(DrawingContext context)
     {
-        var plank = HfMenuArt.Get("sign.png");
-        var lit = HfMenuArt.Get("sign-hover.png");
-        var rect = new Rect(0, 0, 448, 64);
+        var plank = HfMenuArt.Get(IsNarrow ? "sign-narrow.png" : "sign.png");
+        var lit = HfMenuArt.Get(IsNarrow ? "sign-narrow-hover.png" : "sign-hover.png");
+        var w = PlankWidth;
+        var rect = new Rect(0, 0, w, 64);
         context.DrawImage(plank, rect);
         if (IsIndeterminate)
             return;
         // whole texels: the lit wood advances 2 px at a time; the wood still to go is dimmed (on the plank only)
-        var width = Math.Round((448 - 2 * Glow) * Math.Clamp(Value, 0, 100) / 100 / 2) * 2;
+        var width = Math.Round((w - 2 * Glow) * Math.Clamp(Value, 0, 100) / 100 / 2) * 2;
         using (context.PushOpacityMask(new ImageBrush(plank) { Stretch = Stretch.Fill }, rect))
             context.FillRectangle(new SolidColorBrush(Color.FromArgb(110, 0x08, 0x05, 0x11)),
-                new Rect(Glow + width, 0, 448 - Glow - (Glow + width), 64));
+                new Rect(Glow + width, 0, w - Glow - (Glow + width), 64));
         if (width <= 0)
             return;
         using (context.PushClip(new Rect(Glow, 0, width, 64)))

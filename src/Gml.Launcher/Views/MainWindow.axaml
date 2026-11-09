@@ -1,5 +1,6 @@
-<!-- HedgeFox shell (fork-owned): opaque night window, the game menu's night scene behind every page, our own
-     32 px title bar (HfWindowChrome sets the frame per OS), the routed pages and the notifications. -->
+<!-- HedgeFox shell (fork-owned): opaque night window; once signed in, the sidebar (HfSidebar) down the left edge
+     and the game menu's night scene to the right of it, behind the routed pages (on the sign-in page the scene fills
+     the window); our own 32 px title bar over all (HfWindowChrome sets the frame per OS) and the notifications. -->
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Gml.Launcher.ViewModels"
@@ -29,12 +30,14 @@
 
     <!-- a maximised window on Windows has its frame off-screen (OffScreenMargin): everything steps in by it -->
     <Grid Margin="{Binding $parent[Window].OffScreenMargin}">
-        <!-- The night of the game's main menu: sky, stars, moon, peaks, fog and the airship (HfMenuScene) -->
-        <hf:HfMenuScene Name="Scene" />
+        <Grid ColumnDefinitions="Auto,*">
+            <!-- «Играть», «Новости», «Настройки» and the player; DataContext: HfShellModel (MainWindow.axaml.cs) -->
+            <hfv:HfSidebar Name="Sidebar" />
 
-        <Grid RowDefinitions="32,*">
-            <hfv:HfTitleBar Name="TitleBar" />
-            <rxui:RoutedViewHost Grid.Row="1" Router="{Binding Router}">
+            <!-- The night of the game's main menu: sky, stars, moon, peaks, fog and the airship (HfMenuScene) -->
+            <hf:HfMenuScene Name="Scene" Grid.Column="1" ClipToBounds="True" />
+
+            <rxui:RoutedViewHost Grid.Column="1" Margin="0,32,0,0" Router="{Binding Router}">
                 <rxui:RoutedViewHost.DefaultContent>
                     <Panel />
                 </rxui:RoutedViewHost.DefaultContent>
@@ -44,8 +47,9 @@
             </rxui:RoutedViewHost>
         </Grid>
 
-        <!-- MessageBar: under the title bar; on the signed-in pages also under their top row (the gear), see
-             MainWindow.axaml.cs -->
+        <hfv:HfTitleBar Name="TitleBar" VerticalAlignment="Top" />
+
+        <!-- MessageBar: under the title bar -->
         <controls:NotificationMessageContainer Name="Toasts" Margin="0,32,0,0" Manager="{Binding Manager}" />
     </Grid>
 

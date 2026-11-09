@@ -1,0 +1,71 @@
+<!-- «Новости»: the latest posts of Telegram and the site's «Хроника», newest first, one card each in one column
+     (where from and when, the title, the beginning of the text); a click opens the post in the browser. Without
+     posts, the feed's own words and the way to the site. DataContext: HfNewsPageViewModel; HfNewsModel loads. -->
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:hf="using:Gml.Launcher.Views.HedgeFox.Controls"
+             xmlns:core="using:Gml.Launcher.Core.HedgeFox"
+             xmlns:hfvm="using:Gml.Launcher.ViewModels.HedgeFox"
+             x:Class="Gml.Launcher.Views.HedgeFox.HfNewsView">
+    <Grid Name="Root" x:DataType="hfvm:HfNewsModel">
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="0,0,8,0">
+            <StackPanel Width="660" HorizontalAlignment="Center" Spacing="14" Margin="0,22,0,28">
+                <TextBlock Classes="hf-px32" Text="{x:Static core:HfStrings.NewsCaps}" HorizontalAlignment="Center"
+                           Margin="0,0,0,6">
+                    <TextBlock.Effect>
+                        <DropShadowEffect OffsetX="3" OffsetY="3" BlurRadius="0" Opacity="1" Color="#080511" />
+                    </TextBlock.Effect>
+                </TextBlock>
+
+                <ItemsControl Name="Posts" ItemsSource="{Binding Info.News}" IsVisible="{Binding Info.HasNews}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Spacing="12" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="core:HfNewsCard">
+                            <hf:HfButton Classes="card" Padding="20,14,20,16"
+                                         Command="{Binding $parent[ItemsControl].((hfvm:HfNewsModel)DataContext).Info.OpenNewsCommand}"
+                                         CommandParameter="{Binding}">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <StackPanel Spacing="6">
+                                        <StackPanel Orientation="Horizontal" Spacing="10">
+                                            <TextBlock Classes="hf-px16" Text="{Binding Source}"
+                                                       Foreground="{DynamicResource HfOrangeBrush}"
+                                                       VerticalAlignment="Center" />
+                                            <TextBlock Text="{Binding Date}" FontSize="12"
+                                                       Foreground="{DynamicResource HfMutedBrush}" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                        <TextBlock Text="{Binding Title}" FontSize="17" FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource HfTextBrush}" TextWrapping="Wrap" />
+                                        <TextBlock Text="{Binding Text}" FontSize="14" LineHeight="20"
+                                                   Foreground="{DynamicResource HfMutedBrush}" TextWrapping="Wrap"
+                                                   MaxLines="3" TextTrimming="CharacterEllipsis" />
+                                    </StackPanel>
+                                    <hf:PixelIcon Grid.Column="1" Kind="arrow" VerticalAlignment="Top" Margin="16,2,0,0"
+                                                  Foreground="{DynamicResource HfMutedBrush}" />
+                                </Grid>
+                            </hf:HfButton>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <Border IsVisible="{Binding Info.HasNewsMessage}" Background="{DynamicResource HfTicketBrush}"
+                        BorderBrush="{DynamicResource HfLineBrush}" BorderThickness="2" Padding="24,28">
+                    <TextBlock Classes="hf-small" Text="{Binding Info.NewsMessage}" HorizontalAlignment="Center"
+                               TextAlignment="Center" />
+                </Border>
+
+                <hf:HfButton Classes="text accent" FontSize="14" HorizontalAlignment="Center" Margin="0,4,0,0"
+                             Command="{Binding Page.OpenLinkCommand}"
+                             CommandParameter="{x:Static core:HfLinks.News}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="{x:Static core:HfStrings.NewsOnSite}" VerticalAlignment="Center" />
+                        <hf:PixelIcon Kind="arrow" VerticalAlignment="Center" />
+                    </StackPanel>
+                </hf:HfButton>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>
