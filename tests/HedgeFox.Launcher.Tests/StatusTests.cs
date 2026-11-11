@@ -31,6 +31,21 @@ public class StatusParserTests
         Assert.Null(s.Pelena);
     }
 
+    // web/api since 11 Nov 2026: a veil nobody has found yet keeps its height to itself — pelena null plus a new
+    // pelena_sleeping field. The installed launcher must read it as online with no Pelena widget (no NoData).
+    [Fact]
+    public void ASleepingVeilFromTheLiveApiHidesTheWidget()
+    {
+        var s = HfStatusParser.Parse("""
+            {"online":true,"players":0,"max":45,"version":"1.21.1","checked_at":"2026-11-11T14:42:47Z","pelena":null,"pelena_sleeping":true}
+            """);
+        Assert.Equal(HfStatusKind.Online, s.Kind);
+        Assert.Equal(0, s.Players);
+        Assert.Equal(45, s.Max);
+        Assert.Null(s.Pelena);
+        Assert.Null(HfPelenaView.From(s.Pelena));
+    }
+
     [Fact]
     public void PelenaNullWhenRconIsDown()
     {
