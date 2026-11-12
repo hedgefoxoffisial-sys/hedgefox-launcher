@@ -46,6 +46,14 @@ public static class HfStrings
     public const string StraightToServer = "Сразу на сервер";
     public const string PickedForPc = "Подобрано для твоего ПК";
     public const string ForYourPcCaps = "ДЛЯ ТВОЕГО ПК";
+
+    // ----- «Давай настроим лаунчер под тебя» (after the first login) -----
+    public const string WelcomeTitleCaps = "ДАВАЙ НАСТРОИМ ЛАУНЧЕР ПОД ТЕБЯ";
+    public const string WelcomeLead = "Выбери, как будет выглядеть игра. На картинках одно и то же место в трёх версиях.";
+    public const string WelcomeGoCaps = "ПОЕХАЛИ";
+    public const string WelcomeLater = "Поменять можно в любой момент в Настройках";
+    public const string ChosenCaps = "ВЫБРАНО";
+    public const string CompareVersions = "Сравнить версии";
     public const string Reinstall = "Переустановить";
     public const string ReinstallHint = "Если игра не запускается, скачаем её файлы заново.";
     public const string ReinstallAskTitle = "Переустановить игру?";

@@ -8,7 +8,7 @@ public class ProfileCatalogTests
     [Theory]
     [InlineData("HedgeFox", "Обычный", "Полная дальность и все корабли. Для большинства ПК.", 6144)]
     [InlineData("HedgeFox-LowPC", "Слабый ПК", "Короче дальность, легче графика. Для ноутбуков и ПК до 8 ГБ.", 4096)]
-    [InlineData("HedgeFox-Shaders", "Шейдеры", "Красиво: свет и тени. Нужна хорошая видеокарта.", 8192)]
+    [InlineData("HedgeFox-Shaders", "Шейдеры", "Красиво: живой свет и вода. Нужна мощная видеокарта.", 8192)]
     public void KnownProfilesUseTheSpecTable(string gmlName, string title, string hint, int ramMb)
     {
         var card = ProfileCatalog.For(gmlName, "HedgeFox · что-то из GML", 1024);

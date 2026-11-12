@@ -22,7 +22,7 @@ public static class ProfileCatalog
     [
         new(Normal, "Обычный", "Полная дальность и все корабли. Для большинства ПК.", 6144, true),
         new(LowPc, "Слабый ПК", "Короче дальность, легче графика. Для ноутбуков и ПК до 8 ГБ.", 4096, true),
-        new(Shaders, "Шейдеры", "Красиво: свет и тени. Нужна хорошая видеокарта.", 8192, true)
+        new(Shaders, "Шейдеры", "Красиво: живой свет и вода. Нужна мощная видеокарта.", 8192, true)
     ];
 
     /// <summary>The card for a GML profile; unknown profiles show GML's displayName and its recommended memory.</summary>

@@ -71,6 +71,12 @@ public sealed class HfSettingsModel : ReactiveObject, IHfScreenModel
         ToggleModCommand = ReactiveCommand.Create<HfModRow>(row => Mods?.ChangeOptionalModState.Execute(row.Mod),
             this.WhenAnyValue(x => x.CanMods));
         ToggleMoreCommand = ReactiveCommand.Create(() => { ShowMore = !ShowMore; });
+        // «Сравнить версии»: back to «Играть», where the three columns of the first login open again
+        CompareCommand = ReactiveCommand.Create(() =>
+        {
+            HfWelcomeRequest.Ask();
+            HfNav.Show(page.MainViewModel, HfSection.Play);
+        });
         // back to the main screen first: the download shows on its sign
         Reinstall = new HfConfirmModel(() =>
         {
@@ -142,6 +148,9 @@ public sealed class HfSettingsModel : ReactiveObject, IHfScreenModel
 
     [Reactive] public bool ShowMore { get; private set; }
     public ReactiveCommand<Unit, Unit> ToggleMoreCommand { get; }
+
+    /// <summary>«Сравнить версии» under the versions: the three columns with pictures on «Играть».</summary>
+    public ReactiveCommand<Unit, Unit> CompareCommand { get; }
 
     /// <summary>«Переустановить» asks first: it deletes the version's game folder.</summary>
     public HfConfirmModel Reinstall { get; }

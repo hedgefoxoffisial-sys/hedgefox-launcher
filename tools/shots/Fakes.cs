@@ -96,6 +96,7 @@ public static class Fakes
     public static void Register(string scratch)
     {
         var storage = new MemoryStorage();
+        storage.SetAsync(HfWelcome.SeenKey, "1").Wait(); // the columns open only when a shot asks for them
         var system = new FakeSystem(scratch);
         var manager = FakeProxy.Create<IGmlClientManager>(GmlClient(scratch));
         var m = Locator.CurrentMutable;

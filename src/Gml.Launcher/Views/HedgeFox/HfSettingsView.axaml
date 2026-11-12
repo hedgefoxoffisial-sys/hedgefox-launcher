@@ -56,6 +56,9 @@
                                 </Border>
                                 <TextBlock Classes="hf-small" Text="{Binding Picker.Hint}" TextWrapping="Wrap"
                                            IsVisible="{Binding Picker.HasHint, FallbackValue=False}" />
+                                <hf:HfButton Classes="link" FontSize="13" HorizontalAlignment="Left"
+                                             Content="{x:Static core:HfStrings.CompareVersions}"
+                                             Command="{Binding CompareCommand}" />
                             </StackPanel>
                         </Grid>
 

@@ -43,6 +43,9 @@ public sealed class HfVersionPicker : ReactiveObject
     /// <summary>The hardware advice; empty until the probe answers.</summary>
     [Reactive] public HfAdvice Advice { get; private set; } = new(null, false);
 
+    /// <summary>What the advice is based on (memory and video cards); unknown until the probe answers.</summary>
+    [Reactive] public HfHardware Hardware { get; private set; } = HfHardware.Unknown;
+
     /// <summary>More than one version to choose from.</summary>
     [Reactive] public bool HasVersions { get; private set; }
 
@@ -126,9 +129,11 @@ public sealed class HfVersionPicker : ReactiveObject
             return;
         try
         {
-            var advice = HardwareAdvisor.Advise(await _hardware.ReadAsync());
+            var hardware = await _hardware.ReadAsync();
+            var advice = HardwareAdvisor.Advise(hardware);
             RxApp.MainThreadScheduler.Schedule(() =>
             {
+                Hardware = hardware;
                 Advice = advice;
                 Rebuild();
             });

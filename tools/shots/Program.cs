@@ -174,6 +174,18 @@ void Screens(int width, int height, string size)
     main.KeyPressQwerty(PhysicalKey.Escape, RawInputModifiers.None);
     Ui.PumpUntil(() => !picker.IsOpen, "versions list closed by Escape", 3000);
 
+    // «Давай настроим лаунчер под тебя»: the three columns after the first login, Слабый ПК advised and chosen; the
+    // shot waits until the last column has come in (they start one after another, so the fade check alone is early)
+    var welcome = HfModel<HfOverviewModel>(main)!.Welcome;
+    welcome.Open();
+    Ui.PumpUntil(() => welcome is { IsOpen: true, Columns.Count: 3 } && welcome.Columns[0] is { IsChosen: true, Recommended: true } &&
+                       main.GetVisualDescendants().OfType<Border>().Where(b => b.Classes.Contains("hf-welcome-col"))
+                           .Count(b => b.Opacity >= 0.999) == 3, "welcome columns in");
+    Save(main, "welcome" + size);
+    // Escape keeps the chosen version and closes the columns
+    main.KeyPressQwerty(PhysicalKey.Escape, RawInputModifiers.None);
+    Ui.PumpUntil(() => !welcome.IsOpen, "welcome closed by Escape", 3000);
+
     // toasts as the stock view models queue them (their fills only pick the left bar): an error, a success, the VPN
     // note and «reconnecting» with its overlay bar
     if (width == 1180)
@@ -247,6 +259,12 @@ void Screens(int width, int height, string size)
             Ui.PumpUntil(() => settingsModel.Reinstall.IsAsking, "reinstall question");
             Save(main, "settings-reinstall" + size);
             settingsModel.Reinstall.CancelCommand.Execute().Subscribe();
+            // «Сравнить версии» goes back to «Играть» and opens the three columns again; Escape closes them
+            settingsModel.CompareCommand.Execute().Subscribe();
+            Ui.PumpUntil(() => HfModel<HfOverviewModel>(main) is { Welcome: { IsOpen: true, Columns.Count: 3 } },
+                "columns again from Настройки");
+            main.KeyPressQwerty(PhysicalKey.Escape, RawInputModifiers.None);
+            Ui.PumpUntil(() => HfModel<HfOverviewModel>(main) is { Welcome.IsOpen: false }, "columns closed", 3000);
         }
     }
     shell.Go(HfSection.Play);

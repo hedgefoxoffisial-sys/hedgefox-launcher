@@ -36,6 +36,7 @@ public sealed class HfOverviewModel : ReactiveObject, IHfScreenModel
         Info = info ?? HfServerInfoModel.FromServices(NewsInRow);
         _storage = Locator.Current.GetService<IStorageService>();
         Picker = new HfVersionPicker(page, Locator.Current.GetService<IHardwareProbe>(), _storage);
+        Welcome = new HfWelcomeModel(Picker, _storage);
         GoNewsCommand = ReactiveCommand.Create(() =>
         {
             if (page.HostScreen is MainWindowViewModel main)
@@ -46,6 +47,9 @@ public sealed class HfOverviewModel : ReactiveObject, IHfScreenModel
     public OverviewPageViewModel Page { get; }
     public HfServerInfoModel Info { get; }
     public HfVersionPicker Picker { get; }
+
+    /// <summary>«Давай настроим лаунчер под тебя»: the three columns after the first login.</summary>
+    public HfWelcomeModel Welcome { get; }
 
     /// <summary>«Все новости» over the cards: the «Новости» section.</summary>
     public ReactiveCommand<Unit, Unit> GoNewsCommand { get; }
@@ -73,7 +77,7 @@ public sealed class HfOverviewModel : ReactiveObject, IHfScreenModel
 
     public IDisposable Start()
     {
-        var d = new CompositeDisposable(Info.Start(), Picker.Start());
+        var d = new CompositeDisposable(Info.Start(), Picker.Start(), Welcome.Start());
         var list = Page.ListViewModel;
 
         // the stock page restores the last selected profile after it loads the list: pick again whenever it does
