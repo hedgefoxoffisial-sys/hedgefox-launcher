@@ -49,6 +49,9 @@
 
     <Styles.Resources>
         <ResourceDictionary>
+            <!-- «no background» for buttons that fade one in under the pointer: the surface colour at alpha 0, so the
+                 colour transition goes from clear to purple instead of through grey (Transparent is #00FFFFFF) -->
+            <SolidColorBrush x:Key="HfClearBrush" Color="#0021163C" />
             <!-- Fonts: static instances from the site's subsets (tools/fonts.py) -->
             <FontFamily x:Key="HfFontPixel">avares://Gml.Launcher/Assets/HedgeFox/Fonts#Tiny5</FontFamily>
             <FontFamily x:Key="HfFontHeading">avares://Gml.Launcher/Assets/HedgeFox/Fonts#Unbounded</FontFamily>
@@ -128,6 +131,15 @@
                 <Setter Property="HorizontalContentAlignment" Value="Center" />
                 <Setter Property="VerticalContentAlignment" Value="Center" />
                 <Setter Property="Cursor" Value="Hand" />
+                <!-- colours change smoothly under the pointer instead of snapping -->
+                <Setter Property="Transitions">
+                    <Transitions>
+                        <BrushTransition Property="Background" Duration="0:0:0.16" />
+                        <BrushTransition Property="BorderBrush" Duration="0:0:0.16" />
+                        <BrushTransition Property="Foreground" Duration="0:0:0.16" />
+                        <TransformOperationsTransition Property="RenderTransform" Duration="0:0:0.16" Easing="CubicEaseOut" />
+                    </Transitions>
+                </Setter>
                 <!-- the hard shadow and the focus ring are drawn outside the button -->
                 <Setter Property="ClipToBounds" Value="False" />
                 <!-- the focus ring is part of the template (:focus-visible), so it follows the chamfer -->
@@ -202,7 +214,7 @@
                 </Style>
 
                 <Style Selector="^.ghost">
-                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Background" Value="{StaticResource HfClearBrush}" />
                     <Setter Property="Foreground" Value="{DynamicResource HfTextBrush}" />
                     <Setter Property="BorderBrush" Value="{DynamicResource HfLineBrush}" />
                 </Style>
@@ -261,7 +273,11 @@
                     <Setter Property="Margin" Value="-5" />
                     <Setter Property="Notch" Value="0" />
                 </Style>
+                <Style Selector="^.card">
+                    <Setter Property="RenderTransform" Value="translateY(0px)" />
+                </Style>
                 <Style Selector="^.card:pointerover">
+                    <Setter Property="RenderTransform" Value="translateY(-3px)" />
                     <Setter Property="Background" Value="{DynamicResource HfRaisedBrush}" />
                     <Setter Property="BorderBrush" Value="{DynamicResource HfPurpleBrush}" />
                 </Style>
@@ -280,7 +296,7 @@
 
                 <!-- a text link with a button's keyboard and command behaviour («Регистрация», «Забыл пароль?») -->
                 <Style Selector="^.link">
-                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Background" Value="{StaticResource HfClearBrush}" />
                     <Setter Property="Foreground" Value="{DynamicResource HfPurpleLightBrush}" />
                     <Setter Property="Padding" Value="0,2" />
                     <Setter Property="MinHeight" Value="0" />
@@ -298,11 +314,11 @@
                     <Setter Property="BorderThickness" Value="2" />
                 </Style>
                 <Style Selector="^.link:pointerover">
-                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Background" Value="{StaticResource HfClearBrush}" />
                     <Setter Property="Foreground" Value="{DynamicResource HfOrangeLightBrush}" />
                 </Style>
                 <Style Selector="^.link:pressed">
-                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Background" Value="{StaticResource HfClearBrush}" />
                     <Setter Property="RenderTransform" Value="none" />
                 </Style>
 
@@ -312,7 +328,7 @@
                     <Setter Property="FontWeight" Value="Medium" />
                 </Style>
                 <Style Selector="^.text">
-                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Background" Value="{StaticResource HfClearBrush}" />
                     <Setter Property="Foreground" Value="{DynamicResource HfTextBrush}" />
                     <Setter Property="Padding" Value="6,4" />
                     <Setter Property="MinHeight" Value="0" />
@@ -330,11 +346,11 @@
                     <Setter Property="BorderThickness" Value="2" />
                 </Style>
                 <Style Selector="^.text:pointerover">
-                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Background" Value="{StaticResource HfClearBrush}" />
                     <Setter Property="Foreground" Value="{DynamicResource HfOrangeLightBrush}" />
                 </Style>
                 <Style Selector="^.text:pressed">
-                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Background" Value="{StaticResource HfClearBrush}" />
                     <Setter Property="RenderTransform" Value="none" />
                 </Style>
                 <!-- a pixel icon alone (the gear): a square, easy to hit -->
@@ -363,7 +379,7 @@
                 <!-- one of a few choices side by side («Версия игры»): text on a void strip, the chosen one lit
                      with an orange top edge -->
                 <Style Selector="^.tab">
-                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Background" Value="{StaticResource HfClearBrush}" />
                     <Setter Property="Foreground" Value="{DynamicResource HfMutedBrush}" />
                     <Setter Property="Padding" Value="14,7,14,8" />
                     <Setter Property="MinHeight" Value="0" />
@@ -400,7 +416,7 @@
                 <!-- a section of the sidebar («Играть», «Новости», «Настройки»): a full-width row, a pixel icon and a
                      word; the section shown now is lit, with an orange left edge -->
                 <Style Selector="^.nav">
-                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Background" Value="{StaticResource HfClearBrush}" />
                     <Setter Property="Foreground" Value="{DynamicResource HfMutedBrush}" />
                     <Setter Property="FontFamily" Value="{StaticResource HfFontBody}" />
                     <Setter Property="FontWeight" Value="SemiBold" />
@@ -471,7 +487,7 @@
 
                 <!-- one line of the picker's list: the chosen one with an orange left edge -->
                 <Style Selector="^.option">
-                    <Setter Property="Background" Value="Transparent" />
+                    <Setter Property="Background" Value="{StaticResource HfClearBrush}" />
                     <Setter Property="Foreground" Value="{DynamicResource HfTextBrush}" />
                     <Setter Property="FontFamily" Value="{StaticResource HfFontBody}" />
                     <Setter Property="FontWeight" Value="Normal" />

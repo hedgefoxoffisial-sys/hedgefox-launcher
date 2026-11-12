@@ -38,6 +38,10 @@
             <hf:HfMenuScene Name="Scene" Grid.Column="1" ClipToBounds="True" />
 
             <rxui:RoutedViewHost Grid.Column="1" Margin="0,32,0,0" Router="{Binding Router}">
+                <!-- a section gives way to the next with a short fade, the new one rising into place -->
+                <rxui:RoutedViewHost.PageTransition>
+                    <hf:HfPageTransition />
+                </rxui:RoutedViewHost.PageTransition>
                 <rxui:RoutedViewHost.DefaultContent>
                     <Panel />
                 </rxui:RoutedViewHost.DefaultContent>
